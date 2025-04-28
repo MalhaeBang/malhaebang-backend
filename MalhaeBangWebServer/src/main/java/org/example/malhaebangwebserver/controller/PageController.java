@@ -11,7 +11,7 @@ public class PageController {
 
     @GetMapping("/")
     public String home() {
-        return "bootstrap/index"; // templates/bootstrap/index.html
+        return "bootstrap/index";
     }
 
     @GetMapping("/about")

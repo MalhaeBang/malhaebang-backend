@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Kakao 지도 - 내 주소 ➔ 아파트 길찾기</title>
+</head>
+<body>
+<div id="map" style="width:100%;height:600px;"></div>
+
+<script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoAppKey}&libraries=services|"></script>
+<script>
+    var mapContainer = document.getElementById('map');
+    var mapOption = {
+        center: new kakao.maps.LatLng(37.5665, 126.9780),
+        level: 5
+    };
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+
+    var ps = new kakao.maps.services.Places();
+    var geocoder = new kakao.maps.services.Geocoder();
+
+    let userPosition = null;
+    let userAddress = null;
+
+    // 현재 위치 가져오기
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            userPosition = { lat, lng };
+
+            var userMarker = new kakao.maps.Marker({
+                map: map,
+                position: new kakao.maps.LatLng(lat, lng),
+                image: new kakao.maps.MarkerImage(
+                    "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+                    new kakao.maps.Size(24, 35)
+                )
+            });
+
+            map.setCenter(new kakao.maps.LatLng(lat, lng));
+
+            geocoder.coord2Address(lng, lat, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    userAddress = result[0].address.address_name;
+                    console.log("내 주소:", userAddress);
+                } else {
+                    console.error("주소 변환 실패");
+                }
+            });
+        }, function(error) {
+            alert('위치 정보를 가져올 수 없습니다.');
+        });
+    } else {
+        alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
+    }
+
+    // DB에서 아파트 목록 가져오기
+    fetch('/map/apartment')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(function(apt) {
+                ps.keywordSearch(apt.location, function (searchResults, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        var coords = new kakao.maps.LatLng(searchResults[0].y, searchResults[0].x);
+
+                        var marker = new kakao.maps.Marker({
+                            map: map,
+                            position: coords
+                        });
+
+                        var infowindowContent = `
+            <div style="padding:10px;font-size:14px;">
+                🏠 ${apt.location}<br>${apt.description}<br><br>
+                <button onclick="startNavigation(${searchResults[0].x}, ${searchResults[0].y}, '${apt.location}')">길찾기</button>
+            </div>
+        `;
+
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: infowindowContent
+                        });
+
+                        kakao.maps.event.addListener(marker, 'click', function() {
+                            infowindow.open(map, marker);
+                        });
+                    }
+                });
+            });
+        })
+        .catch(error => {
+            console.error('아파트 목록을 불러오지 못했습니다.', error);
+            alert('서버에서 아파트 목록을 불러오지 못했습니다.');
+        });
+    function startNavigation(destX, destY, destName) {
+        if (!userPosition || !userAddress) {
+            alert('현재 위치 정보 또는 주소를 가져올 수 없습니다.');
+            return;
+        }
+
+        const startX = userPosition.lng;
+        const startY = userPosition.lat;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // 모바일: 카카오맵 앱 이동
+            const url = `kakaomap://route?sp=${startY},${startX}&ep=${destY},${destX}&by=CAR`;
+            window.location.href = url;
+        } else {
+            // PC: 카카오맵 웹 이동
+            const url = `https://map.kakao.com/?map_type=TYPE_MAP&target=car&rt=${startX},${startY},${destX},${destY}&rt1=${encodeURIComponent(userAddress)}&rt2=${encodeURIComponent(destName)}&rtIds=,`;
+            window.open(url, '_blank');
+        }
+    }
+</script>
+</body>
+</html>
