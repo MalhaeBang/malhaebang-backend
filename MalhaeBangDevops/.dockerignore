@@ -1,0 +1,16 @@
+# 공통
+.git
+.gitignore
+*.log
+*.md
+
+# 파이썬
+__pycache__/
+*.pyc
+
+# 자바
+.gradle
+build
+
+.env
+**/application.yml
