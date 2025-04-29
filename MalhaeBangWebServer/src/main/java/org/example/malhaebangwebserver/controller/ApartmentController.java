@@ -40,4 +40,5 @@ public class ApartmentController {
                 .map(apt -> new ApartmentDto(apt.getLocation(), apt.getDescription()))
                 .collect(Collectors.toList());
     }
+
 }

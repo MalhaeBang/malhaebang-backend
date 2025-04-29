@@ -13,6 +13,30 @@ public class PageController {
     public String home() {
         return "bootstrap/index";
     }
+    @GetMapping("/mypage")
+    public String mypage() {
+        return "bootstrap/mypage";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "bootstrap/login";
+    }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "bootstrap/signup";
+    }
+
+    @GetMapping("/findid")
+    public String findid() {
+        return "bootstrap/findid";
+    }
+
+    @GetMapping("/findpassword")
+    public String findpassword() {
+        return "bootstrap/findpassword";
+    }
 
     @GetMapping("/about")
     public String about() {
