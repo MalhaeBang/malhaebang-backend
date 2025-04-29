@@ -2,16 +2,19 @@
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
         <div class="logo d-flex align-items-center me-auto">
-            <img th:src="@{/assets/img/malhaebang/logo.png}" alt="Logo" style=" ">        </div>
+            <a th:href="@{/}">
+                <img th:src="@{/assets/img/malhaebang/logo.png}" alt="Logo" style="height: 40px;">
+            </a>
+        </div>
 
         <nav id="navmenu" class="navmenu">
             <ul>
-                <li><a href="mypage.html" class="active">챗봇</a></li>
-                <li><a href="mypage.html">둘러보기</a></li>
-                <li><a href="map/">지역분석</a></li>
-                <li><a href="mypage.html">뉴스</a></li>
-                <li><a href="mypage.html">MY</a></li>
-                <li><a href="mypage.html">Login</a></li>
+                <li><a href="/mypage">챗봇</a></li>
+                <li><a href="/mypage">둘러보기</a></li>
+                <li><a href="/map">지역분석</a></li>
+                <li><a href="/mypage">뉴스</a></li>
+                <li><a href="/mypage">MY</a></li>
+                <li><a href="/login">Login</a></li>
             </ul>
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
