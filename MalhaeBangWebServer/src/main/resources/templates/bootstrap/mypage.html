@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Page</title>
+
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="assets/css/main.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        .mypage-wrapper {
+            display: flex;
+            padding-top: 100px;
+            min-height: 80vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            padding: 20px;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .sidebar li {
+            padding: 10px 0;
+            cursor: pointer;
+            color: #ccc;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .sidebar li.active {
+            color: #000;
+            font-weight: bold;
+        }
+
+        .sidebar li.active::before {
+            content: '\25B6';
+            position: absolute;
+            left: 0;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px 40px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .favorite-item {
+            background: #ffffff;
+            border: 2px solid #000;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .favorite-icon {
+            color: #3b82f6;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .favorite-description {
+            font-size: 14px;
+            color: #444;
+        }
+
+        .favorite-details {
+            display: none;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #222;
+        }
+
+        .favorite-item.expanded .favorite-details {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="index-page">
+<div th:replace="header :: header"></div>
+
+<main class="main">
+    <div class="container-fluid mypage-wrapper">
+        <div class="sidebar">
+            <h2>My page</h2>
+            <ul>
+                <li class="tab-btn active" data-target="info">기본 정보</li>
+                <li class="tab-btn" data-target="favorites">찜 목록</li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            <div id="info" class="tab-content active">
+                <h4>김땡땡 님, 안녕하세요.</h4>
+                <p>Email : kim0808@naver.com</p>
+                <p>전화번호: 010-1234-5678</p>
+                <button class="btn btn-primary btn-change">비밀번호 변경</button>
+            </div>
+
+            <div id="favorites" class="tab-content">
+                <h4>김땡땡 님, 찜하신 매물이예요.</h4>
+
+                <div class="favorite-item">
+                    <div>
+                        <i class="bi bi-star-fill favorite-icon"></i>
+                        <strong>상암월드시티 1동 11층</strong><br>
+                        <span class="favorite-description">
+                            45.71㎡/19.81㎡, 11/15층, 남향<br>
+                            단기임대가능, 풀옵션, 주차 무료, 마포구청 2분
+                        </span>
+                        <div class="favorite-details">
+                            <strong>방구조:</strong> 오픈형<br>
+                            <strong>현관 구조:</strong> 복도식<br>
+                            <strong>복층 여부:</strong> 단층<br>
+                            <strong>관리비:</strong> 14만원<br>
+                            <strong>난방:</strong> 개별난방 / 도시가스<br>
+                            <strong>입주 가능일:</strong> 2025년 5월 1일<br>
+                            <strong>총주차대수:</strong> 163대 (0.5대/세대)<br>
+                            <strong>내부시설:</strong> 침대, 옷장, 냉장고, 세탁기, 전자레인지 등
+                        </div>
+                    </div>
+                    <div class="favorite-price">월세 1000/60</div>
+                </div>
+
+                <div class="favorite-item">
+                    <div>
+                        <i class="bi bi-star-fill favorite-icon"></i>
+                        <strong>정자역AK와이즈플레이스 A동</strong><br>
+                        <span class="favorite-description">
+                            49A/20㎡, 15/29층, 동향<br>
+                            주거용 용무 높은층고 신분당선도보5분
+                        </span>
+                        <div class="favorite-details">
+                            <strong>방구조:</strong> 투룸형<br>
+                            <strong>현관 구조:</strong> 계단식<br>
+                            <strong>복층 여부:</strong> 없음<br>
+                            <strong>관리비:</strong> 12만원<br>
+                            <strong>난방:</strong> 중앙난방 / 지역난방<br>
+                            <strong>입주 가능일:</strong> 즉시입주<br>
+                            <strong>총주차대수:</strong> 100대 (0.3대/세대)<br>
+                            <strong>내부시설:</strong> 붙박이장, 인덕션, 에어컨, 세면대 등
+                        </div>
+                    </div>
+                    <div class="favorite-price">월세 1억/50</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="footer :: footer"></footer>
+
+<script>
+    // 탭 전환
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const target = btn.getAttribute('data-target');
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.id === target) tab.classList.add('active');
+            });
+        });
+    });
+
+    // 상세정보 토글
+    const items = document.querySelectorAll('.favorite-item');
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            item.classList.toggle('expanded');
+        });
+    });
+</script>
+</body>
+</html>
