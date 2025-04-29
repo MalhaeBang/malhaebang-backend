@@ -1,13 +1,83 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <title>Kakao 지도 - 내 주소 ➔ 아파트 길찾기</title>
-</head>
-<body>
-<div id="map" style="width:100%;height:600px;"></div>
 
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <!-- 🔥 추가: 지도 꽉 채우기용 스타일 -->
+    <style>
+        /* 헤더 고정 */
+        #header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+        }
+        body {
+            overflow: hidden;
+        }
+
+        /* 본문 영역: 헤더 높이만큼 margin-top */
+        main.main {
+            margin-top: 80px; /* 대략적 예상값 (헤더 높이 맞게 나중에 수정 가능) */
+            margin-bottom: 200px; /* 대략적 예상값 (푸터 높이 맞게 나중에 수정 가능) */
+            padding: 0;
+        }
+
+        /* 지도 영역 */
+        #map {
+            width: 100%;
+            height: calc(100vh - 80px ); /* 화면 전체 - 헤더 높이 */
+        }
+    </style>
+
+</head>
+
+<body class="index-page">
+
+<!-- 헤더 삽입 -->
+<div id="header" th:replace="header :: header"></div>
+
+<!-- 메인(지도) -->
+<main class="main">
+    <div id="map"></div>
+</main>
+
+
+<!-- Scroll Top -->
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+</a>
+
+<!-- Preloader -->
+<div id="preloader"></div>
+
+<!-- Vendor JS Files -->
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/aos/aos.js"></script>
+<script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+<!-- Kakao Map API -->
 <script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoAppKey}&libraries=services|"></script>
+
+<!-- Main JS File -->
+<script src="assets/js/main.js"></script>
+
+<!-- 지도 스크립트 -->
 <script>
     var mapContainer = document.getElementById('map');
     var mapOption = {
@@ -22,7 +92,6 @@
     let userPosition = null;
     let userAddress = null;
 
-    // 현재 위치 가져오기
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
@@ -43,9 +112,6 @@
             geocoder.coord2Address(lng, lat, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     userAddress = result[0].address.address_name;
-                    console.log("내 주소:", userAddress);
-                } else {
-                    console.error("주소 변환 실패");
                 }
             });
         }, function(error) {
@@ -55,12 +121,11 @@
         alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
     }
 
-    // DB에서 아파트 목록 가져오기
     fetch('/map/apartment')
         .then(response => response.json())
         .then(data => {
             data.forEach(function(apt) {
-                ps.keywordSearch(apt.location, function (searchResults, status) {
+                ps.keywordSearch(apt.location, function(searchResults, status) {
                     if (status === kakao.maps.services.Status.OK) {
                         var coords = new kakao.maps.LatLng(searchResults[0].y, searchResults[0].x);
 
@@ -70,11 +135,11 @@
                         });
 
                         var infowindowContent = `
-            <div style="padding:10px;font-size:14px;">
-                🏠 ${apt.location}<br>${apt.description}<br><br>
-                <button onclick="startNavigation(${searchResults[0].x}, ${searchResults[0].y}, '${apt.location}')">길찾기</button>
-            </div>
-        `;
+              <div style="padding:10px;font-size:14px;">
+                  🏠 ${apt.location}<br>${apt.description}<br><br>
+                  <button onclick="startNavigation(${searchResults[0].x}, ${searchResults[0].y}, '${apt.location}')">길찾기</button>
+              </div>
+            `;
 
                         var infowindow = new kakao.maps.InfoWindow({
                             content: infowindowContent
@@ -89,8 +154,8 @@
         })
         .catch(error => {
             console.error('아파트 목록을 불러오지 못했습니다.', error);
-            alert('서버에서 아파트 목록을 불러오지 못했습니다.');
         });
+
     function startNavigation(destX, destY, destName) {
         if (!userPosition || !userAddress) {
             alert('현재 위치 정보 또는 주소를 가져올 수 없습니다.');
@@ -102,15 +167,15 @@
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         if (isMobile) {
-            // 모바일: 카카오맵 앱 이동
             const url = `kakaomap://route?sp=${startY},${startX}&ep=${destY},${destX}&by=CAR`;
             window.location.href = url;
         } else {
-            // PC: 카카오맵 웹 이동
             const url = `https://map.kakao.com/?map_type=TYPE_MAP&target=car&rt=${startX},${startY},${destX},${destY}&rt1=${encodeURIComponent(userAddress)}&rt2=${encodeURIComponent(destName)}&rtIds=,`;
             window.open(url, '_blank');
         }
     }
 </script>
+
 </body>
+
 </html>
