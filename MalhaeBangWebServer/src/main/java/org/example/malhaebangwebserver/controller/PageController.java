@@ -3,6 +3,7 @@ package org.example.malhaebangwebserver.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -20,23 +21,30 @@ public class PageController {
 
     @GetMapping("/login")
     public String login() {
-        return "bootstrap/login";
+        return "account/login";
     }
 
     @GetMapping("/signup")
     public String signup() {
-        return "bootstrap/signup";
+        return "account/signup";
     }
 
     @GetMapping("/findid")
     public String findid() {
-        return "bootstrap/findid";
+        return "account/findid";
     }
 
     @GetMapping("/findpassword")
     public String findpassword() {
-        return "bootstrap/findpassword";
+        return "account/findpassword";
     }
+
+    @RequestMapping("/chatbot")
+    public String chatbotPage(Model model) {
+        model.addAttribute("isChatbot", true);
+        return "bootstrap/chatbot";
+    }
+
 
     @GetMapping("/about")
     public String about() {

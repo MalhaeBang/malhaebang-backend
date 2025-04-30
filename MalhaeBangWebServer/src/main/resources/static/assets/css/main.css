@@ -225,14 +225,16 @@ h6 {
   --background-color: rgba(255, 255, 255, 0);
   --heading-color: #ffffff;
   color: var(--default-color);
-  background-color: var(--background-color);
-  padding: 20px 0;
-  transition: all 0.5s;
+  /*background-color: var(--background-color);*/
+  background: #0e1d34; /* 헤더 배경색 (원래 템플릿에 있던 진한 남색) */
+  padding: 0;
   z-index: 997;
+  transition: all 0.3s ease;
+
 }
 
 .header .logo {
-  line-height: 1;
+  line-height: 5;
 }
 
 .header .logo img {
@@ -2003,4 +2005,86 @@ section,
 --------------------------------------------------------------*/
 .starter-section {
   /* Add your styles here */
+}
+
+/*수정 부분*/
+/* 최근 찜한 매물 스타일 */
+.item-title {
+  font-size: 20px; /* 제목 글자 크게 */
+  font-weight: bold; /* 제목 글자 두껍게 */
+  margin-bottom: 8px; /* 제목 밑에 여백 */
+}
+
+.item-detail {
+  font-size: 16px; /* 상세 설명은 약간 작게 */
+  line-height: 1.5; /* 줄 간격 넓게 */
+}
+
+.featured-services .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+.featured-services .col-6 {
+  padding-left: 0;
+  padding-right: 0;
+}
+textarea.form-control {
+  resize: none; /* 사용자가 가로로 늘리는 거 막음 */
+  overflow-y: hidden; /* 스크롤바 안뜨게 */
+}
+
+
+
+/* Sidebar Toggle + Header/Main shift on open */
+.toggle-sidebar-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  background-color: #e5ebf0;
+  height: 100vh;
+  padding: 20px;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 999;
+}
+
+body.sidebar-open .sidebar {
+  transform: translateX(0);
+}
+
+
+body.sidebar-open #header,
+body.sidebar-open header,
+body.sidebar-open .main-content {
+  margin-left: 300px;
+  width: calc(100% - 300px);
+}
+
+#header,
+header,
+.main-content {
+  transition: all 0.3s ease;
+}
+
+.chatbot-page header .container-fluid,
+.chatbot-page header .container-xl {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 30px;
+  padding-right: 30px;
+  transition: all 0.3s ease;
 }
