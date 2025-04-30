@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>챗봇 추천 - 말해방</title>
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/main.css" rel="stylesheet" />
+    <style>
+        .chatbot-page body {
+            background-color: #0c1b2c;
+            color: #fff;
+            height: 100vh;
+        }
+
+        .chatbot-page .layout-wrapper {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chatbot-page .sidebar {
+            width: 300px;
+            background-color: #e5ebf0;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100vh;
+            flex-shrink: 0;
+        }
+
+        .chatbot-page .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f7f8f9;
+            color: #000;
+            height: 100vh;
+        }
+
+        .chatbot-page .main-content {
+            padding-top: 80px; /* Adjust based on actual header height */
+        }
+
+
+
+        .chatbot-page main.chatbot-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .chatbot-page .listing-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            color: #000;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chatbot-page .main-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chatbot-page .chat-display {
+            background-color: #ffffff;
+            color: #000;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            height: 100%;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .chatbot-page .chat-message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .chatbot-page .chat-message.bot {
+            align-self: flex-start;
+        }
+
+        .chatbot-page .chat-message.user {
+            align-self: flex-end;
+        }
+
+        .chatbot-page .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chatbot-page .chat-input-area input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .chatbot-page .chat-input-area button {
+            background-color: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+        }
+
+    </style>
+</head>
+<body class="chatbot-page">
+<div class="chatbot-page layout-wrapper">
+    <!-- Toggle sidebar button -->
+    <button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+    <!-- 사이드바 -->
+    <aside class="sidebar d-none">
+        <div class="listing-card">
+            <strong>[집주인] 다가구</strong><br/>
+            월세 1,000/70<br/>
+            단독/다가구<br/>
+            3/4층, 남동향<br/>
+            <span>#2000이하</span>
+        </div>
+        <!-- 추가 매물 반복 -->
+    </aside>
+
+    <!-- 본문 전체 -->
+    <div class="main-content">
+        <header th:replace="header :: header"></header>
+
+        <main class="chatbot-wrapper">
+            <div class="main-area">
+                <div class="chat-display" id="chatWindow">
+                    <div class="chat-message bot">
+                        안녕하세요! 어떤 조건으로 집을 찾고 계신가요?
+                    </div>
+                    <div class="chat-message user">
+                        용산구 월세 150 이하 반려동물 가능한 집 찾아줘.
+                    </div>
+                </div>
+                <div class="chat-input-area mt-auto">
+                    <input type="text" placeholder="조건을 입력해보세요..." />
+                    <button>전송</button>
+                </div>
+            </div>
+        </main>
+
+        <footer th:replace="footer :: footer"></footer>
+    </div>
+</div>
+</body>
+<script>
+    function toggleSidebar() {
+        document.body.classList.toggle('sidebar-open');
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('d-none');
+    }
+</script>
+</html>

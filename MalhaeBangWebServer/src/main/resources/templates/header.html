@@ -1,6 +1,5 @@
 <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
-
         <div class="logo d-flex align-items-center me-auto">
             <a th:href="@{/}">
                 <img th:src="@{/assets/img/malhaebang/logo.png}" alt="Logo" style="height: 40px;">
@@ -9,15 +8,27 @@
 
         <nav id="navmenu" class="navmenu">
             <ul>
-                <li><a href="/mypage">챗봇</a></li>
-                <li><a href="/mypage">둘러보기</a></li>
-                <li><a href="/map">지역분석</a></li>
+                <li><a href="/chatbot">챗봇</a></li>
+                <li><a href="/map">둘러보기</a></li>
+                <li><a href="/mypage">지역분석</a></li>
                 <li><a href="/mypage">뉴스</a></li>
                 <li><a href="/mypage">MY</a></li>
                 <li><a href="/login">Login</a></li>
             </ul>
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
-
     </div>
 </header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebarToggleBtn = document.querySelector('.toggle-sidebar-btn');
+    const body = document.body;
+
+    if (sidebarToggleBtn) {
+      sidebarToggleBtn.addEventListener('click', () => {
+        body.classList.toggle('sidebar-open');
+      });
+    }
+  });
+</script>
