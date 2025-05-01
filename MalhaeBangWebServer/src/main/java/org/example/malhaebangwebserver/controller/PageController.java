@@ -14,10 +14,7 @@ public class PageController {
     public String home() {
         return "bootstrap/index";
     }
-    @GetMapping("/mypage")
-    public String mypage() {
-        return "bootstrap/mypage";
-    }
+
 
     @GetMapping("/login")
     public String login() {

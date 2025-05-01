@@ -1,3 +1,4 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
         <div class="logo d-flex align-items-center me-auto">
@@ -13,7 +14,18 @@
                 <li><a href="/mypage">지역분석</a></li>
                 <li><a href="/mypage">뉴스</a></li>
                 <li><a href="/mypage">MY</a></li>
-                <li><a href="/login">Login</a></li>
+
+                <!-- 로그인한 경우 -->
+                <li sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-link" style="padding: 0; color: inherit; background: none; border: none;">Logout</button>
+                    </form>
+                </li>
+
+                <!-- 비로그인 상태 -->
+                <li sec:authorize="isAnonymous()">
+                    <a href="/login">Login</a>
+                </li>
             </ul>
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
