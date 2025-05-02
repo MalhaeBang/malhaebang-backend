@@ -29,7 +29,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oauth2User = delegate.loadUser(request);
 
-        String registrationId = request.getClientRegistration().getRegistrationId(); // ex: "kakao","naver"
+        String registrationId = request.getClientRegistration().getRegistrationId(); // ex: "kakao","naver", "google"
         Map<String, Object> attributes = oauth2User.getAttributes();
 
         log.info("🔎 registrationId = {}", registrationId);
@@ -48,10 +48,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             } else if (registrationId.equals("naver")) {
                 Map<String, Object> response = (Map<String, Object>) attributes.get("response");
                 email = (String) response.get("email");
-                nickname = (String) response.get("name"); // 또는 "nickname"이 있을 수도 있음
-                attributes = response; // 중요: 중첩 제거
+                nickname = (String) response.get("name");
+                attributes = response;
 
-            } else {
+            } else if (registrationId.equals("google")) {
+                email = (String) attributes.get("email");
+                nickname = (String) attributes.get("name");
+            }
+            else {
                 throw new OAuth2AuthenticationException("지원하지 않는 OAuth 로그인입니다.");
             }
 
@@ -65,21 +69,27 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 user = existingUser.get();
 
                 if (!user.getLoginType().name().equalsIgnoreCase(registrationId)) {
-                    // 예외 던지기 또는 리다이렉트용 에러
                     throw new OAuth2AuthenticationException("ALREADY_REGISTERED_WITH_" + user.getLoginType());
                 }
 
                 log.info("✅ 기존 유저 로그인: {}", user.getUserEmail());
             }
 
+
             else {
+                LoginType loginType = switch (registrationId) {
+                    case "kakao" -> LoginType.KAKAO;
+                    case "naver" -> LoginType.NAVER;
+                    case "google" -> LoginType.GOOGLE;
+                    default -> throw new IllegalStateException("Unexpected provider: " + registrationId);
+                };
                 user = User.builder()
                         .userEmail(email)
                         .userNickname(generateUniqueNickname(nickname))
                         .userPw(UUID.randomUUID().toString())
                         .createdAt(LocalDateTime.now())
                         .isDeleted(false)
-                        .loginType(registrationId.equals("kakao") ? LoginType.KAKAO : LoginType.NAVER)
+                        .loginType(loginType)
                         .build();
                 userRepository.save(user);
                 log.info("🆕 새 유저 저장 완료: {}", user.getUserEmail());
