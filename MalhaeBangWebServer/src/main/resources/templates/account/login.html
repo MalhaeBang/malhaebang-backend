@@ -198,6 +198,13 @@
 <!-- Vendor JS -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/main.js"></script>
-
+<!-- login.html 내부 -->
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error === 'already_registered') {
+        alert('이미 가입된 계정입니다. 기존 로그인 방식을 이용해 주세요.');
+    }
+</script>
 </body>
 </html>

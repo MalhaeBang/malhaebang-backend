@@ -28,9 +28,6 @@ public class User {
     @Column(nullable = false, unique = true, length = 64)
     private String userNickname;
 
-    @Column(nullable = false, length = 20)
-    private String userPhone;
-
     @Column(nullable = false)
     private LocalDateTime createdAt;
 

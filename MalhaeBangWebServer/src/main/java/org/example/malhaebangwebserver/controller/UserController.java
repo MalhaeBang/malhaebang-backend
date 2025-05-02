@@ -26,7 +26,6 @@ public class UserController {
     public String signup(
             @RequestParam("id") String email,
             @RequestParam("name") String nickname,
-            @RequestParam("phone") String phone,
             @RequestParam("password") String password,
             @RequestParam("passwordConfirm") String passwordConfirm,
             Model model
@@ -38,7 +37,7 @@ public class UserController {
         }
 
         try {
-            userService.register(email, nickname, phone, password);
+            userService.register(email, nickname, password);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "signup";

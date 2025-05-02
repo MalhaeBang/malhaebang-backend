@@ -21,7 +21,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void register(String email, String nickname, String phone, String password) {
+    public void register(String email, String nickname, String password) {
         log.info("🔥 [회원가입 시도] 이메일: {}", email);
         if (userRepository.existsByUserEmail(email)) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
@@ -32,7 +32,6 @@ public class UserService {
                 .userPw(passwordEncoder.encode(password))
 
                 .userNickname(nickname)
-                .userPhone(phone)
                 .createdAt(LocalDateTime.now())
                 .isDeleted(false)
                 .loginType(LoginType.FORM)
