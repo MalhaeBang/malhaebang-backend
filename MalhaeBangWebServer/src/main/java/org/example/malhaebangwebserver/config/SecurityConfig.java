@@ -1,6 +1,7 @@
 package org.example.malhaebangwebserver.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.malhaebangwebserver.security.CustomOAuth2UserService;
 import org.example.malhaebangwebserver.security.CustomUserDetailsService;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,16 +31,23 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/login/form")
                         .defaultSuccessUrl("/", true)
                         .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
                 )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                .csrf(csrf -> csrf.disable());// 필요 시 개발 중엔 일시 비활성화
+                .csrf(csrf -> csrf.disable());// 개발 중엔 일시 비활성화, 운영 시 주석처리
 
         return http.build();
     }

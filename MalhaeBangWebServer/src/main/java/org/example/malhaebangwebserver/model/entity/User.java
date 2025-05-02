@@ -2,6 +2,8 @@ package org.example.malhaebangwebserver.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.malhaebangwebserver.model.enums.LoginType;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,4 +39,8 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<LikedFolder> folders;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private LoginType loginType;  // ex: "FORM", "KAKAO", "NAVER"
 }

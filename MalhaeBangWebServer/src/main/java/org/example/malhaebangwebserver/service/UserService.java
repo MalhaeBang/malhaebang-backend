@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.malhaebangwebserver.model.entity.User;
+import org.example.malhaebangwebserver.model.enums.LoginType;
 import org.example.malhaebangwebserver.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,10 +30,12 @@ public class UserService {
         User user = User.builder()
                 .userEmail(email)
                 .userPw(passwordEncoder.encode(password))
+
                 .userNickname(nickname)
                 .userPhone(phone)
                 .createdAt(LocalDateTime.now())
                 .isDeleted(false)
+                .loginType(LoginType.FORM)
                 .build();
 
         log.info("🔥 [회원 생성 직전]");
