@@ -126,10 +126,11 @@
                 <h4 th:text="${user.userNickname} + ' 님, 안녕하세요.'"></h4>
                 <p th:text="'Email : ' + ${user.userEmail}"></p>
             <!-- 여기에 버튼 조건부 렌더링 -->
-            <button class="btn btn-primary btn-change"
-                    th:if="${user.loginType.name() == 'FORM'}">
+                <button class="btn btn-primary btn-change"
+                        th:if="${user.loginType.name() == 'FORM'}"
+                        onclick="location.href='/changepassword'">
                     비밀번호 변경
-            </button>
+                </button>
             </div>
 
             <!-- 찜 목록 탭 -->
