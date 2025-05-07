@@ -102,19 +102,28 @@
 
 <main class="main">
     <div class="findid-container">
-        <h2>아이디 찾기</h2>
-        <p>회원가입 시 등록한 이메일 주소를 입력해 주세요.<br>입력하신 이메일로 아이디 정보를 보내드립니다.</p>
+        <h2>아이디 확인</h2>
+        <p>회원가입 시 등록한 이메일 주소를 입력해 주세요.<br>가입 여부를 확인 후 비밀번호 재설정을 도와드립니다.</p>
 
         <form method="post" action="/findid">
-
             <div class="form-group">
                 <label for="email">이메일 주소</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="malhaebang@malhaebang.com" required>
             </div>
-
-            <button type="submit" class="btn btn-primary btn-findid">아이디 발송하기</button>
-
+            <button type="submit" class="btn btn-primary btn-findid">가입 여부 확인</button>
         </form>
+
+        <!-- 결과 메시지 -->
+        <div class="mt-4">
+            <p th:if="${emailFound}">
+                입력하신 이메일 <strong th:text="${email}"></strong>은 가입된 계정입니다.<br>
+                <a th:href="@{/findpassword}">👉 비밀번호를 재설정하시겠어요?</a>
+            </p>
+            <p th:if="${emailFound == false}" class="text-danger">
+                해당 이메일로 가입된 계정을 찾을 수 없습니다.<br>
+                <a th:href="@{/signup}">회원가입 하러 가기</a>
+            </p>
+        </div>
     </div>
 </main>
 

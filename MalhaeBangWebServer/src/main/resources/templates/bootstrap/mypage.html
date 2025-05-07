@@ -125,7 +125,11 @@
             <div id="info" class="tab-content active">
                 <h4 th:text="${user.userNickname} + ' 님, 안녕하세요.'"></h4>
                 <p th:text="'Email : ' + ${user.userEmail}"></p>
-                <button class="btn btn-primary btn-change">비밀번호 변경</button>
+            <!-- 여기에 버튼 조건부 렌더링 -->
+            <button class="btn btn-primary btn-change"
+                    th:if="${user.loginType.name() == 'FORM'}">
+                    비밀번호 변경
+            </button>
             </div>
 
             <!-- 찜 목록 탭 -->

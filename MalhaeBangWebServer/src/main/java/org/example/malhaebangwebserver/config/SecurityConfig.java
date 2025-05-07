@@ -24,9 +24,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/signup").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/signup").permitAll()
-                        .requestMatchers("/login", "/findid", "/find-password", "/assets/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/signup", "/findid", "/findpassword").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/signup", "/findid", "/findpassword").permitAll()
+                        .requestMatchers("/login", "/assets/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

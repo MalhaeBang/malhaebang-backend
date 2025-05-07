@@ -6,6 +6,7 @@ import org.example.malhaebangwebserver.model.entity.Liked;
 import org.example.malhaebangwebserver.model.entity.User;
 import org.example.malhaebangwebserver.repository.LikedRepository;
 import org.example.malhaebangwebserver.security.CustomUserDetails;
+import org.example.malhaebangwebserver.service.EmailService;
 import org.example.malhaebangwebserver.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,7 @@ public class UserController {
 
     private final UserService userService;
     private final LikedRepository likedRepository;
+    private final EmailService emailService;
 
     @PostMapping("/signup")
     public String signup(
@@ -57,4 +59,34 @@ public class UserController {
         return "bootstrap/mypage";
     }
 
+    @PostMapping("/findid")
+    public String checkEmailRegistered(@RequestParam("email") String email, Model model) {
+        boolean exists = userService.existsByEmail(email);
+
+        if (exists) {
+            model.addAttribute("emailFound", true);
+            model.addAttribute("email", email);
+        } else {
+            model.addAttribute("emailFound", false);
+        }
+
+        return "account/findid";
+    }
+
+
+    @PostMapping("/findpassword")
+    public String findPassword(@RequestParam("email") String email, Model model) {
+        try {
+            String tempPassword = userService.resetPassword(email);
+
+            // HTML 템플릿 기반 이메일 전송
+            emailService.sendTempPasswordHtml(email, tempPassword);
+
+            model.addAttribute("message", "입력하신 이메일로 임시 비밀번호가 발송되었습니다.");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", "해당 이메일로 등록된 사용자가 없습니다.");
+        }
+
+        return "account/findpassword";
+    }
 }

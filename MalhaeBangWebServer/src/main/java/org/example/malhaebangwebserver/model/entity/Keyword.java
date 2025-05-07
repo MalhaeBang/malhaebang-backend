@@ -21,6 +21,9 @@ public class Keyword {
     @Column(nullable = false, unique = true)
     private String keyword;
 
+    @Column(nullable = true)
+    private String options;
+
     @OneToMany(mappedBy = "keyword")
     private List<HouseKeyword> houseKeywords;
 }
