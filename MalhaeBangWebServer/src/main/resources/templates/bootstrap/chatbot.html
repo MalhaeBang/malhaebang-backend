@@ -168,5 +168,74 @@
         const sidebar = document.querySelector('.sidebar');
         sidebar.classList.toggle('d-none');
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const chatWindow = document.getElementById("chatWindow");
+        const inputField = document.querySelector(".chat-input-area input");
+        const sendButton = document.querySelector(".chat-input-area button");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+
+        if (query) {
+            const userMessage = document.createElement("div");
+            userMessage.className = "chat-message user";
+            userMessage.textContent = decodeURIComponent(query);
+            chatWindow.appendChild(userMessage);
+
+            fetch("http://localhost:8000/query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot";
+                    botMessage.textContent = data.response;
+                    chatWindow.appendChild(botMessage);
+                });
+        }
+        // 버튼 클릭 시 입력된 값으로 챗봇 응답 요청
+        sendButton.addEventListener("click", () => {
+            const query = inputField.value.trim();
+            if (!query) return;
+
+            // 사용자 메시지 표시
+            const userMessage = document.createElement("div");
+            userMessage.className = "chat-message user";
+            userMessage.textContent = query;
+            chatWindow.appendChild(userMessage);
+            inputField.value = "";
+
+            // FastAPI로 POST 요청
+            fetch("http://localhost:8000/query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot";
+                    botMessage.textContent = data.response;
+                    chatWindow.appendChild(botMessage);
+                })
+                .catch(err => {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot";
+                    botMessage.textContent = "⚠️ 서버 연결에 실패했습니다.";
+                    chatWindow.appendChild(botMessage);
+                    console.error("Error:", err);
+                });
+        });
+        inputField.addEventListener("keydown", function (event) {
+            if (event.isComposing) return;
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendButton.click();
+            }
+        });
+    });
 </script>
 </html>

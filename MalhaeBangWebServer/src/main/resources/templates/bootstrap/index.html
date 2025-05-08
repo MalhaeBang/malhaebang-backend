@@ -52,15 +52,25 @@
             <h2 data-aos="fade-up">어디에 살고 싶은지 조건을 말해주세요.</h2>
             <p data-aos="fade-up" data-aos-delay="100">💡 지역, 입주 희망 날자, 옵션 등 조건을 상세하게 작성할수록 좋아요!</p>
 
-            <form action="#" class="form-search d-flex align-items-stretch mb-3" data-aos="fade-up" data-aos-delay="200">
-              <textarea class="form-control" placeholder="🏠 원하시는 조건을 작성해주세요." rows="1" oninput="autoResize(this)"></textarea>
+            <form id="searchForm" class="form-search d-flex align-items-stretch mb-3">
+              <textarea id="userInput" class="form-control" placeholder="🏠 원하시는 조건을 작성해주세요." rows="1" oninput="autoResize(this)"></textarea>
               <button type="submit" class="btn btn-primary">Search</button>
             </form>
             <script>
               function autoResize(textarea) {
-                textarea.style.height = 'auto'; // 높이를 초기화한 다음
-                textarea.style.height = (textarea.scrollHeight) + 'px'; // 실제 입력된 내용 기준으로 높이 조정
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
               }
+
+              document.getElementById("searchForm").addEventListener("submit", function (e) {
+                e.preventDefault();
+                const inputValue = document.getElementById("userInput").value.trim();
+                if (inputValue) {
+
+                  const encoded = encodeURIComponent(inputValue);
+                  window.location.href = `/chatbot?query=${encoded}`;
+                }
+              });
             </script>
 
             <div class="row gy-4" data-aos="fade-up" data-aos-delay="300">

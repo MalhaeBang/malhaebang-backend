@@ -42,6 +42,15 @@ services:
     networks:
       - malhaebang-network
 
+  malhaebang-nlp:
+    build:
+      context: ../MalhaeBangNlpServer
+      dockerfile: Dockerfile
+    container_name: malhaebang-nlp
+    ports:
+      - "8000:8000"
+    networks:
+      - malhaebang-network
 
 networks:
   malhaebang-network:
