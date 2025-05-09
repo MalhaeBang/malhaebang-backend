@@ -121,7 +121,7 @@
         alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
     }
 
-    fetch('/map/apartment')
+    fetch('/map/houses')
         .then(response => response.json())
         .then(data => {
             data.forEach(function(apt) {
@@ -135,6 +135,7 @@
                         });
 
                         var infowindowContent = `
+
               <div style="padding:10px;font-size:14px;">
                   🏠 ${apt.location}<br>${apt.description}<br><br>
                   <button onclick="startNavigation(${searchResults[0].x}, ${searchResults[0].y}, '${apt.location}')">길찾기</button>

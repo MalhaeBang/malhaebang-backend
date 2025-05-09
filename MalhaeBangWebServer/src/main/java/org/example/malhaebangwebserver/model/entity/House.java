@@ -89,10 +89,15 @@ public class House {
     @Column(name = "house_num", nullable = false)
     private Long num;
 
+    private Double latitude;
+
+    private Double longitude;
 
     @OneToOne(mappedBy = "house")
     private SafetyScore safetyScore;
 
     @OneToMany(mappedBy = "house")
     private List<HouseKeyword> houseKeywords;
+
+
 }
