@@ -29,7 +29,7 @@ public class KakaoGeocodingService {
                     .header("Origin", "http://localhost:8080")
                     .header("KA", "sdk/1.0.0 os/Windows lang/Java")
                     .build();
-            System.out.println("▶ API KEY: " + apiKey);
+//            System.out.println("▶ API KEY: " + apiKey);
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -39,6 +39,7 @@ public class KakaoGeocodingService {
 
             if (documents.length() > 0) {
                 JSONObject doc = documents.getJSONObject(0);
+
                 double x = doc.getDouble("x");
                 double y = doc.getDouble("y");
                 return Optional.of(new double[]{y, x});

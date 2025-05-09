@@ -89,11 +89,15 @@ public class House {
     @Column(name = "house_num", nullable = false)
     private Long num;
 
+    @Setter
     private Double latitude;
+
+    @Setter
+
 
     private Double longitude;
 
-    @OneToOne(mappedBy = "house")
+    @OneToOne(mappedBy = "house", fetch = FetchType.LAZY)
     private SafetyScore safetyScore;
 
     @OneToMany(mappedBy = "house")

@@ -120,41 +120,35 @@
     } else {
         alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
     }
-
     fetch('/map/houses')
         .then(response => response.json())
         .then(data => {
             data.forEach(function(apt) {
-                ps.keywordSearch(apt.location, function(searchResults, status) {
-                    if (status === kakao.maps.services.Status.OK) {
-                        var coords = new kakao.maps.LatLng(searchResults[0].y, searchResults[0].x);
+                const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
 
-                        var marker = new kakao.maps.Marker({
-                            map: map,
-                            position: coords
-                        });
+                const marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
 
-                        var infowindowContent = `
-
-              <div style="padding:10px;font-size:14px;">
-                  🏠 ${apt.location}<br>${apt.description}<br><br>
-                  <button onclick="startNavigation(${searchResults[0].x}, ${searchResults[0].y}, '${apt.location}')">길찾기</button>
-              </div>
+                const infowindowContent = `
+                <div style="padding:10px;font-size:14px;">
+                    🏠 ${apt.description}<br>${apt.latitude}, ${apt.longitude}<br><br>
+                    <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.description}')">길찾기</button>
+                </div>
             `;
 
-                        var infowindow = new kakao.maps.InfoWindow({
-                            content: infowindowContent
-                        });
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: infowindowContent
+                });
 
-                        kakao.maps.event.addListener(marker, 'click', function() {
-                            infowindow.open(map, marker);
-                        });
-                    }
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    infowindow.open(map, marker);
                 });
             });
         })
         .catch(error => {
-            console.error('아파트 목록을 불러오지 못했습니다.', error);
+            console.error('건물 목록을 불러오지 못했습니다.', error);
         });
 
     function startNavigation(destX, destY, destName) {

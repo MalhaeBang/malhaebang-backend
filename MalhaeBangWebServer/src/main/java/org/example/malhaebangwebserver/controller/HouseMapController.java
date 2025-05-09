@@ -32,9 +32,6 @@ public class HouseMapController {
     @GetMapping("/houses")
     @ResponseBody
     public List<SimpleHouseDto> getHouses() {
-        return houseRepository.findAll().stream()
-                .map(h -> new SimpleHouseDto(h.getAddress(), h.getTitle()))
-                .collect(Collectors.toList());
-
+        return houseRepository.findSimpleDtoAll();
     }
 }
