@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -31,7 +32,11 @@ public class HouseMapController {
 
     @GetMapping("/houses")
     @ResponseBody
-    public List<SimpleHouseDto> getHouses() {
-        return houseRepository.findSimpleDtoAll();
+    public List<SimpleHouseDto> getHouses(@RequestParam(required = false) String type) {
+        if (type == null || type.equals("전체")) {
+            return houseRepository.findSimpleDtoAll();
+        } else {
+            return houseRepository.findSimpleDtoByDepositType(type);
+        }
     }
 }

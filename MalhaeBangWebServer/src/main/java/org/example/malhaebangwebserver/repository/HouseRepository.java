@@ -12,7 +12,11 @@ import java.util.Optional;
 
 @Repository
 public interface HouseRepository extends JpaRepository<House, Integer> {
-    @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(h.latitude, h.longitude, h.title) FROM House h")
+    @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(h.latitude, h.longitude, h.address) FROM House h")
     List<SimpleHouseDto> findSimpleDtoAll();
+
+    @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(h.latitude, h.longitude, h.address) " +
+            "FROM House h WHERE h.depositType = :depositType")
+    List<SimpleHouseDto> findSimpleDtoByDepositType(@Param("depositType") String depositType);
 }
 

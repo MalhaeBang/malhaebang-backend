@@ -2,104 +2,112 @@
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Kakao 지도 - 내 주소 ➔ 아파트 길찾기</title>
 
-    <!-- Vendor CSS Files -->
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet" />
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet" />
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+    <link href="assets/css/main.css" rel="stylesheet" />
 
-    <!-- Main CSS File -->
-    <link href="assets/css/main.css" rel="stylesheet">
-
-    <!-- 🔥 추가: 지도 꽉 채우기용 스타일 -->
     <style>
-        /* 헤더 고정 */
         #header {
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 999;
         }
+
         body {
             overflow: hidden;
         }
 
-        /* 본문 영역: 헤더 높이만큼 margin-top */
         main.main {
-            margin-top: 80px; /* 대략적 예상값 (헤더 높이 맞게 나중에 수정 가능) */
-            margin-bottom: 200px; /* 대략적 예상값 (푸터 높이 맞게 나중에 수정 가능) */
+            margin-top: 80px;
+            margin-bottom: 200px;
             padding: 0;
         }
 
-        /* 지도 영역 */
         #map {
             width: 100%;
-            height: calc(100vh - 80px ); /* 화면 전체 - 헤더 높이 */
+            height: calc(100vh - 80px);
+        }
+
+        #filter-container {
+            position: absolute;
+            top: 100px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .form-select {
+            width: 120px;
         }
     </style>
-
 </head>
 
 <body class="index-page">
-
-<!-- 헤더 삽입 -->
+<!-- 헤더 -->
 <div id="header" th:replace="header :: header"></div>
 
-<!-- 메인(지도) -->
+<!-- 본문 -->
 <main class="main">
+    <!-- 거래방식 필터 -->
+    <div id="filter-container">
+        <select id="filter-depositType" class="form-select">
+            <option value="전체">전체</option>
+            <option value="전세">전세</option>
+            <option value="월세">월세</option>
+            <option value="단기임대">단기임대</option>
+        </select>
+    </div>
+
+    <!-- 지도 -->
     <div id="map"></div>
 </main>
 
-
-<!-- Scroll Top -->
+<!-- 기타 UI -->
 <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
     <i class="bi bi-arrow-up-short"></i>
 </a>
-
-<!-- Preloader -->
 <div id="preloader"></div>
 
-<!-- Vendor JS Files -->
+<!-- Vendor JS -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/vendor/aos/aos.js"></script>
 <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
 <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-
-<!-- Kakao Map API -->
 <script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoAppKey}&libraries=services|"></script>
-
-<!-- Main JS File -->
 <script src="assets/js/main.js"></script>
 
 <!-- 지도 스크립트 -->
 <script>
-    var mapContainer = document.getElementById('map');
-    var mapOption = {
+    const mapContainer = document.getElementById("map");
+    const mapOption = {
         center: new kakao.maps.LatLng(37.5665, 126.9780),
         level: 5
     };
-    var map = new kakao.maps.Map(mapContainer, mapOption);
-
-    var ps = new kakao.maps.services.Places();
-    var geocoder = new kakao.maps.services.Geocoder();
-
+    const map = new kakao.maps.Map(mapContainer, mapOption);
+    const geocoder = new kakao.maps.services.Geocoder();
+    const infowindows = [];
+    let markers = [];
     let userPosition = null;
     let userAddress = null;
 
+    // 현재 위치 마커
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
+        navigator.geolocation.getCurrentPosition(position => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
             userPosition = { lat, lng };
 
-            var userMarker = new kakao.maps.Marker({
-                map: map,
+            const userMarker = new kakao.maps.Marker({
+                map,
                 position: new kakao.maps.LatLng(lat, lng),
                 image: new kakao.maps.MarkerImage(
                     "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
@@ -109,51 +117,25 @@
 
             map.setCenter(new kakao.maps.LatLng(lat, lng));
 
-            geocoder.coord2Address(lng, lat, function(result, status) {
+            geocoder.coord2Address(lng, lat, (result, status) => {
                 if (status === kakao.maps.services.Status.OK) {
                     userAddress = result[0].address.address_name;
                 }
             });
-        }, function(error) {
-            alert('위치 정보를 가져올 수 없습니다.');
+        }, () => {
+            alert("위치 정보를 가져올 수 없습니다.");
         });
-    } else {
-        alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
     }
-    fetch('/map/houses')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(function(apt) {
-                const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
 
-                const marker = new kakao.maps.Marker({
-                    map: map,
-                    position: coords
-                });
+    // 지도 클릭 시 인포윈도우 닫기
+    kakao.maps.event.addListener(map, "click", () => {
+        infowindows.forEach(iw => iw.close());
+    });
 
-                const infowindowContent = `
-                <div style="padding:10px;font-size:14px;">
-                    🏠 ${apt.description}<br>${apt.latitude}, ${apt.longitude}<br><br>
-                    <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.description}')">길찾기</button>
-                </div>
-            `;
-
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: infowindowContent
-                });
-
-                kakao.maps.event.addListener(marker, 'click', function() {
-                    infowindow.open(map, marker);
-                });
-            });
-        })
-        .catch(error => {
-            console.error('건물 목록을 불러오지 못했습니다.', error);
-        });
-
+    // 길찾기 함수
     function startNavigation(destX, destY, destName) {
         if (!userPosition || !userAddress) {
-            alert('현재 위치 정보 또는 주소를 가져올 수 없습니다.');
+            alert("현재 위치 정보 또는 주소를 가져올 수 없습니다.");
             return;
         }
 
@@ -162,15 +144,56 @@
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         if (isMobile) {
-            const url = `kakaomap://route?sp=${startY},${startX}&ep=${destY},${destX}&by=CAR`;
-            window.location.href = url;
+            window.location.href = `kakaomap://route?sp=${startY},${startX}&ep=${destY},${destX}&by=CAR`;
         } else {
             const url = `https://map.kakao.com/?map_type=TYPE_MAP&target=car&rt=${startX},${startY},${destX},${destY}&rt1=${encodeURIComponent(userAddress)}&rt2=${encodeURIComponent(destName)}&rtIds=,`;
-            window.open(url, '_blank');
+            window.open(url, "_blank");
         }
     }
-</script>
 
+    // 필터링 함수
+    function loadFilteredHouses() {
+        const type = document.getElementById("filter-depositType").value;
+        const url = type === "전체" ? "/map/houses" : `/map/houses?type=${encodeURIComponent(type)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // 기존 마커 및 인포윈도우 제거
+                markers.forEach(m => m.setMap(null));
+                markers = [];
+                infowindows.forEach(iw => iw.close());
+                infowindows.length = 0;
+
+                data.forEach(apt => {
+                    const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
+                    const marker = new kakao.maps.Marker({ map, position: coords });
+                    markers.push(marker);
+
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `
+                <div style="padding:10px;font-size:14px;">
+                  🏠 ${apt.description}<br>${apt.latitude}, ${apt.longitude}<br><br>
+                  <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.description}')">길찾기</button>
+                </div>
+              `
+                    });
+                    infowindows.push(infowindow);
+
+                    kakao.maps.event.addListener(marker, "click", function () {
+                        infowindows.forEach(iw => iw.close());
+                        infowindow.open(map, marker);
+                    });
+                });
+            });
+    }
+
+    // 이벤트 바인딩
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("filter-depositType").addEventListener("change", loadFilteredHouses);
+        loadFilteredHouses(); // 최초 로딩
+    });
+</script>
 </body>
 
 </html>
