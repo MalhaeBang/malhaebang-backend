@@ -6,13 +6,34 @@ pipeline {
     }
 
     stages {
+        stage('Check Branch') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'main'
+                }
+            }
+            steps {
+                echo "✅ Main 브랜치에서 실행 중입니다."
+            }
+        }
+
         stage('Clone Repository') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'main'
+                }
+            }
             steps {
                 git branch: 'main', url: 'https://github.com/MalhaeBang/malhaebang-backend.git'
             }
         }
 
         stage('Build Docker Image') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'main'
+                }
+            }
             steps {
                 dir('MalhaeBangWebServer') {
                     script {
@@ -26,6 +47,11 @@ pipeline {
         }
 
         stage('Push to DockerHub') {
+            when {
+                expression {
+                    return env.BRANCH_NAME == 'main'
+                }
+            }
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {

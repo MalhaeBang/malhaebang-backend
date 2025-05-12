@@ -14,7 +14,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
 # 2단계: Run Stage
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-jdk-slim-buster
 WORKDIR /app
 
 # 위 단계에서 빌드한 JAR 파일 복사
