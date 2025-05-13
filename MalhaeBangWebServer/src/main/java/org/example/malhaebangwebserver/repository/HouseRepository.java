@@ -12,11 +12,36 @@ import java.util.Optional;
 
 @Repository
 public interface HouseRepository extends JpaRepository<House, Integer> {
-    @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(h.latitude, h.longitude, h.address) FROM House h")
-    List<SimpleHouseDto> findSimpleDtoAll();
-
     @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(h.latitude, h.longitude, h.address) " +
-            "FROM House h WHERE h.depositType = :depositType")
-    List<SimpleHouseDto> findSimpleDtoByDepositType(@Param("depositType") String depositType);
+            "FROM House h " +
+            "WHERE (:depositType IS NULL OR :depositType = '' OR h.depositType = :depositType) " +
+            "AND (:direction IS NULL OR :direction = '' OR h.direction = :direction) " +
+            "AND (:parking IS NULL OR :parking = '' OR h.parking = :parking) " +
+            "AND (:gu IS NULL OR :gu = '' OR h.gu = :gu) " +
+            "AND (:dong IS NULL OR :dong = '' OR h.dong = :dong)")
+    List<SimpleHouseDto> findSimpleDtoByFilters(@Param("depositType") String depositType,
+                                                @Param("direction") String direction,
+                                                @Param("parking") String parking,
+                                                @Param("gu") String gu,
+                                                @Param("dong") String dong);
+
+
+//   지도 필터 드롭다운용
+
+    @Query("SELECT DISTINCT h.depositType FROM House h")
+    List<String> findDistinctDepositTypes();
+
+    @Query("SELECT DISTINCT h.direction FROM House h")
+    List<String> findDistinctDirections();
+
+    @Query("SELECT DISTINCT h.parking FROM House h")
+    List<String> findDistinctParking();
+
+    @Query("SELECT DISTINCT h.gu FROM House h")
+    List<String> findDistinctGu();
+
+    @Query("SELECT DISTINCT h.dong FROM House h WHERE h.gu = :gu")
+    List<String> findDistinctDongByGu(@Param("gu") String gu);
+
 }
 
