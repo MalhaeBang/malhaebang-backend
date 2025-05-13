@@ -95,10 +95,11 @@
     const geocoder = new kakao.maps.services.Geocoder();
     const infowindows = [];
     let markers = [];
+    let polygons = [];
     let userPosition = null;
     let userAddress = null;
 
-    // 현재 위치 마커
+    // === 현재 위치 마커 표시 ===
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
             const lat = position.coords.latitude;
@@ -126,12 +127,10 @@
         });
     }
 
-    // 지도 클릭 시 인포윈도우 닫기
     kakao.maps.event.addListener(map, "click", () => {
         infowindows.forEach(iw => iw.close());
     });
 
-    // 길찾기 함수
     function startNavigation(destX, destY, destName) {
         if (!userPosition || !userAddress) {
             alert("현재 위치 정보 또는 주소를 가져올 수 없습니다.");
@@ -150,7 +149,6 @@
         }
     }
 
-    // 필터링 함수
     function loadFilteredHouses() {
         const depositType = document.getElementById("filter-depositType").value;
         const direction = document.getElementById("filter-direction")?.value || "전체";
@@ -159,20 +157,15 @@
         const dong = document.getElementById("filter-dong")?.value || "전체";
 
         const params = new URLSearchParams();
-
         params.append("type", depositType === "전체" ? "" : depositType);
         params.append("direction", direction === "전체" ? "" : direction);
         params.append("parking", parking === "전체" ? "" : parking);
         params.append("gu", gu === "전체" ? "" : gu);
         params.append("dong", dong === "전체" ? "" : dong);
 
-        const url = `/map/houses?${params.toString()}`;
-
-        fetch(url)
+        fetch(`/map/houses?${params.toString()}`)
             .then(res => res.json())
             .then(data => {
-                // 기존 마커 제거
-                console.log("받은 데이터:", data);  // ✅ 이 로그를 확인해보세요
                 markers.forEach(m => m.setMap(null));
                 markers = [];
                 infowindows.forEach(iw => iw.close());
@@ -185,16 +178,15 @@
 
                     const infowindow = new kakao.maps.InfoWindow({
                         content: `
-                        <div style="padding:10px;font-size:14px;">
-                            🏠 ${apt.address}<br>
-                            위도: ${apt.latitude}, 경도: ${apt.longitude}<br><br>
-                            <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.address}')">길찾기</button>
-                        </div>
-                    `
+                            <div style="padding:10px;font-size:14px;">
+                                🏠 ${apt.address}<br>
+                                위도: ${apt.latitude}, 경도: ${apt.longitude}<br><br>
+                                <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.address}')">길찾기</button>
+                            </div>
+                        `
                     });
 
                     infowindows.push(infowindow);
-
                     kakao.maps.event.addListener(marker, "click", function () {
                         infowindows.forEach(iw => iw.close());
                         infowindow.open(map, marker);
@@ -203,95 +195,121 @@
             });
     }
 
-                // 이벤트 바인딩
-                document.addEventListener("DOMContentLoaded", function () {
-                    loadFilterOptions();   // 옵션들 먼저 로드
-                    loadFilteredHouses(); // 초기 집 데이터 로드
+    function drawFilteredPolygons(regionName) {
+        polygons.forEach(p => p.setMap(null));
+        polygons = [];
 
-                    document.getElementById("filter-depositType").addEventListener("change", loadFilteredHouses);
-                    document.getElementById("filter-direction").addEventListener("change", loadFilteredHouses);
-                    document.getElementById("filter-parking").addEventListener("change", loadFilteredHouses);
-                    document.getElementById("filter-gu").addEventListener("change", function () {
-                        const gu = this.value;
-                        const dongSelect = document.getElementById("filter-dong");
-                        dongSelect.innerHTML = "<option value='전체'>전체</option>"; // 초기화
-
-                        if (gu !== "전체") {
-                            fetch(`/api/filters/dong?gu=${encodeURIComponent(gu)}`)
-                                .then(res => res.json())
-                                .then(data => {
-                                    data.forEach(d => {
-                                        const option = document.createElement("option");
-                                        option.value = d;
-                                        option.text = d;
-                                        dongSelect.appendChild(option);
-                                    });
-                                });
+        fetch('/assets/json/geojson_wgs84.json')
+            .then(res => res.json())
+            .then(geojson => {
+                geojson.features.forEach(feature => {
+                    const dongName = feature.properties.EMD_KOR_NM;
+                    if (regionName === "전체" || dongName === regionName) {
+                        const geometry = feature.geometry;
+                        if (geometry.type === 'Polygon') {
+                            drawPolygon(geometry.coordinates);
+                        } else if (geometry.type === 'MultiPolygon') {
+                            geometry.coordinates.forEach(polygonCoords => {
+                                drawPolygon(polygonCoords);
+                            });
                         }
+                    }
+                });
+            });
+    }
 
-                        loadFilteredHouses(); // gu 변경 시에도 새로 로드
+    function drawPolygon(coordsArray) {
+        coordsArray.forEach(linearRing => {
+            const path = linearRing.map(coord => new kakao.maps.LatLng(coord[1], coord[0]));
+            const polygon = new kakao.maps.Polygon({
+                path,
+                strokeWeight: 2,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                fillColor: '#FF0000',
+                fillOpacity: 0.3
+            });
+            polygon.setMap(map);
+            polygons.push(polygon);
+        });
+    }
+
+    function loadFilterOptions() {
+        const fillSelect = (id, url) => {
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const select = document.getElementById(id);
+                    select.innerHTML = '<option value="전체">전체</option>';
+                    data.forEach(item => {
+                        const option = document.createElement("option");
+                        option.value = item;
+                        option.text = item;
+                        select.appendChild(option);
                     });
+                });
+        };
 
-                    document.getElementById("filter-dong").addEventListener("change", loadFilteredHouses);
+        fillSelect("filter-depositType", "/api/filters/depositType");
+        fillSelect("filter-direction", "/api/filters/direction");
+        fillSelect("filter-parking", "/api/filters/parking");
+
+        // gu + 동 + 초기 polygon 처리
+        fetch("/api/filters/gu")
+            .then(res => res.json())
+            .then(data => {
+                const guSelect = document.getElementById("filter-gu");
+                guSelect.innerHTML = '<option value="전체">전체</option>';
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item;
+                    option.text = item;
+                    guSelect.appendChild(option);
                 });
 
-                function loadFilterOptions() {
-                    // 거래방식
-                    fetch('/api/filters/depositType')
-                        .then(res => res.json())
-                        .then(data => {
-                            const select = document.getElementById("filter-depositType");
-                            select.innerHTML = '<option value="전체">전체</option>';
-                            data.forEach(item => {
-                                const option = document.createElement("option");
-                                option.value = item;
-                                option.text = item;
-                                select.appendChild(option);
-                            });
-                        });
-
-                    // 방향
-                    fetch('/api/filters/direction')
-                        .then(res => res.json())
-                        .then(data => {
-                            const select = document.getElementById("filter-direction");
-                            select.innerHTML = '<option value="전체">전체</option>';
-                            data.forEach(item => {
-                                const option = document.createElement("option");
-                                option.value = item;
-                                option.text = item;
-                                select.appendChild(option);
-                            });
-                        });
-
-                    // 주차
-                    fetch('/api/filters/parking')
-                        .then(res => res.json())
-                        .then(data => {
-                            const select = document.getElementById("filter-parking");
-                            select.innerHTML = '<option value="전체">전체</option>';
-                            data.forEach(item => {
-                                const option = document.createElement("option");
-                                option.value = item;
-                                option.text = item;
-                                select.appendChild(option);
-                            });
-                        });
-
-                    // 구
-                    fetch('/api/filters/gu')
-                        .then(res => res.json())
-                        .then(data => {
-                            const select = document.getElementById("filter-gu");
-                            select.innerHTML = '<option value="전체">전체</option>';
-                            data.forEach(item => {
-                                const option = document.createElement("option");
-                                option.value = item;
-                                option.text = item;
-                                select.appendChild(option);
-                            });
-                        });
+                if (data.length > 0) {
+                    guSelect.value = data[0];
+                    drawFilteredPolygons(data[0]);
+                    loadFilteredHouses();
                 }
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadFilterOptions();
+
+        document.getElementById("filter-depositType").addEventListener("change", loadFilteredHouses);
+        document.getElementById("filter-direction").addEventListener("change", loadFilteredHouses);
+        document.getElementById("filter-parking").addEventListener("change", loadFilteredHouses);
+
+        document.getElementById("filter-gu").addEventListener("change", function () {
+            const gu = this.value;
+            const dongSelect = document.getElementById("filter-dong");
+            dongSelect.innerHTML = "<option value='전체'>전체</option>";
+
+            if (gu !== "전체") {
+                fetch(`/api/filters/dong?gu=${encodeURIComponent(gu)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(d => {
+                            const option = document.createElement("option");
+                            option.value = d;
+                            option.text = d;
+                            dongSelect.appendChild(option);
+                        });
+                    });
+            }
+
+            drawFilteredPolygons(gu);
+            loadFilteredHouses();
+        });
+
+        document.getElementById("filter-dong").addEventListener("change", function () {
+            const dong = this.value;
+            drawFilteredPolygons(dong);
+            loadFilteredHouses();
+        });
+    });
 </script>
 </body>
 
