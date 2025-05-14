@@ -1,19 +1,17 @@
-package org.example.malhaebangwebserver.test;
-
-
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-//import org.example.malhaebangwebserver.service.HouseService;
-import org.example.malhaebangwebserver.service.KakaoGeocodingService;
-import org.springframework.stereotype.Component;
-
-@Component
-@RequiredArgsConstructor
-public class GeocodingTestRunner {
-
-    private final KakaoGeocodingService geocodingService;
-//    private final HouseService houseService;
-
+//package org.example.malhaebangwebserver.test;
+//
+//
+//import jakarta.annotation.PostConstruct;
+//import lombok.RequiredArgsConstructor;
+//import org.example.malhaebangwebserver.service.KakaoGeocodingService;
+//import org.springframework.stereotype.Component;
+//
+//@Component
+//@RequiredArgsConstructor
+//public class GeocodingTestRunner {
+//
+//    private final KakaoGeocodingService geocodingService;
+//
 //    @PostConstruct
 //    public void testGeocoding() {
 //        String testAddress = "서울특별시 종로구 세종대로 175";
@@ -22,5 +20,5 @@ public class GeocodingTestRunner {
 //                () -> System.out.println("❌ 위경도 변환 실패")
 //        );
 //    }
-
-}
+//
+//}

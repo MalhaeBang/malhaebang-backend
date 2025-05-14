@@ -52,9 +52,18 @@ services:
     networks:
       - malhaebang-network
 
+  malhaebang-recommend:
+    build:
+      context: ../MalhaeBangRecommendServer
+      dockerfile: Dockerfile
+    container_name: malhaebang-recommend
+    ports:
+      - "5000:5000"
+    networks:
+      - malhaebang-network
+
 networks:
   malhaebang-network:
-
 volumes:
   jenkins_home:
   mysql_data:

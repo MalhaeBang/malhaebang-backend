@@ -11,6 +11,7 @@
             <ul>
                 <li><a href="/chatbot">챗봇</a></li>
                 <li><a href="/map">둘러보기</a></li>
+                <li><a href="http://localhost:5001" target="_blank">대출추천</a></li>
                 <li><a href="/mypage">지역분석</a></li>
                 <li><a href="/mypage">뉴스</a></li>
                 <li><a href="/mypage">MY</a></li>
@@ -31,7 +32,17 @@
         </nav>
     </div>
 </header>
+<style>
+    header.header {
+        height: 80px;
+        background-color: #0d0d0d;
+        z-index: 9999;
+    }
 
+    main {
+        padding-top: 80px;
+    }
+</style>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const sidebarToggleBtn = document.querySelector('.toggle-sidebar-btn');
