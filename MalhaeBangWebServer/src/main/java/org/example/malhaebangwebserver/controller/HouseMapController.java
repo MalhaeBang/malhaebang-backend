@@ -35,13 +35,15 @@ public class HouseMapController {
             @RequestParam(required = false) String gu,
             @RequestParam(required = false) String dong
     ) {
-        String depositType = (type != null && !type.equals("전체")) ? type : null;
-        String dir = (direction != null && !direction.equals("전체")) ? direction : null;
-        String park = (parking != null && !parking.equals("전체")) ? parking : null;
-        String guFilter = (gu != null && !gu.equals("전체")) ? gu : null;
-        String dongFilter = (dong != null && !dong.equals("전체")) ? dong : null;
+        String depositType = (type != null && !type.equals("상관없음")) ? type : null;
+        String dir = (direction != null && !direction.equals("상관없음")) ? direction : null;
+        String park = (parking != null && !parking.equals("상관없음")) ? parking : null;
+        String guFilter = (gu != null && !gu.equals("상관없음")) ? gu : null;
+        String dongFilter = (dong != null && !dong.equals("상관없음")) ? dong : null;
 
-        List<SimpleHouseDto> result = houseRepository.findSimpleDtoByFilters(depositType, dir, park, guFilter, dongFilter);
+        List<SimpleHouseDto> result = houseRepository.findSimpleDtoByFilters(
+                depositType, dir, park, guFilter, dongFilter
+        );
         return ResponseEntity.ok(result);
     }
 

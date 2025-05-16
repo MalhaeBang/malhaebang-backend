@@ -61,6 +61,9 @@ public class House {
     @Column(nullable = false)
     private String dong;
 
+    @Column(name = "apt_name")
+    private String aptName;
+
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
