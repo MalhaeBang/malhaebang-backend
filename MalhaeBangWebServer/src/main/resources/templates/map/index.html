@@ -56,6 +56,48 @@
             background-color: #0d0d0d;
             color: #ffffff;
         }
+        #house-list-panel .house-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+            background-color: white;
+            cursor: pointer;
+        }
+        #house-list-panel .house-item:hover {
+            background-color: #eaeaea;
+        }
+        .main.d-flex {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #filter-container {
+            background-color: #fff;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            z-index: 10;
+        }
+
+        #house-list-panel {
+            border-right: 1px solid #ccc;
+            height: 100%;
+            overflow-y: auto;
+        }
+        @media (max-width: 768px) {
+            .main.d-flex > div:last-child {
+                flex-direction: column;
+            }
+
+            #house-list-panel {
+                width: 100%;
+                height: 300px;
+            }
+
+            #map {
+                height: calc(100vh - 460px); /* 상단 + 목록 패널 */
+            }
+        }
+
     </style>
 </head>
 
@@ -63,9 +105,11 @@
 <!-- 헤더 -->
 <header th:replace="~{header :: header}" class="header fixed-top"></header>
 <!-- 본문 -->
-<main class="main">
-    <!-- 거래방식 필터 -->
-    <div id="filter-container">
+
+<main class="main d-flex" style="flex-direction: column;">
+    <!-- 필터 -->
+    <div id="filter-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px;">
+        <!-- 각 select 그대로 -->
         <select id="filter-depositType" class="form-select">
             <option value="" selected disabled hidden>거래방식</option>
             <option value="상관없음">상관없음</option>
@@ -92,8 +136,16 @@
         </select>
     </div>
 
-    <!-- 지도 -->
-    <div id="map"></div>
+    <!-- 본문 (지도 + 목록) -->
+    <div style="display: flex; flex: 1; height: calc(100vh - 160px);">
+        <!-- 매물 목록 패널 -->
+        <div id="house-list-panel" style="width: 300px; overflow-y: auto; background-color: #f0f0f0;">
+            <!-- JS로 목록 삽입 -->
+        </div>
+
+        <!-- 지도 -->
+        <div id="map" style="flex-grow: 1;"></div>
+    </div>
 </main>
 
 <!-- 기타 UI -->
@@ -202,24 +254,47 @@
         fetch(`/map/houses?${params.toString()}`)
             .then(res => res.json())
             .then(data => {
+                // 1. 기존 마커/인포윈도우 제거
                 markers.forEach(m => m.setMap(null));
                 markers = [];
                 infowindows.forEach(iw => iw.close());
                 infowindows.length = 0;
 
-                data.forEach(apt => {
+                // ✅ 사이드바 초기화
+                const listPanel = document.getElementById("house-list-panel");
+                listPanel.innerHTML = "";
+
+                // 2. 새 데이터 처리
+                data.forEach((apt, idx) => {
                     const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
                     const marker = new kakao.maps.Marker({ map, position: coords });
                     markers.push(marker);
 
                     const infowindow = new kakao.maps.InfoWindow({
                         content: `
-                            <div style="padding:10px;font-size:14px;">
-                                🏠 ${apt.address}<br>
-                                위도: ${apt.latitude}, 경도: ${apt.longitude}<br><br>
-                                <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.address}')">길찾기</button>
-                            </div>
-                        `
+                    <div style="padding:10px;font-size:14px;">
+                            🏠 ${apt.title}<br>
+                            💰 가격: ${apt.price}<br>
+                            📍 주소: ${apt.address}<br>
+                            📐 면적: ${apt.area}<br>
+                            🧭 방향: ${apt.direction}<br>
+                            🏢 층수: ${apt.floor}<br>
+                            📦 거래 방식: ${apt.depositType}<br>
+                            🅿️ 주차: ${apt.parking}<br>
+                            💡 관리비: ${apt.mFee}<br>
+                            ⏰ 입주 가능일: ${apt.aFrom}<br>
+                            🧑‍💼 중개사 정보: ${apt.agentInfo}<br>
+                            📞 중개 수수료: ${apt.agentComm}<br>
+                            🛏 방 개수: ${apt.roomsCnt}<br>
+                            🧰 옵션: ${apt.options}<br>
+                            📅 등록일: ${apt.postedAt}<br>
+                            🏙 지역: ${apt.gu} ${apt.dong}<br>
+                            🏠 건물유형: ${apt.buildingType}<br>
+                            🏗 준공일: ${apt.builtDate}<br>
+                            📝 설명: ${apt.explanations}<br><br>
+                        <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.address}')">길찾기</button>
+                    </div>
+                `
                     });
 
                     infowindows.push(infowindow);
@@ -227,6 +302,24 @@
                         infowindows.forEach(iw => iw.close());
                         infowindow.open(map, marker);
                     });
+
+                    // ✅ 사이드바 목록에 추가
+                    const houseDiv = document.createElement("div");
+                    houseDiv.className = "house-item";
+                    houseDiv.innerHTML = `
+                        <strong>${apt.title || ""}</strong><br>
+                        💰 가격: ${apt.price || ""}<br>
+                        📦 거래 방식: ${apt.depositType || ""}<br>
+                        🧭 방향: ${apt.direction || ""}<br>
+                        🏢 층수: ${apt.floor || ""}층<br>
+                    `;
+                    houseDiv.onclick = () => {
+                        map.panTo(coords);
+                        infowindows.forEach(iw => iw.close());
+                        infowindow.open(map, marker);
+                    };
+
+                    listPanel.appendChild(houseDiv);
                 });
             });
     }
@@ -253,6 +346,7 @@
                 });
             });
     }
+
 
     function drawPolygon(coordsArray) {
         coordsArray.forEach(linearRing => {

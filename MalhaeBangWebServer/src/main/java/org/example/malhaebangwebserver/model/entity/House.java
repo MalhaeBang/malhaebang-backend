@@ -96,8 +96,6 @@ public class House {
     private Double latitude;
 
     @Setter
-
-
     private Double longitude;
 
     @OneToOne(mappedBy = "house", fetch = FetchType.LAZY)
