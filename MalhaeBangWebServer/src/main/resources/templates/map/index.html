@@ -281,8 +281,8 @@
                             🏢 층수: ${apt.floor}<br>
                             📦 거래 방식: ${apt.depositType}<br>
                             🅿️ 주차: ${apt.parking}<br>
-                            💡 관리비: ${apt.mFee}<br>
-                            ⏰ 입주 가능일: ${apt.aFrom}<br>
+                            💡 관리비: ${apt.mfee}<br>
+                            ⏰ 입주 가능일: ${apt.afrom}<br>
                             🧑‍💼 중개사 정보: ${apt.agentInfo}<br>
                             📞 중개 수수료: ${apt.agentComm}<br>
                             🛏 방 개수: ${apt.roomsCnt}<br>
@@ -291,6 +291,7 @@
                             🏙 지역: ${apt.gu} ${apt.dong}<br>
                             🏠 건물유형: ${apt.buildingType}<br>
                             🏗 준공일: ${apt.builtDate}<br>
+                            📝 정보: ${apt.feature}<br>
                             📝 설명: ${apt.explanations}<br><br>
                         <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.address}')">길찾기</button>
                     </div>
@@ -311,7 +312,7 @@
                         💰 가격: ${apt.price || ""}<br>
                         📦 거래 방식: ${apt.depositType || ""}<br>
                         🧭 방향: ${apt.direction || ""}<br>
-                        🏢 층수: ${apt.floor || ""}층<br>
+                        🏢 층수: ${apt.floor || ""}<br>
                     `;
                     houseDiv.onclick = () => {
                         map.panTo(coords);
