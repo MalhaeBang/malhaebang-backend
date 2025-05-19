@@ -35,4 +35,5 @@ public class EmailService {
             throw new RuntimeException("메일 전송 실패", e);
         }
     }
+
 }

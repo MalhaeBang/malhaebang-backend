@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -27,25 +26,11 @@ public class UserService {
 
     @Transactional
     public void register(String email, String nickname, String password) {
-        Optional<User> optionalUser = userRepository.findByUserEmail(email);
-
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-            if (existingUser.getIsDeleted()) {
-                // 🔄 탈퇴했던 유저 재가입 처리
-                existingUser.setIsDeleted(false);
-                existingUser.setUserNickname(nickname);
-                existingUser.setUserPw(passwordEncoder.encode(password));
-                existingUser.setCreatedAt(LocalDateTime.now());
-                existingUser.setLoginType(LoginType.FORM);  // loginType 덮어쓰기
-                userRepository.save(existingUser);
-                return;
-            } else {
-                throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-            }
+        log.info("🔥 [회원가입 시도] 이메일: {}", email);
+        if (userRepository.existsByUserEmail(email)) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        // 신규 회원
         User user = User.builder()
                 .userEmail(email)
                 .userPw(passwordEncoder.encode(password))
@@ -55,7 +40,9 @@ public class UserService {
                 .loginType(LoginType.FORM)
                 .build();
 
+        log.info("🔥 [회원 생성 직전]");
         userRepository.save(user);
+        log.info("✅ [회원 생성 완료]");
     }
 
     public User findByEmail(String email) {

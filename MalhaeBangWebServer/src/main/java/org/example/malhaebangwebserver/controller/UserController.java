@@ -98,6 +98,7 @@ public class UserController {
         return "account/findpassword";
     }
 
+
     @GetMapping("/changepassword")
     public String changePasswordForm() {
         return "account/changepassword";
