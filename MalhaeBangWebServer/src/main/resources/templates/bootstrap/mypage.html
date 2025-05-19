@@ -26,6 +26,8 @@
             width: 200px;
             padding: 20px;
             border-right: 1px solid #333;
+            height: 80vh;
+
         }
 
         .mypage-sidebar h2 {
@@ -123,8 +125,7 @@
         <div class="content-area">
             <!-- 기본 정보 탭 -->
             <div id="info" class="tab-content active">
-                <h4 th:text="${user.userNickname} + ' 님, 안녕하세요.'"></h4>
-                <p th:text="'Email : ' + ${user.userEmail}"></p>
+                <h4 th:text="${user.userNickname.contains('_') ? #strings.substringBefore(user.userNickname, '_') : user.userNickname} + '님, 안녕하세요.'"></h4>                <p th:text="'Email : ' + ${user.userEmail}"></p>
             <!-- 여기에 버튼 조건부 렌더링 -->
                 <button class="btn btn-primary btn-change"
                         th:if="${user.loginType.name() == 'FORM'}"
@@ -140,7 +141,7 @@
 
             <!-- 찜 목록 탭 -->
             <div id="favorites" class="tab-content">
-                <h4 th:text="${user.userNickname} + ' 님, 찜하신 매물이예요.'"></h4>
+                <h4 th:text="${user.userNickname.contains('_') ? #strings.substringBefore(user.userNickname, '_') : user.userNickname} + ' 님, 찜하신 매물이예요.'"></h4>
 
                 <div th:each="liked : ${likedFolder}" class="favorite-item" th:if="${liked.house != null}">
                     <div>
@@ -162,7 +163,7 @@
 </main>
 
 <!-- Footer fragment -->
-<footer th:replace="footer :: footer"></footer>
+<!--<footer th:replace="footer :: footer"></footer>-->
 
 <script>
     // 탭 전환 기능
