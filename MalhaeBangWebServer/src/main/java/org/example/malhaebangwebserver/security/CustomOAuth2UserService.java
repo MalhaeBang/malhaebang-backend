@@ -64,26 +64,35 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             Optional<User> existingUser = userRepository.findByUserEmail(email);
 
+            LoginType loginType = switch (registrationId) {
+                case "kakao" -> LoginType.KAKAO;
+                case "naver" -> LoginType.NAVER;
+                case "google" -> LoginType.GOOGLE;
+                default -> throw new IllegalStateException("Unexpected provider: " + registrationId);
+            };
+
             User user;
             if (existingUser.isPresent()) {
                 user = existingUser.get();
 
-                if (!user.getLoginType().name().equalsIgnoreCase(registrationId)) {
-                    throw new OAuth2AuthenticationException("ALREADY_REGISTERED_WITH_" + user.getLoginType());
+                if (user.getIsDeleted()) {
+                    // 재가입 처리
+                    user.setIsDeleted(false);
+                    user.setUserNickname(generateUniqueNickname(nickname));
+                    user.setUserPw(UUID.randomUUID().toString());
+                    user.setCreatedAt(LocalDateTime.now());
+                    user.setLoginType(loginType);  // ✔ 여기서 재사용
+                    userRepository.save(user);
+                    log.info("♻️ 탈퇴한 유저 재가입 처리: {}", user.getUserEmail());
+                } else {
+                    if (!user.getLoginType().name().equalsIgnoreCase(registrationId)) {
+                        throw new OAuth2AuthenticationException("ALREADY_REGISTERED_WITH_" + user.getLoginType());
+                    }
+                    log.info("✅ 기존 유저 로그인: {}", user.getUserEmail());
                 }
 
-                log.info("✅ 기존 유저 로그인: {}", user.getUserEmail());
-            }
-
-
-            else {
-                LoginType loginType = switch (registrationId) {
-                    case "kakao" -> LoginType.KAKAO;
-                    case "naver" -> LoginType.NAVER;
-                    case "google" -> LoginType.GOOGLE;
-                    default -> throw new IllegalStateException("Unexpected provider: " + registrationId);
-                };
-                user = User.builder()
+            } else {
+                 user = User.builder()
                         .userEmail(email)
                         .userNickname(generateUniqueNickname(nickname))
                         .userPw(UUID.randomUUID().toString())

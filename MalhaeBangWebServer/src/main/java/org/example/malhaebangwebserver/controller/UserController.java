@@ -1,5 +1,6 @@
 package org.example.malhaebangwebserver.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.malhaebangwebserver.model.entity.Liked;
@@ -121,5 +122,20 @@ public class UserController {
 
         redirectAttributes.addFlashAttribute("success", "비밀번호가 성공적으로 변경되었습니다.");
         return "redirect:/mypage";  // 마이페이지로 이동
+    }
+
+
+    @PostMapping("/user/delete")
+    public String deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails,
+                             HttpServletRequest request,
+                             RedirectAttributes redirectAttributes) {
+        User user = userDetails.getUser();
+        userService.deleteUser(user);
+
+        // 세션 종료 (로그아웃 효과)
+        request.getSession().invalidate();
+
+        redirectAttributes.addFlashAttribute("message", "회원 탈퇴가 완료되었습니다.");
+        return "redirect:/login?deleted";
     }
 }

@@ -131,6 +131,11 @@
                         onclick="location.href='/changepassword'">
                     비밀번호 변경
                 </button>
+
+                <!-- 회원 탈퇴 버튼 -->
+                <form th:action="@{/user/delete}" method="post" onsubmit="return confirm('정말로 탈퇴하시겠습니까? 탈퇴 시 모든 정보가 삭제됩니다.');">
+                    <button type="submit" class="btn btn-danger mt-3">회원 탈퇴</button>
+                </form>
             </div>
 
             <!-- 찜 목록 탭 -->
