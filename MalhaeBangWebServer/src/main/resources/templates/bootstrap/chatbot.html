@@ -10,27 +10,11 @@
     <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
     <link href="/assets/css/main.css" rel="stylesheet" />
     <style>
-        body.chatbot-page {
-            background-color: #0c1b2c;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
-        }
 
-        #header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 80px;
-            background-color: #0c1b2c;
-            z-index: 999;
-        }
 
         main.chatbot-layout {
             display: flex;
             height: calc(100vh - 80px);
-            margin-top: 80px;
         }
 
         .sidebar {
@@ -127,8 +111,9 @@
         }
     </style>
 </head>
-<body class="chatbot-page">
-<header th:replace="~{header :: header}"></header>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
 <main class="chatbot-layout">
     <!-- 사이드바 -->
     <aside class="sidebar">

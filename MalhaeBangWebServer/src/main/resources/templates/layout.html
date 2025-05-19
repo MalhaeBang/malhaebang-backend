@@ -9,26 +9,37 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <!-- ✅ 공통 CSS -->
-    <link rel="stylesheet" th:href="@{/assets/css/style.css}">
-
+    <link rel="stylesheet" th:href="@{/assets/css/main.css}">
     <!-- ✅ 커스텀 폰트/아이콘 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        iframe {
+            display: block;
+            width: 100%;
+            border: none;
+        }
+         html, body, main, iframe, div {
+             margin: 0 !important;
+             padding: 0 !important;
+         }
+    </style>
 </head>
 <body>
 <!-- ✅ 공통 헤더 -->
 <div th:replace="fragments/header :: header"></div>
-
-<!-- ✅ 본문 삽입 위치 -->
-<main>
-    <div th:insert="~{::content}"></div>
+<main class="px-0">
+    <div th:insert="~{__${content}__}"></div>
 </main>
 
-<!-- ✅ 공통 푸터 -->
-<div th:replace="fragments/footer :: footer"></div>
-
-<!-- ✅ JS 스크립트 로드 -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.env/
+
+# Git and Docker files
+.git
+.gitignore
+.dockerignore
+
+# System files
+.DS_Store
+
+# IDE/editor configs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Test, build, dist folders
+build/
+dist/
+*.egg-info/

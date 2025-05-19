@@ -2088,3 +2088,20 @@ header,
   padding-right: 30px;
   transition: all 0.3s ease;
 }
+
+
+header.header {
+  position: fixed;           /* 고정 위치 */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;              /* 고정 높이 */
+  background-color: #0d0d0d;
+  z-index: 9999;
+  width: 100%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* 선택적: 하단 그림자 */
+}
+
+main {
+  padding-top: 80px !important; /* 헤더 가릴 위험 방지 */
+}

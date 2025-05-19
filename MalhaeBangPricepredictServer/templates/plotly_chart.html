@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">🤖 전세가격지수 예측</h2>
+    <p class="text-center mb-5">기준시점 2025.03.31 = 100.0</p>
+    
+    <!-- 입력 폼 -->
+    <form method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="region">지역:</label>
+                <select name="region" class="form-control">
+                    {% for region in regions %}
+                    <option value="{{ region }}" {% if region == selected_region %}selected{% endif %}>{{ region }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label for="label">면적:</label>
+                <select name="label" class="form-control">
+                    {% for label, label_kor in zipped_labels %}
+                    <option value="{{ label }}" {% if label == selected_label %}selected{% endif %}>{{ label_kor }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-primary">그래프 업데이트</button>
+        </div>
+    </form>
+
+
+    <!-- 그래프 표시 -->
+    {% if plot_json %}
+    <h4 class="text-center">{{ selected_region }}: {{ selected_label_kor }} 전체 구간</h4>
+    <p> 기준시점 2025.03.31=100.0 </p>
+    <div id="chart" class="mb-4"></div>
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> # plotly js
+
+    <script>
+        let plot_data = {{ plot_json | safe }};
+        Plotly.newPlot('chart', plot_data.data, plot_data.layout);
+    </script>
+    {% endif %}
+
+
+</div>
+{% endblock %}
