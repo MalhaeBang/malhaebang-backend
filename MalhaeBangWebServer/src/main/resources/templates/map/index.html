@@ -37,22 +37,23 @@
         }
 
         #filter-container {
-            position: relative;
+            background-color: #0d1d34;
+            width: 100%;
+
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
             justify-content: center;
             align-items: center;
             margin: 0;
-            padding: 10px;
         }
         .form-select {
+            margin: 0;
             width: auto;
             min-width: 120px;
             padding: 6px 12px;
             border-radius: 8px;
             border: 1px solid #ffffff;
-            background-color: #0d0d0d;
+            background-color: #0d1d34;
             color: #ffffff;
         }
         #house-list-panel .house-item {
@@ -101,10 +102,11 @@
 
 <main class="main d-flex" style="flex-direction: column;">
     <!-- 필터 -->
-    <div id="filter-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px;">
+    <div id="filter-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; height: 50px">
         <!-- 각 select 그대로 -->
         <select id="filter-depositType" class="form-select">
             <option value="" selected disabled hidden>거래방식</option>
+
             <option value="상관없음">상관없음</option>
         </select>
 
@@ -139,6 +141,31 @@
         <!-- 지도 -->
         <div id="map" style="flex-grow: 1;"></div>
     </div>
+    <!-- 폴더 선택 모달 -->
+
+    <div class="modal fade" id="folderSelectModal" tabindex="-1" aria-labelledby="folderSelectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="folderSelectModalLabel">폴더 선택</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <!-- 모달 내부 수정 -->
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" id="newFolderName" class="form-control" placeholder="새 폴더 이름 입력" />
+                        <button type="button" class="btn btn-secondary mt-2" onclick="createNewFolder()">폴더 생성</button>
+                    </div>
+<!--                    <ul id="folder-list" class="list-group"></ul>-->
+                    <ul id="folder-list" class="list-group" style="max-height: 300px; overflow-y: auto;"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="folderConfirmBtn">확인</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 <!-- 기타 UI -->
@@ -158,6 +185,7 @@
 
 <!-- 지도 스크립트 -->
 <script>
+
     const mapContainer = document.getElementById("map");
     const mapOption = {
         center: new kakao.maps.LatLng(37.5665, 126.9780),
@@ -300,19 +328,55 @@
                     // ✅ 사이드바 목록에 추가
                     const houseDiv = document.createElement("div");
                     houseDiv.className = "house-item";
-                    houseDiv.innerHTML = `
-                        <strong>${apt.title || ""}</strong><br>
-                        💰 가격: ${apt.price || ""}<br>
-                        📦 거래 방식: ${apt.depositType || ""}<br>
-                        🧭 방향: ${apt.direction || ""}<br>
-                        🏢 층수: ${apt.floor || ""}<br>
-                    `;
-                    houseDiv.onclick = () => {
+
+                    // 찜 버튼 생성 + 이벤트 바인딩
+                    const starSpan = document.createElement("span");
+                    starSpan.className = "favorite-toggle";
+                    starSpan.dataset.houseId = apt.houseId;
+                    starSpan.innerHTML = `<i class="bi bi-star"></i>`;
+                    if (apt.isLiked) {
+                        starSpan.querySelector("i").classList.remove("bi-star");
+                        starSpan.querySelector("i").classList.add("bi-star-fill");
+                    }
+
+                    starSpan.addEventListener("click", function (e) {
+                        e.stopPropagation();
+                        console.log("⭐ 별 클릭됨", apt.houseId);
+
+                        openFolderSelectModal(apt.houseId);
+                    });
+
+                    // 제목 엘리먼트
+                    const title = document.createElement("strong");
+                    title.textContent = apt.title || "";
+
+                    // 헤더 라인 조립
+                    const topLine = document.createElement("div");
+                    topLine.style.display = "flex";
+                    topLine.style.justifyContent = "space-between";
+                    topLine.style.alignItems = "center";
+                    topLine.appendChild(title);
+                    topLine.appendChild(starSpan);
+
+                    // 상세 정보
+                    const body = document.createElement("div");
+                    body.innerHTML = `
+                    💰 가격: ${apt.price || ""}<br>
+                    📦 거래 방식: ${apt.depositType || ""}<br>
+                    🧭 방향: ${apt.direction || ""}<br>
+                    🏢 층수: ${apt.floor || ""}<br>
+                      `;
+
+                    // 클릭 시 지도 이동
+                    houseDiv.addEventListener("click", () => {
                         map.panTo(coords);
                         infowindows.forEach(iw => iw.close());
                         infowindow.open(map, marker);
-                    };
+                    });
 
+                    // 조립 후 패널에 추가
+                    houseDiv.appendChild(topLine);
+                    houseDiv.appendChild(body);
                     listPanel.appendChild(houseDiv);
                 });
             });
@@ -440,6 +504,98 @@
             loadFilteredHouses();
         });
     });
+
+
+
+
+    let selectedFolderId = null;
+    let lastHouseId = null;
+
+    function openFolderSelectModal(houseId) {
+        lastHouseId = houseId;
+        fetch("/api/like/folders")
+            .then(res => res.json())
+            .then(folders => {
+                console.log("📁 폴더 개수:", folders.length);  // ← 반드시 출력해보세요
+                console.log("📁 폴더들:", folders);            // ← 실제 객체 배열 출력
+                const list = document.getElementById("folder-list");
+                list.innerHTML = "";
+                selectedFolderId = null;
+
+                folders.forEach(folder => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item list-group-item-action";
+                    // li.textContent = folder.folderName;
+                    li.textContent = `${folder.folderName} (ID: ${folder.folderId})`;
+                    li.addEventListener("click", () => {
+                        list.querySelectorAll(".active").forEach(el => el.classList.remove("active"));
+                        li.classList.add("active");
+                        selectedFolderId = folder.folderId;
+                    });
+
+                    list.appendChild(li);
+                });
+
+                // 폴더 없을 때 안내 추가
+                if (folders.length === 0) {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.textContent = "폴더가 없습니다.";
+                    list.appendChild(li);
+                }
+
+                // 확인 버튼 동작
+                document.getElementById("folderConfirmBtn").onclick = () => {
+                    if (selectedFolderId) {
+                        saveToFolder(houseId, selectedFolderId);
+                        bootstrap.Modal.getInstance(document.getElementById("folderSelectModal")).hide();
+                    } else {
+                        alert("폴더를 선택해주세요.");
+                    }
+                };
+
+                // 모달 열기
+                const modal = new bootstrap.Modal(document.getElementById("folderSelectModal"));
+                modal.show();
+            });
+    }
+    function saveToFolder(houseId, folderId) {
+        fetch(`/api/like/${houseId}/folder/${folderId}`, {
+            method: "POST"
+        }).then(res => res.text())
+            .then(msg => {
+                console.log(msg);
+                alert("찜 목록에 추가되었습니다.");
+            });
+    }
+
+    function createNewFolder() {
+        const newFolderName = document.getElementById("newFolderName").value.trim();
+        if (!newFolderName) {
+            alert("폴더 이름을 입력해주세요.");
+            return;
+        }
+
+        fetch("/api/like/folder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ folderName: newFolderName })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("폴더 생성 실패");
+                return res.text();
+            })
+            .then(msg => {
+                alert(msg);
+                document.getElementById("newFolderName").value = "";
+                openFolderSelectModal(lastHouseId); // 폴더 목록 갱신
+            })
+            .catch(err => {
+                alert("폴더 생성 중 오류가 발생했습니다.");
+                console.error(err);
+            });
+    }
+
 </script>
 </body>
 

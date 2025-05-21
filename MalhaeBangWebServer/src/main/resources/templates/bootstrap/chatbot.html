@@ -10,11 +10,17 @@
     <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
     <link href="/assets/css/main.css" rel="stylesheet" />
     <style>
-
-
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
         main.chatbot-layout {
             display: flex;
-            height: calc(100vh - 80px);
+            height: 100%;
+            flex-direction: row;
+
         }
 
         .sidebar {
@@ -38,12 +44,12 @@
 
         .chatbot-main {
             flex-grow: 1;
+            height: 100%;
             display: flex;
             flex-direction: column;
             background-color: #ffffff;
             color: #000;
             padding: 30px;
-            overflow-y: auto;
         }
 
         .chat-display {
@@ -109,6 +115,7 @@
             border-left: 4px solid #00c851;
             border-radius: 8px;
         }
+
     </style>
 </head>
 <body>
@@ -118,10 +125,15 @@
     <!-- 사이드바 -->
     <aside class="sidebar">
         <div class="listing-card">
-            <strong>[집주인] 다가구</strong><br/>
-            월세 1,000/70<br/>
-            단독/다가구<br/>
-            3/4층, 남동향<br/>
+            <div class="listing-header">
+                <strong>[집주인] 다가구</strong>
+                <span class="favorite-toggle" onclick="toggleFavorite(this)">
+            <i class="bi bi-star"></i> <!-- 초기 상태는 빈 별 -->
+        </span>
+            </div>
+            월세 1,000/70<br />
+            단독/다가구<br />
+            3/4층, 남동향<br />
             #20000이하
         </div>
         <div class="listing-card">
@@ -179,8 +191,8 @@
 
             fetch("http://localhost:8000/query", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query })
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({query})
             })
                 .then(res => res.json())
                 .then(data => {
@@ -205,8 +217,8 @@
             // FastAPI로 POST 요청
             fetch("http://localhost:8000/query", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query })
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({query})
             })
                 .then(res => res.json())
                 .then(data => {
@@ -231,5 +243,16 @@
             }
         });
     });
+
+        function toggleFavorite(elem) {
+        const icon = elem.querySelector("i");
+
+        // 별 아이콘 모양 토글
+        icon.classList.toggle("bi-star");
+        icon.classList.toggle("bi-star-fill");
+
+        // 색상 적용용 클래스 토글
+        elem.classList.toggle("active");
+    }
 </script>
 </html>

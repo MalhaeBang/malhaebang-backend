@@ -3,8 +3,10 @@ package org.example.malhaebangwebserver.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.malhaebangwebserver.model.entity.LikedFolder;
 import org.example.malhaebangwebserver.model.entity.User;
 import org.example.malhaebangwebserver.model.enums.LoginType;
+import org.example.malhaebangwebserver.repository.LikedFolderRepository;
 import org.example.malhaebangwebserver.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LikedFolderRepository likedFolderRepository;
 
     @Transactional
     public void register(String email, String nickname, String password) {
@@ -41,8 +44,14 @@ public class UserService {
                 .build();
 
         log.info("🔥 [회원 생성 직전]");
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);  // ✅ 수정
         log.info("✅ [회원 생성 완료]");
+        LikedFolder defaultFolder = LikedFolder.builder()
+                .user(savedUser)
+                .folderName("기본 폴더")
+                .createdAt(LocalDateTime.now())
+                .build();
+        likedFolderRepository.save(defaultFolder);
     }
 
     public User findByEmail(String email) {

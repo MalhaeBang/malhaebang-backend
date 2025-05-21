@@ -3,9 +3,9 @@ package org.example.malhaebangwebserver.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.malhaebangwebserver.model.entity.Liked;
+import org.example.malhaebangwebserver.model.entity.LikedFolder;
 import org.example.malhaebangwebserver.model.entity.User;
-import org.example.malhaebangwebserver.repository.LikedRepository;
+import org.example.malhaebangwebserver.repository.LikedFolderRepository;
 import org.example.malhaebangwebserver.repository.UserRepository;
 import org.example.malhaebangwebserver.security.CustomUserDetails;
 import org.example.malhaebangwebserver.service.EmailService;
@@ -27,10 +27,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final LikedRepository likedRepository;
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LikedFolderRepository likedFolderRepository;
+
 
     @PostMapping("/signup")
     public String signup(
@@ -56,14 +57,14 @@ public class UserController {
         return "redirect:/";
     }
 
+    // UserController.java
     @GetMapping("/mypage")
     public String mypage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        String email = userDetails.getUsername();
-        User user = userService.findByEmail(email);
-        List<Liked> likedFolder = likedRepository.findAllByUser_UserId(user.getUserId());
-        model.addAttribute("user", user);
-        model.addAttribute("likedFolder", likedFolder);
+        User user = userService.findByEmail(userDetails.getUsername());
+        List<LikedFolder> likedFolders = likedFolderRepository.findAllByUser(user);
 
+        model.addAttribute("user", user);
+        model.addAttribute("likedFolders", likedFolders); // ✔️ 폴더 단위로 넘김
         return "bootstrap/mypage";
     }
 
@@ -72,6 +73,7 @@ public class UserController {
         boolean exists = userService.existsByEmail(email);
 
         if (exists) {
+
             model.addAttribute("emailFound", true);
             model.addAttribute("email", email);
         } else {

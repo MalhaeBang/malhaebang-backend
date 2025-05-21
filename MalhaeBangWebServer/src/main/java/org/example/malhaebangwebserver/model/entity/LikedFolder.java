@@ -30,6 +30,7 @@ public class LikedFolder {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+
     @OneToMany(mappedBy = "folder")
     private List<Liked> likedItems;
 }

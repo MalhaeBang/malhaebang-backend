@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
 
 # requirements.txt 복사 및 설치
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+#RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --no-binary :all: -r requirements.txt
 
 # 모델 캐시 및 기타 불필요한 파일 제거
 RUN rm -rf /root/.cache /root/.huggingface

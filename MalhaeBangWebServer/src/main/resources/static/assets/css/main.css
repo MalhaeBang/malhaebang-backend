@@ -821,10 +821,11 @@ section,
 # Global Section Titles
 --------------------------------------------------------------*/
 .section-title {
-  text-align: center;
-  padding: 30px 0;
-  margin-bottom: 30px;
-  position: relative;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 10px;
+  padding-left: 0px;
 }
 
 .section-title h2 {
@@ -2096,7 +2097,7 @@ header.header {
   left: 0;
   right: 0;
   height: 80px;              /* 고정 높이 */
-  background-color: #0d0d0d;
+  background-color: #0d1d34;
   z-index: 9999;
   width: 100%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* 선택적: 하단 그림자 */
@@ -2104,4 +2105,45 @@ header.header {
 
 main {
   padding-top: 80px !important; /* 헤더 가릴 위험 방지 */
+}
+.nav-link-btn {
+  all: unset;                /* 버튼 스타일 초기화 */
+  cursor: pointer;
+  display: inline-block;
+  padding: 10px 16px;
+  color: #fff;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav-link-btn:hover {
+  text-decoration: underline;
+}
+
+
+
+.listing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.favorite-toggle {
+  font-size: 22px;
+  cursor: pointer;
+  color: #999; /* 기본 회색 */
+  transition: color 0.2s;
+}
+
+.favorite-toggle.active {
+  color: #007bff; /* 클릭되면 파란색 */
+}
+
+.favorite-toggle:hover {
+  color: #1a6eff; /* 호버 시 밝은 파랑 */
+}
+.folder-btn {
+  font-size: 14px;
+  color: #aaa;
+  padding-left: 20px;
 }

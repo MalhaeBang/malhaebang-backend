@@ -9,3 +9,5 @@
 jenkins_home/
 MalhaeBangDevops/.env
 mysql_dump.sql
+
+MalhaeBangCrawler

@@ -12,12 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface HouseRepository extends JpaRepository<House, Integer> {
-            @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(" +
-                    "h.latitude, h.longitude, h.title, h.price, h.address, h.floor, " +
-                    "h.depositType, h.mFee, h.aFrom, h.agentComm, h.agentInfo, " +
-                    "h.roomsCnt, h.options, h.postedAt, h.gu, h.dong, " +
-                    "h.imgUrl, h.area, h.direction, h.builtDate, " +
-                    "h.parking, h.buildingType, h.feature, h.explanations, h.num) " +
+    @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(" +
+            "h.houseId, h.latitude, h.longitude, h.title, h.price, h.address, h.floor, " +
+            "h.depositType, h.mFee, h.aFrom, h.agentComm, h.agentInfo, " +
+            "h.roomsCnt, h.options, h.postedAt, h.gu, h.dong, " +
+            "h.imgUrl, h.area, h.direction, h.builtDate, " +
+            "h.parking, h.buildingType, h.feature, h.explanations, h.num) " +  // ← isLiked 제외
             "FROM House h " +
             "WHERE (:depositType IS NULL OR :depositType = '' OR h.depositType = :depositType) " +
             "AND (:direction IS NULL OR :direction = '' OR h.direction = :direction) " +

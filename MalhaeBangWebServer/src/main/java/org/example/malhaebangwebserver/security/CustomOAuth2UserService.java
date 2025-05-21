@@ -2,8 +2,10 @@ package org.example.malhaebangwebserver.security;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+import org.example.malhaebangwebserver.model.entity.LikedFolder;
 import org.example.malhaebangwebserver.model.entity.User;
 import org.example.malhaebangwebserver.model.enums.LoginType;
+import org.example.malhaebangwebserver.repository.LikedFolderRepository;
 import org.example.malhaebangwebserver.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.*;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -21,7 +23,7 @@ import java.util.UUID;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
-
+    private final LikedFolderRepository likedFolderRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
         log.info("✅ [OAuth2] CustomOAuth2UserService 실행됨");
@@ -100,7 +102,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .isDeleted(false)
                         .loginType(loginType)
                         .build();
-                userRepository.save(user);
+                User savedUser = userRepository.save(user);
+                log.info("🆕 새 유저 저장 완료: {}", savedUser.getUserEmail());
+
+                LikedFolder defaultFolder = LikedFolder.builder()
+                        .user(savedUser)
+                        .folderName("기본 폴더")
+                        .createdAt(LocalDateTime.now())
+                        .build();
+                likedFolderRepository.save(defaultFolder);
+                user = savedUser;
                 log.info("🆕 새 유저 저장 완료: {}", user.getUserEmail());
             }
 

@@ -6,8 +6,8 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Builder
 public class SimpleHouseDto {
+    private Integer houseId;
     private Double latitude;
     private Double longitude;
     private String title;
@@ -33,12 +33,15 @@ public class SimpleHouseDto {
     private String feature;
     private String explanations;
     private Long num;
+    private Boolean isLiked;
 
-    public SimpleHouseDto(Double latitude, Double longitude, String title, String price, String address, String floor,
+
+    public SimpleHouseDto(Integer houseId, Double latitude, Double longitude, String title, String price, String address, String floor,
                           String depositType, String mFee, String aFrom, String agentComm, String agentInfo,
                           String roomsCnt, String options, String postedAt, String gu, String dong,
                           String imgUrl, String area, String direction, String builtDate,
                           String parking, String buildingType, String feature, String explanations, Long num) {
+        this.houseId = houseId;
         this.latitude = latitude;
         this.longitude = longitude;
         this.title = title;
@@ -64,5 +67,6 @@ public class SimpleHouseDto {
         this.feature = feature;
         this.explanations = explanations;
         this.num = num;
+
     }
 }
