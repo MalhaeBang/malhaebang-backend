@@ -1,0 +1,44 @@
+# Python 관련 캐시 파일
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+
+# 가상환경
+venv/
+env/
+.venv/
+.env/
+
+# Git
+.git
+.gitignore
+
+# IDE 및 에디터 설정 파일
+.idea/
+.vscode/
+
+# 운영체제 파일
+.DS_Store
+Thumbs.db
+
+# 테스트 관련
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 빌드 및 배포 파일
+dist/
+build/
+*.egg-info/
+
+# 로그 파일
+*.log
+
+# SQLite DB (MySQL 사용 시 불필요)
+db.sqlite3
+
+# Static & Media (개발 중인 경우 제외, 프로덕션에서는 포함할 수 있음)
+staticfiles/
+media/
