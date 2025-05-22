@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Page</title>
+
+    <!-- CSS -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="/assets/css/main.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        .mypage-wrapper {
+            display: flex;
+            min-height: 80vh;
+        }
+
+        .mypage-sidebar {
+            width: 200px;
+            padding: 20px;
+            border-right: 1px solid #333;
+            height: 80vh;
+
+        }
+
+        .mypage-sidebar h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .mypage-sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .mypage-sidebar li {
+            padding: 10px 0;
+            cursor: pointer;
+            color: #ccc;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .mypage-sidebar li.active {
+            color: #000;
+            font-weight: bold;
+        }
+
+        .mypage-sidebar li.active::before {
+            content: '\25B6';
+            position: absolute;
+            left: 0;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px 40px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .favorite-item {
+            background: #ffffff;
+            border: 2px solid #000;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .favorite-icon {
+            color: #3b82f6;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .favorite-description {
+            font-size: 14px;
+            color: #444;
+        }
+
+        .favorite-details {
+            display: none;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #222;
+        }
+
+        .favorite-item.expanded .favorite-details {
+            display: block;
+        }
+        .sidebar-label {
+            padding: 10px 0;
+            font-weight: bold;
+            color: #999;
+            padding-left: 10px;
+            cursor: default;
+        }
+    </style>
+</head>
+
+<body class="index-page">
+<!-- Header fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="main">
+    <div class="container-fluid mypage-wrapper">
+        <div class="mypage-sidebar">
+            <h2>My page</h2>
+            <ul>
+                <li class="tab-btn section-title active" data-target="info">기본 정보</li>
+                <li class="sidebar-label section-title">찜 목록</li>
+
+                <li th:each="folder : ${likedFolders}"
+                    class="tab-btn folder-btn"
+                    th:data-folder-id="${folder.folderId}"
+                    th:text="${folder.folderName}">
+                </li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            <!-- 기본 정보 탭 -->
+            <div id="info" class="tab-content active">
+                <h4 th:text="${user.userNickname.contains('_') ? #strings.substringBefore(user.userNickname, '_') : user.userNickname} + '님, 안녕하세요.'"></h4>                <p th:text="'Email : ' + ${user.userEmail}"></p>
+            <!-- 여기에 버튼 조건부 렌더링 -->
+                <button class="btn btn-primary btn-change"
+                        th:if="${user.loginType.name() == 'FORM'}"
+                        onclick="location.href='/changepassword'">
+                    비밀번호 변경
+                </button>
+
+                <!-- 회원 탈퇴 버튼 -->
+                <form th:action="@{/user/delete}" method="post" onsubmit="return confirm('정말로 탈퇴하시겠습니까? 탈퇴 시 모든 정보가 삭제됩니다.');">
+                    <button type="submit" class="btn btn-danger mt-3">회원 탈퇴</button>
+                </form>
+            </div>
+
+
+
+            <div id="favorites" class="tab-content">
+                <h4 th:text="${user.userNickname.contains('_') ? #strings.substringBefore(user.userNickname, '_') : user.userNickname} + '님, 찜하신 매물이예요.'"></h4>
+
+                <div th:each="folder : ${likedFolders}">
+                    <div class="favorite-folder-group"
+                         th:attr="data-folder-id=${folder.folderId}"
+                         style="display: none;"> <!-- 초기에는 안 보이게 -->
+
+                        <h5 th:text="${folder.folderName}"></h5>
+
+                        <div th:each="liked : ${folder.likedItems}"
+                             th:if="${liked.house != null}" class="favorite-item">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <i class="bi bi-star-fill favorite-icon"></i>
+                                        <strong th:text="${liked.house.title}"></strong><br>
+                                    </div>
+                                    <div style="color: #1e40af; font-weight: bold;">
+                                        <span th:text="${liked.house.price}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- 주요 설명 -->
+                                <div class="favorite-description" style="margin-top: 5px;">
+                                    <span th:text="${liked.house.area} + '㎡'"></span><br>
+                                    <span th:text="${liked.house.feature}"></span>
+                                </div>
+
+
+
+                                <div class="favorite-details">
+                                    📍 주소: <span th:text="${liked.house.address}"></span><br>
+                                    🧭 방향: <span th:text="${liked.house.direction}"></span><br>
+                                    🏢 층수: <span th:text="${liked.house.floor}"></span><br>
+                                    📦 거래 방식: <span th:text="${liked.house.depositType}"></span><br>
+                                    🅿️ 주차: <span th:text="${liked.house.parking}"></span><br>
+                                    💡 관리비: <span th:text="${liked.house.MFee} + '만원'"></span><br>
+                                    ⏰ 입주 가능일: <span th:text="${liked.house.aFrom}"></span><br>
+                                    🧑‍💼 중개사 정보: <span th:text="${liked.house.agentInfo}"></span><br>
+                                    📞 중개 수수료: <span th:text="${liked.house.agentComm}"></span><br>
+                                    🛏 방 개수: <span th:text="${liked.house.roomsCnt}"></span><br>
+                                    🧰 옵션: <span th:text="${liked.house.options}"></span><br>
+                                    📅 등록일: <span th:text="${liked.house.postedAt}"></span><br>
+                                    🏙 지역: <span th:text="${liked.house.gu} + ' ' + ${liked.house.dong}"></span><br>
+                                    🏠 건물유형: <span th:text="${liked.house.buildingType}"></span><br>
+                                    🏗 준공일: <span th:text="${liked.house.builtDate}"></span><br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer fragment -->
+<!--<footer th:replace="footer :: footer"></footer>-->
+
+<script>
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const folderBtns = document.querySelectorAll('.folder-btn'); // ✅ 미리 정의
+    const folderGroups = document.querySelectorAll('.favorite-folder-group');
+
+    // 🔁 기존 tab-btn 로직 유지
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const target = btn.getAttribute('data-target');
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.id === target) tab.classList.add('active');
+            });
+        });
+    });
+
+    // ✅ 찜 폴더 클릭 시 favorites 탭 활성화 + 해당 폴더만 표시
+    folderBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // 강제 favorites 탭 활성화
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            document.getElementById('favorites').classList.add('active');
+
+            // 사이드바 active 처리
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const folderId = btn.getAttribute('data-folder-id');
+
+            // 폴더 그룹만 표시
+            folderGroups.forEach(group => {
+                group.style.display = (group.getAttribute('data-folder-id') === folderId) ? 'block' : 'none';
+            });
+        });
+    });
+
+    // 🔁 상세 정보 토글
+    const items = document.querySelectorAll('.favorite-item');
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            item.classList.toggle('expanded');
+        });
+    });
+
+    // ✅ 페이지 로딩 시 첫 폴더 자동 클릭
+    window.addEventListener('DOMContentLoaded', () => {
+        const firstFolderBtn = document.querySelector('.folder-btn');
+        if (firstFolderBtn) {
+            firstFolderBtn.click();
+        }
+    });
+</script>
+</body>
+</html>

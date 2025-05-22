@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Page</title>
+
+    <!-- CSS -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="/assets/css/main.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        .coming-soon {
+            min-height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        .coming-soon h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .coming-soon p {
+            font-size: 1.2rem;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body class="index-page">
+<!-- Header fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="main">
+    <div class="container coming-soon">
+        <h1>🚧 아직 준비 중입니다 🚧</h1>
+        <p>빠른 시일 내에 서비스를 제공할 수 있도록 노력하겠습니다.</p>
+    </div>
+
+
+</main>
+
+<!-- Footer fragment -->
+<!--<footer th:replace="footer :: footer"></footer>-->
+
+</body>
+</html>

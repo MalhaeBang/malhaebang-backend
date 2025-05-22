@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>전세가격지수 예측 리포트</title>
+    <style>
+        body { font-family: sans-serif; margin: 30px; }
+        h2, h4 { color: #333; }
+        img { max-width: 100%; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h2>전세가격지수 예측 리포트</h2>
+    <p><strong>지역 1:</strong> {{ selected_region }}</p>
+    <p><strong>지역 2:</strong> {{ selected_region2 }}</p>
+    <p><strong>면적:</strong> {{ selected_label_kor }}</p>
+    <p><strong>선택 연도:</strong> {{ selected_years | join(', ') }}</p>
+
+    {% if plot_url %}
+    <h4>{{ selected_region }} 전체 구간</h4>
+    <img src="data:image/png;base64,{{ plot_url }}">
+    {% endif %}
+
+    {% if plot_url2 %}
+    <h4>{{ selected_region2 }} 전체 구간</h4>
+    <img src="data:image/png;base64,{{ plot_url2 }}">
+    {% endif %}
+
+    {% if plot_url_zoom %}
+    <h4>{{ selected_region }} 예측 구간</h4>
+    <img src="data:image/png;base64,{{ plot_url_zoom }}">
+    {% endif %}
+
+    {% if plot_url_zoom2 %}
+    <h4>{{ selected_region2 }} 예측 구간</h4>
+    <img src="data:image/png;base64,{{ plot_url_zoom2 }}">
+    {% endif %}
+
+    <h4>데이터 테이블</h4>
+    {{ df_html | safe }}
+</body>
+</html>

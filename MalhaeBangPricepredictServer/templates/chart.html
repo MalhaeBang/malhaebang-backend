@@ -1,0 +1,244 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container mt-5">
+    <!-- 페이지 제목 -->
+  <h2 class="text-center mb-5">🏠 오피스텔 전월세 가격 추이</h2>
+
+  <!-- 지역 선택 드롭다운 -->
+  <div class="mb-4">
+    <label for="regionSelect" class="form-label"><strong>지역 선택</strong></label>
+    <select class="form-select" id="regionSelect" onchange="updateChart()">
+      <option value="전국">전국</option>
+      <option value="수도권">수도권</option>
+      <option value="서울">서울</option>
+      <option value="서울 도심권">서울 도심권</option>
+      <option value="서울 동북권">서울 동북권</option>
+      <option value="서울 서북권">서울 서북권</option>
+      <option value="서울 서남권">서울 서남권</option>
+      <option value="서울 동남권">서울 동남권</option>
+    </select>
+  </div>
+
+  <!-- 월별 차트와 표 -->
+  <div class="row mb-5">
+    <div class="col-md-7">
+      <h4 class="text-primary mb-3">월별 오피스텔 평균 보증금 및 월세</h4>
+      <canvas id="monthlyChart" height="150"></canvas>
+    </div>
+    <div class="col-md-5">
+      <div class="accordion" id="monthlyTableAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingMonthly">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMonthly" aria-expanded="false" aria-controls="collapseMonthly">
+              📊 월별 데이터 표 보기
+            </button>
+          </h2>
+          <div id="collapseMonthly" class="accordion-collapse collapse" aria-labelledby="headingMonthly" data-bs-parent="#monthlyTableAccordion">
+            <div class="accordion-body p-2">
+              <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-bordered table-sm table-striped">
+                  <thead class="table-light">
+                    <tr>
+                      <th>날짜</th>
+                      <th>전국<br>보증금</th>
+                      <th>전국<br>월세</th>
+                      <th>서울<br>보증금</th>
+                      <th>서울<br>월세</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in office_monthly | reverse %}
+                    <tr>
+                      <td>{{ row['날짜'] }}</td>
+                      <td>{{ row['전국-평균보증금'] }}</td>
+                      <td>{{ row['전국-평균월세'] }}</td>
+                      <td>{{ row['서울-평균보증금'] }}</td>
+                      <td>{{ row['서울-평균월세'] }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 연도별 차트와 표 -->
+  <div class="row mb-5">
+    <div class="col-md-7">
+      <h4 class="text-success mb-3">연도별 오피스텔 전세 가격</h4>
+      <canvas id="yearlyChart" height="150"></canvas>
+    </div>
+    <div class="col-md-5">
+      <div class="accordion" id="yearlyTableAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingYearlyUnique">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseYearlyUnique" aria-expanded="false" aria-controls="collapseYearlyUnique">
+              📊 연도별 데이터 표 보기
+            </button>
+          </h2>
+          <div id="collapseYearlyUnique" class="accordion-collapse collapse" aria-labelledby="headingYearlyUnique" data-bs-parent="#yearlyTableAccordion">
+            <div class="accordion-body p-2">
+              <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-bordered table-sm table-striped">
+                  <thead class="table-light">
+                    <tr>
+                      <th>날짜</th>
+                      <th>전국<br>전세</th>
+                      <th>서울<br>전세</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in office_yearly | reverse %}
+                    <tr>
+                      <td>{{ row['날짜'] }}</td>
+                      <td>{{ row['전국-평균전세가격'] }}</td>
+                      <td>{{ row['서울-평균전세가격'] }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const officeMonthlyData = {{ office_monthly | tojson | safe }};
+  const officeYearlyData = {{ office_yearly | tojson | safe }};
+
+  let selectedRegion = '전국';
+
+  const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+  const yearlyCtx = document.getElementById('yearlyChart').getContext('2d');
+
+  const monthlyChart = new Chart(monthlyCtx, {
+    type: 'line',
+    data: {
+      labels: officeMonthlyData.map(item => item.날짜),
+      datasets: [
+        {
+          label: selectedRegion + ' 평균 보증금',
+          data: officeMonthlyData.map(item => item[selectedRegion + "-평균보증금"]),
+          borderColor: 'rgb(75, 192, 192)',
+          fill: false,
+          yAxisID: 'y'
+        },
+        {
+          label: selectedRegion + ' 평균 월세',
+          data: officeMonthlyData.map(item => item[selectedRegion + "-평균월세"]),
+          borderColor: 'rgb(255, 99, 132)',
+          fill: false,
+          yAxisID: 'y1'
+        },
+        {
+          label: '서울 평균 보증금',
+          data: officeMonthlyData.map(item => item["서울-평균보증금"]),
+          borderColor: 'rgb(54, 162, 235)',
+          fill: false,
+          borderDash: [5, 5],
+          yAxisID: 'y'
+        },
+        {
+          label: '서울 평균 월세',
+          data: officeMonthlyData.map(item => item["서울-평균월세"]),
+          borderColor: 'rgb(255, 159, 64)',
+          fill: false,
+          borderDash: [5, 5],
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: '월별 평균 보증금 및 월세 추이'
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: '날짜' }
+        },
+        y: {
+          type: 'linear',
+          position: 'left',
+          title: { display: true, text: '보증금 (만원)' }
+        },
+        y1: {
+          type: 'linear',
+          position: 'right',
+          title: { display: true, text: '월세 (만원)' },
+          grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  });
+
+  const yearlyChart = new Chart(yearlyCtx, {
+    type: 'line',
+    data: {
+      labels: officeYearlyData.map(item => item.날짜),
+      datasets: [
+        {
+          label: selectedRegion + ' 평균 전세 가격',
+          data: officeYearlyData.map(item => item[selectedRegion + "-평균전세가격"]),
+          borderColor: 'rgb(54, 162, 235)',
+          fill: false
+        },
+        {
+          label: '서울 평균 전세 가격',
+          data: officeYearlyData.map(item => item["서울-평균전세가격"]),
+          borderColor: 'rgb(153, 102, 255)',
+          fill: false,
+          borderDash: [5, 5]
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: '연도별 전세 가격 추이'
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: '날짜' }
+        },
+        y: {
+          title: { display: true, text: '가격 (만원)' }
+        }
+      }
+    }
+  });
+
+  function updateChart() {
+    selectedRegion = document.getElementById('regionSelect').value;
+
+    monthlyChart.data.datasets[0].label = selectedRegion + ' 평균 보증금';
+    monthlyChart.data.datasets[0].data = officeMonthlyData.map(item => item[selectedRegion + "-평균보증금"]);
+    monthlyChart.data.datasets[1].label = selectedRegion + ' 평균 월세';
+    monthlyChart.data.datasets[1].data = officeMonthlyData.map(item => item[selectedRegion + "-평균월세"]);
+    monthlyChart.update();
+
+    yearlyChart.data.datasets[0].label = selectedRegion + ' 평균 전세 가격';
+    yearlyChart.data.datasets[0].data = officeYearlyData.map(item => item[selectedRegion + "-평균전세가격"]);
+    yearlyChart.update();
+  }
+</script>
+
+{% endblock %}

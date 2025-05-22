@@ -1,0 +1,8 @@
+Flask==2.2.5
+pandas==2.2.2
+matplotlib==3.8.4
+reportlab==4.1.0
+plotly==5.20.0
+gunicorn==21.2.0  # 배포 시 사용 (로컬 개발에서는 선택 사항)
+adjustText
+plotly

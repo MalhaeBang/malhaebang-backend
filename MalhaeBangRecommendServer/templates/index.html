@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대출 마스터</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            padding: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            font-weight: 700;
+        }
+
+        /* 사용자 말풍선 스타일 */
+        .user-bubble {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            text-align: right;
+            max-width: 70%;
+            margin-left: auto;
+        }
+
+        /* 로봇 말풍선 초록색 */
+        .bot {
+            color: #28a745;
+            padding: 10px;
+        }
+
+        .profile-bubble {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            max-width: 70%;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-box {
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-group input {
+            flex: 1;
+            margin-right: 10px;
+            border-radius: 30px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .input-group button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .input-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .container {
+            padding-top: 50px;
+        }
+
+        /* 버튼 스타일 */
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 30px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .alert-info {
+            background-color: #e9f7fd;
+            border-color: #b8d9e6;
+            color: #2c3e50;
+        }
+
+        /* 리스트 스타일 */
+        .list-group-item {
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-group-item:hover {
+            background-color: #f1f1f1;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .loan-name {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.3rem;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+            max-width: 60%;
+        }
+
+        /* 호버 효과 추가 */
+        .loan-name:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 카드의 버튼을 중앙 정렬 */
+        .btn-container {
+            margin-top: auto;
+            text-align: center;
+        }
+
+        .list-group-item strong {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .alert-info strong {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center">💰 대출 마스터</h1>
+
+    <div class="chat-box" id="chat-box">
+        <div class="bot">🤖 안녕하세요! 전세 금액과 자금, 프로필 키워드를 입력해 주세요. 조건에 맞는 대출을 추천해드릴게요!</div>
+    </div>
+
+    <form method="POST" action="/">
+        <div class="form-group">
+            <input type="text" class="form-control" id="user_input" name="user_input" placeholder="예: 전세 2억5천, 자금 1억" required value="{{ user_input or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="user_profile"><strong>💡 키워드 선택:</strong></label>
+            <select class="form-control" id="user_profile" name="user_profile" required>
+                <option value="" disabled {% if not user_profile %}selected{% endif %}>선택하세요</option>
+                <option value="청년" {% if user_profile == '청년' %}selected{% endif %}>청년</option>
+                <option value="직장인" {% if user_profile == '직장인' %}selected{% endif %}>직장인</option>
+                <option value="전세자금" {% if user_profile == '전세자금' %}selected{% endif %}>전세자금</option>
+                <option value="담보" {% if user_profile == '담보' %}selected{% endif %}>담보</option>
+                <option value="신혼" {% if user_profile == '신혼' %}selected{% endif %}>신혼부부</option>
+                <option value="농업" {% if user_profile == '농업' %}selected{% endif %}>농업종사자</option>
+                <option value="의료인" {% if user_profile == '의료인' %}selected{% endif %}>의료인</option>
+                <option value="공무원" {% if user_profile == '공무원' %}selected{% endif %}>공무원</option>
+                <option value="교직원" {% if user_profile == '교직원' %}selected{% endif %}>교직원</option>
+                <option value="사업자" {% if user_profile == '사업자' %}selected{% endif %}>사업자</option>
+                <option value="군인" {% if user_profile == '군인' %}selected{% endif %}>군인</option>
+                <option value="금융인" {% if user_profile == '금융인' %}selected{% endif %}>금융인</option>
+                <option value="외국인" {% if user_profile == '외국인' %}selected{% endif %}>외국인</option>
+                <option value="퇴직" {% if user_profile == '퇴직' %}selected{% endif %}>퇴직</option>
+                <option value="국가유공자" {% if user_profile == '국가유공자' %}selected{% endif %}>국가유공자</option>
+                <option value="가족" {% if user_profile == '가족' %}selected{% endif %}>가족</option>
+                <option value="무주택" {% if user_profile == '무주택' %}selected{% endif %}>무주택</option>
+                <option value="보증금" {% if user_profile == '보증금' %}selected{% endif %}>보증금</option>
+                <option value="서민" {% if user_profile == '서민' %}selected{% endif %}>서민</option>
+                <option value="월세" {% if user_profile == '월세' %}selected{% endif %}>월세</option>
+                <option value="공공주택" {% if user_profile == '공공주택' %}selected{% endif %}>공공주택</option>
+                <option value="대환" {% if user_profile == '대환' %}selected{% endif %}>대환</option>
+                <option value="전세사기" {% if user_profile == '전세사기' %}selected{% endif %}>전세사기</option>
+            </select>
+        </div>
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">🎯 추천 받기</button>
+        </div>
+
+    </form>
+
+    {% if results %}
+    <hr>
+    <h2>🤖 추천 대출 상품</h2><br>
+    <div class="alert alert-info">
+        <p><strong>💸 보유 자금:</strong> {{ own_money }} </p>
+        <p><strong>💰 희망 전세금:</strong> {{ rent_price }}</p>
+        <p><strong>🔑 필요 대출금액:</strong> {{ required_loan }}</p>
+    </div>
+
+    <ul class="list-group">
+        {% for loan in results %}
+        <li class="list-group-item">
+            <strong>
+                <span class="loan-name">{{ loan['name'] }}</span>
+            </strong><br>
+            <p><strong>🔑 특징:</strong> {{ loan['feature'] }}</p>
+            <p><strong>📉 금리:</strong> {{ loan['rate'] }}</p>
+            <p><strong>💰 한도:</strong> {{ loan['limit'] }}</p>
+            <p><strong>⏳ 대출 기간:</strong> {{ loan['period'] }}</p>
+            <p><strong>💡 추천 이유:</strong> {{ loan['reason'] }}</p>
+
+            <!-- 중앙 정렬된 '자세히 보기' 버튼 -->
+            <div class="btn-container">
+                <a href="{{ loan['link'] }}" target="_blank" class="btn btn-primary">📖 자세히 보기</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% else %}
+    <div class="alert alert-warning">
+        조건에 맞는 대출 상품이 없습니다.
+    </div>
+
+    {% endif %}
+</div>
+
+</body>
+</html>

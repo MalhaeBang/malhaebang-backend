@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Page</title>
+
+    <!-- CSS -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="/assets/css/main.css" rel="stylesheet" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        main.chatbot-layout {
+            display: flex;
+            height: 100%;
+            flex-direction: row;
+
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #e5ebf0;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .listing-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #000;
+        }
+
+        .chatbot-main {
+            flex-grow: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            color: #000;
+            padding: 30px;
+        }
+
+        .chat-display {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            color: #000;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            background-color: #d0e8ff;
+            border-color: #8ecaff;
+        }
+
+        .chat-message.bot {
+            align-self: flex-start;
+            background-color: #fff;
+            border-color: #ccc;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .chat-input-area button {
+            background-color: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+        }
+
+        .tip-box {
+            font-size: 14px;
+            background: #e0f7e9;
+            padding: 10px;
+            margin-top: 10px;
+            border-left: 4px solid #00c851;
+            border-radius: 8px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="chatbot-layout">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+        <div class="listing-card">
+            <div class="listing-header">
+                <strong>[집주인] 다가구</strong>
+                <span class="favorite-toggle" onclick="toggleFavorite(this)">
+            <i class="bi bi-star"></i> <!-- 초기 상태는 빈 별 -->
+        </span>
+            </div>
+            월세 1,000/70<br />
+            단독/다가구<br />
+            3/4층, 남동향<br />
+            #20000이하
+        </div>
+        <div class="listing-card">
+            <strong>[집주인] 단독</strong><br/>
+            전세 2,000<br/>
+            단독/다가구<br/>
+            3/4층, 남동향<br/>
+            #20000이하
+        </div>
+        <!-- 추가 매물 카드들 -->
+    </aside>
+
+    <!-- 메인 -->
+    <div class="chatbot-main">
+        <div class="chat-display" id="chatWindow">
+            <div class="tip-box">
+                ✅ Tip! 낮에 방문하여 채광 & 환기를 꼭 확인해보세요!
+            </div>
+            <div class="tip-box">
+                ✅ Tip! 전입신고 + 확정일자를 꼭 받으세요!
+            </div>
+            <div class="chat-message bot">
+                🏡 서울 용산구에 월세 150 이하인 집에서 살고 싶어...
+            </div>
+            <div class="chat-message bot">
+                💡 조건에 맞는 집을 추천해드릴게요!
+                <img src="/assets/img/map-mockup.png" style="width: 100%; border-radius: 10px; margin: 10px 0;" />
+            </div>
+
+            <div class="chat-message user">
+                반려동물 가능한 집으로 필터링해줘.
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" placeholder="조건을 입력해보세요..." />
+            <button>전송</button>
+        </div>
+    </div>
+</main>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chatWindow = document.getElementById("chatWindow");
+        const inputField = document.querySelector(".chat-input-area input");
+        const sendButton = document.querySelector(".chat-input-area button");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+
+        if (query) {
+            const userMessage = document.createElement("div");
+            userMessage.className = "chat-message user";
+            userMessage.textContent = decodeURIComponent(query);
+            chatWindow.appendChild(userMessage);
+
+            fetch("http://localhost:8000/query", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({query})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot";
+                    botMessage.textContent = data.response;
+                    chatWindow.appendChild(botMessage);
+                });
+        }
+        // 버튼 클릭 시 입력된 값으로 챗봇 응답 요청
+        sendButton.addEventListener("click", () => {
+            const query = inputField.value.trim();
+            if (!query) return;
+
+            // 사용자 메시지 표시
+            const userMessage = document.createElement("div");
+            userMessage.className = "chat-message user";
+            userMessage.textContent = query;
+            chatWindow.appendChild(userMessage);
+            inputField.value = "";
+
+            // FastAPI로 POST 요청
+            fetch("http://localhost:8000/query", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({query})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot";
+                    botMessage.textContent = data.response;
+                    chatWindow.appendChild(botMessage);
+                })
+                .catch(err => {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot";
+                    botMessage.textContent = "⚠️ 서버 연결에 실패했습니다.";
+                    chatWindow.appendChild(botMessage);
+                    console.error("Error:", err);
+                });
+        });
+        inputField.addEventListener("keydown", function (event) {
+            if (event.isComposing) return;
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendButton.click();
+            }
+        });
+    });
+
+        function toggleFavorite(elem) {
+        const icon = elem.querySelector("i");
+
+        // 별 아이콘 모양 토글
+        icon.classList.toggle("bi-star");
+        icon.classList.toggle("bi-star-fill");
+
+        // 색상 적용용 클래스 토글
+        elem.classList.toggle("active");
+    }
+</script>
+</html>

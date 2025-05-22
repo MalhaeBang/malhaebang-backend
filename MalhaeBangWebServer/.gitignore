@@ -41,5 +41,8 @@ out/
 **/application.yml
 env.md
 
+### json파일 ###
+src/main/resources/static/assets/json
 ### 트러블 슈팅 ###
 info.md
+use.md

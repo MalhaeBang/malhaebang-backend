@@ -1,73 +1,85 @@
 package org.example.malhaebangwebserver.service;
 
-import org.example.malhaebangwebserver.model.dto.UserDto;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.malhaebangwebserver.model.entity.LikedFolder;
 import org.example.malhaebangwebserver.model.entity.User;
+import org.example.malhaebangwebserver.model.enums.LoginType;
+import org.example.malhaebangwebserver.repository.LikedFolderRepository;
 import org.example.malhaebangwebserver.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
+
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final LikedFolderRepository likedFolderRepository;
 
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(user -> UserDto.builder()
-                        .id(user.getId())
-                        .name(user.getName())
-                        .email(user.getEmail())
-                        .build())
-                .collect(Collectors.toList());
-    }
+    @Transactional
+    public void register(String email, String nickname, String password) {
+        log.info("🔥 [회원가입 시도] 이메일: {}", email);
+        if (userRepository.existsByUserEmail(email)) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
 
-    public UserDto createUser(UserDto dto) {
         User user = User.builder()
-                .name(dto.getName())
-                .email(dto.getEmail())
+                .userEmail(email)
+                .userPw(passwordEncoder.encode(password))
+                .userNickname(nickname)
+                .createdAt(LocalDateTime.now())
+                .isDeleted(false)
+                .loginType(LoginType.FORM)
                 .build();
 
-        User saved = userRepository.save(user);
-
-        return UserDto.builder()
-                .id(saved.getId())
-                .name(saved.getName())
-                .email(saved.getEmail())
+        log.info("🔥 [회원 생성 직전]");
+        User savedUser = userRepository.save(user);  // ✅ 수정
+        log.info("✅ [회원 생성 완료]");
+        LikedFolder defaultFolder = LikedFolder.builder()
+                .user(savedUser)
+                .folderName("기본 폴더")
+                .createdAt(LocalDateTime.now())
                 .build();
+        likedFolderRepository.save(defaultFolder);
     }
 
-    public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
-
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .build();
+    public User findByEmail(String email) {
+        return userRepository.findByUserEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
     }
 
-    public UserDto updateUser(Long id, UserDto dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
-
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-
-        User updated = userRepository.save(user);
-
-        return UserDto.builder()
-                .id(updated.getId())
-                .name(updated.getName())
-                .email(updated.getEmail())
-                .build();
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByUserEmail(email);
     }
 
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    @Transactional
+    public String resetPassword(String email) {
+        User user = userRepository.findByUserEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("이메일 없음"));
+
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        user.setUserPw(passwordEncoder.encode(tempPassword));
+        userRepository.save(user);
+
+        log.info("🔐 임시 비밀번호: {}", tempPassword);
+
+        return tempPassword;
+    }
+    @Transactional
+    public void deleteUser(User user) {
+        user.setIsDeleted(true);
+        userRepository.save(user);
+        log.info("🗑️ 회원 탈퇴 처리 완료: {}", user.getUserEmail());
     }
 }

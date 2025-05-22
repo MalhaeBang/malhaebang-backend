@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">📝 전세가격지수 비교 보고서</h2>
+    <p class="text-center mb-5">기준시점 2025.03.31 = 100.0</p>
+
+    <!-- 입력 폼 -->
+    <form method="POST" class="mb-5">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="region" class="form-label">지역1:</label>
+                <select name="region" class="form-control">
+                    {% for region in regions %}
+                    <option value="{{ region }}" {% if region == selected_region %}selected{% endif %}>{{ region }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="region2" class="form-label">지역2:</label>
+                <select name="region2" class="form-control">
+                    {% for region in regions %}
+                    <option value="{{ region }}" {% if region == selected_region2 %}selected{% endif %}>{{ region }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="label" class="form-label">면적:</label>
+                <select name="label" class="form-control">
+                    {% for label, label_kor in zipped_labels %}
+                    <option value="{{ label }}" {% if label == selected_label %}selected{% endif %}>{{ label_kor }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">분석</button>
+        </div>
+    </form>
+
+    <!-- 그래프 2x2 -->
+    <div class="row mb-5">
+        {% if plot_url %}
+        <div class="col-md-6 mb-4">
+            <h4 class="text-center">{{ selected_region }}: {{ selected_label_kor }} 전체 구간</h4>
+            <img src="data:image/png;base64,{{ plot_url }}" class="img-fluid rounded shadow-sm">
+        </div>
+        {% endif %}
+
+        {% if plot_url2 %}
+        <div class="col-md-6 mb-4">
+            <h4 class="text-center">{{ selected_region2 }}: {{ selected_label_kor }} 전체 구간</h4>
+            <img src="data:image/png;base64,{{ plot_url2 }}" class="img-fluid rounded shadow-sm">
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row mb-5">
+        {% if plot_url_zoom %}
+        <div class="col-md-6 mb-4">
+            <h4 class="text-center">{{ selected_region }}: {{ selected_label_kor }} 예측 구간</h4>
+            <img src="data:image/png;base64,{{ plot_url_zoom }}" class="img-fluid rounded shadow-sm">
+        </div>
+        {% endif %}
+
+        {% if plot_url_zoom2 %}
+        <div class="col-md-6 mb-4">
+            <h4 class="text-center">{{ selected_region2 }}: {{ selected_label_kor }} 예측 구간</h4>
+            <img src="data:image/png;base64,{{ plot_url_zoom2 }}" class="img-fluid rounded shadow-sm">
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 연도 필터링 -->
+    <div class="card mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">조회하고자 하는 연도를 선택하세요</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="d-flex flex-wrap">
+                    {% set all_years = ['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'] %}
+                    {% for year in all_years %}
+                    <label class="mr-4 mb-2" style="display: inline-block; margin-right: 20px; margin-left: 20px;">
+                        <input type="checkbox" name="years[]" value="{{ year }}" {% if year in selected_years %}checked{% endif %}> {{ year }}
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-gradient btn-lg px-5 py-3" style="
+                        background: linear-gradient(135deg, #6e7bff, #a14bff); 
+                        color: white; 
+                        border-radius: 30px; 
+                        border: none; 
+                        font-size: 18px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                        transition: all 0.3s ease;
+                    ">조회</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 데이터 표 -->
+    <div class="mt-4">
+        <button class="btn btn-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#mainTable" aria-expanded="false" aria-controls="mainTable">
+            데이터 표 보기/숨기기
+        </button>
+
+        <div class="collapse show" id="mainTable">
+            <div style="overflow-x: auto; max-width: 100%; word-wrap: break-word;">
+                {{ df_html|safe }}
+            </div>
+        </div>
+
+        <!-- PDF 다운로드 버튼 -->
+        <form method="POST" action="/download_pdf">
+            <input type="hidden" name="selected_region" value="{{ selected_region }}">
+            <input type="hidden" name="selected_region2" value="{{ selected_region2 }}">
+            <input type="hidden" name="selected_label" value="{{ selected_label }}">
+            <input type="hidden" name="selected_label_kor" value="{{ selected_label_kor }}">
+            {% for year in selected_years %}
+            <input type="hidden" name="selected_years" value="{{ year }}">
+            {% endfor %}
+
+            <input type="hidden" name="plot_url" value="{{ plot_url }}">
+            <input type="hidden" name="plot_url_zoom" value="{{ plot_url_zoom }}">
+            <input type="hidden" name="plot_url2" value="{{ plot_url2 }}">
+            <input type="hidden" name="plot_url_zoom2" value="{{ plot_url_zoom2 }}">
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-danger btn-lg">PDF 다운로드</button>
+            </div>
+        </form>
+    </div>    
+</div>
+{% endblock %}
