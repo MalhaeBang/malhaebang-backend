@@ -98,6 +98,25 @@ services:
     networks:
       - malhaebang-network
 
+  malhaebang-saju:
+    build:
+      context: ../MalhaeBangSajuServer
+      dockerfile: Dockerfile
+    container_name: malhaebang-saju
+    ports:
+      - "8010:8000"
+    depends_on:
+      - mysql
+    environment:
+      DJANGO_SETTINGS_MODULE: saju_project.settings
+      DATABASE_NAME: ${MYSQL_DATABASE}
+      DATABASE_USER: root
+      DATABASE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+    networks:
+      - malhaebang-network
+
 networks:
   malhaebang-network:
 volumes:
