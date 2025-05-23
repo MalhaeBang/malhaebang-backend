@@ -196,11 +196,17 @@
             })
                 .then(res => res.json())
                 .then(data => {
+                    console.log("서버 응답:", data.response);
                     const botMessage = document.createElement("div");
                     botMessage.className = "chat-message bot";
                     botMessage.textContent = data.response;
                     chatWindow.appendChild(botMessage);
+                })
+                .catch(err => {
+                    console.error("fetch 오류:", err);
+                    // 에러 시 처리 코드
                 });
+
         }
         // 버튼 클릭 시 입력된 값으로 챗봇 응답 요청
         sendButton.addEventListener("click", () => {

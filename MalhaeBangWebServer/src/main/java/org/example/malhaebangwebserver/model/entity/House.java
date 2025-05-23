@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @Table(name = "house")
 public class House {
 
@@ -28,26 +29,28 @@ public class House {
     private String address;
 
     @Column(nullable = false)
-    private String floor;
+    private Integer floor;
 
     @Column(name = "deposit_type", nullable = false)
     private String depositType;
 
     @Column(name = "management_fee")
-    private String mFee;
+    private Integer mfee;
 
-    @Column(name = "availabe_from", nullable = false)
+    @Column(name = "available_from", nullable = false)
     private String aFrom;
 
+    @Column(name = "house_num", nullable = false)
+    private Long houseNum;
 
     @Column(name = "agent_comm")
-    private String agentComm;
+    private Integer agentComm;
 
     @Column(name = "agent_info", nullable = false)
     private String agentInfo;
 
     @Column(name = "rooms_count", nullable = false)
-    private String roomsCnt;
+    private Integer roomsCount;
 
     @Column(columnDefinition = "TEXT")
     private String options;
@@ -61,14 +64,11 @@ public class House {
     @Column(nullable = false)
     private String dong;
 
-    @Column(name = "apt_name")
-    private String aptName;
-
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
     @Column(name = "area_size", nullable = false)
-    private String area;
+    private String areaSize;
 
     @Column(nullable = false)
     private String direction;
@@ -77,20 +77,40 @@ public class House {
     private String builtDate;
 
     @Column(nullable = false)
-    private String parking;
+    private Integer parking;
 
     @Column(name = "building_type", nullable = false)
     private String buildingType;
 
     @Column(name = "house_feature", columnDefinition = "TEXT")
-    private String feature;
+    private String houseFeature;
 
     @Column(name = "house_explanations", columnDefinition = "TEXT")
-    private String explanations;
+    private String houseExplanations;
 
+    @Column(name = "apt_name")
+    private String aptName;
 
-    @Column(name = "house_num", nullable = false)
-    private Long num;
+    @Column(name = "safety_grade")
+    private String safetyGrade;
+
+    @Column
+    private Integer deposit;
+
+    @Column(name = "monthly_rent")
+    private Integer monthlyRent;
+
+    @Column
+    private Integer space;
+
+    @Column(name = "bath_count")
+    private Integer bathCount;
+
+    @Column(name = "total_floor")
+    private Integer totalFloor;
+
+    @Column(columnDefinition = "TEXT")
+    private String gptDescription;
 
     @Setter
     private Double latitude;
@@ -98,11 +118,10 @@ public class House {
     @Setter
     private Double longitude;
 
+    // 관계 필드 예시
     @OneToOne(mappedBy = "house", fetch = FetchType.LAZY)
     private SafetyScore safetyScore;
 
     @OneToMany(mappedBy = "house")
     private List<HouseKeyword> houseKeywords;
-
-
 }

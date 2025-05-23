@@ -14,14 +14,14 @@ import java.util.Optional;
 public interface HouseRepository extends JpaRepository<House, Integer> {
     @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(" +
             "h.houseId, h.latitude, h.longitude, h.title, h.price, h.address, h.floor, " +
-            "h.depositType, h.mFee, h.aFrom, h.agentComm, h.agentInfo, " +
-            "h.roomsCnt, h.options, h.postedAt, h.gu, h.dong, " +
-            "h.imgUrl, h.area, h.direction, h.builtDate, " +
-            "h.parking, h.buildingType, h.feature, h.explanations, h.num) " +  // ← isLiked 제외
+            "h.depositType, h.mfee, h.aFrom, h.agentComm, h.agentInfo, " +
+            "h.roomsCount, h.options, h.postedAt, h.gu, h.dong, " +
+            "h.imgUrl, h.areaSize, h.direction, h.builtDate, " +
+            "h.parking, h.buildingType, h.houseFeature, h.houseExplanations, h.houseNum) " +  // isLiked 제외
             "FROM House h " +
             "WHERE (:depositType IS NULL OR :depositType = '' OR h.depositType = :depositType) " +
             "AND (:direction IS NULL OR :direction = '' OR h.direction = :direction) " +
-            "AND (:parking IS NULL OR :parking = '' OR h.parking = :parking) " +
+            "AND (:parking IS NULL OR :parking = '' OR CAST(h.parking AS string) = :parking) " + // parking 타입 변환 필요할 수 있음
             "AND (:gu IS NULL OR :gu = '' OR h.gu = :gu) " +
             "AND (:dong IS NULL OR :dong = '' OR h.dong = :dong)")
     List<SimpleHouseDto> findSimpleDtoByFilters(@Param("depositType") String depositType,
