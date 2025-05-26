@@ -1,10 +1,8 @@
 <div th:fragment="chatbot">
     <button id="chatbotToggle" class="chatbot-toggle-btn" aria-label="chatbot">
-        💬
+        <img src="/assets/img/malhaebang/logo_low.png" alt="챗봇 아이콘" class="chatbot-logo">
     </button>
-
-    <div id="chatbotPopup" class="chatbot-popup" style="display:none;">
-        <button id="chatbotClose" aria-label="chatbot_close">X</button>
+    <div id="chatbotPopup" class="chatbot-popup">
 
         <header class="chatbot-header">
             <img src="/assets/img/malhaebang/logo3d.jpg" alt="로고" class="chatbot-logo" />
@@ -15,205 +13,197 @@
         </header>
 
         <main class="chatbot-layout">
-                <div class="chatbot-main" id="chatWindow">
-                <div class="chatbot-main-logo">
-                    <img src="/assets/img/malhaebang/logo3d.jpg" alt="큰 로고" />
-                </div>
-
-                <div class="tip-box">✅ Tip! 전입신고 + 확정일자를 꼭 받으세요!</div>
-
-                <div class="chat-message bot">🏡 서울 용산구에 월세 150 이하인 집에서 살고 싶어...</div>
-                <div class="chat-message bot">💡 조건에 맞는 집을 추천해드릴게요!!!!!!!!!!</div>
-
-                <div class="chat-message user">
-                    반려동물 가능한 집으로 필터링해줘.
-                </div>
+            <div class="chatbot-main" id="chatWindow">
+                <div class="chat-message bot">👤 서울 용산구에 월세 150 이하인 집에서 살고 싶어</div>
+                <div class="chat-message bot">🤖 조건을 입력하시면 추천해드릴게요!</div>
+                <div class="chat-message user">노량진 전세 1억 이하, 주차 가능한 집 찾아줘.</div>
             </div>
 
             <div class="chat-input-area">
-                <input type="text" placeholder="조건을 입력해보세요..." />
+                <input type="text" placeholder="조건을 입력해 주세요." />
                 <button>전송</button>
             </div>
         </main>
+
+        <div class="chat-tip">✅ Tip! 전입신고 + 확정일자를 꼭 받으세요!</div>
     </div>
 
     <style>
         .chatbot-toggle-btn {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background-color: #2b6bed;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            bottom: 24px;
+            right: 24px;
+            padding: 0;
             border: none;
+            background: none;
             cursor: pointer;
-            color: white;
-            font-size: 28px;
-            z-index: 1000;
+            z-index: 9999;
+        }
+
+        .chatbot-logo {
+            width: 48px;
+            height: 48px;
         }
 
         .chatbot-popup {
             position: fixed;
             bottom: 90px;
             right: 20px;
-            width: 425px;
-            height: 570px;
+            width: 420px;
+            height: 600px;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 3px 20px rgba(0,0,0,0.3);
-            z-index: 1100;
+            box-shadow: 0 3px 20px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
+            z-index: 1100;
+            overflow: hidden;
+
+            /* 애니메이션 효과용 초기 상태 */
+            transform: scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .chatbot-popup.show {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .chatbot-header {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             padding: 15px 20px;
             border-bottom: 1px solid #eee;
             background-color: #fff;
-            flex-shrink: 0;
-        }
-
-        .chatbot-logo {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
         }
 
         .chatbot-header-text h1 {
-            font-size: 1.25rem;
             margin: 0;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: #3a3a3a;
         }
 
         .chatbot-header-text p {
             margin: 0;
-            font-size: 0.875rem;
-            color: #888;
+            font-size: 0.85rem;
+            color: #666;
         }
 
-        main.chatbot-layout {
-            flex: 1 1 auto;
+        .chatbot-layout {
+            flex: 1;
             display: flex;
-            flex-direction: column; /* 기존: row → column 으로 변경 */
-            height: 100%;
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-            overflow: hidden;     /* ✅ 여기선 스크롤 안 주는 게 맞음 */
+            flex-direction: column;
+            padding: 5px 16px !important;;
+            overflow: hidden;
         }
 
         .chatbot-main {
-            flex: 1 1 auto;
+            background-image: url('/assets/img/malhaebang/logo3d.jpg');
+            background-size: 300px auto;
+            background-repeat: no-repeat;
+            background-position: center center;
+            /*background-attachment: local;       */
+
+            flex: 1;
             overflow-y: auto;
-            padding: 5px;
+            padding: 10px 0;
             display: flex;
             flex-direction: column;
-            min-height: 0; /* ❗ 핵심: 스크롤 허용 */
-        }
-
-        .chatbot-main-logo {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-
-        .chatbot-main-logo img {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
+            gap: 8px;
         }
 
         .chat-message {
-            max-width: 70%;
             padding: 12px 16px;
-            border-radius: 16px;
+            border-radius: 20px;
             font-size: 14px;
             line-height: 1.4;
-            word-wrap: break-word;
-            border: 1px solid #ccc;
-            color: #000;
-            margin-bottom: 5px;
+            word-break: keep-word;
+            white-space: pre-wrap;
+            max-width: 85%;
+            margin-bottom: 12px;
+
         }
 
         .chat-message.bot {
             align-self: flex-start;
-            background-color: #ffffff;
-            border-color: #ccc;
+            background-color: #f2f2f2;
+            color: #333;
         }
 
         .chat-message.user {
             align-self: flex-end;
-            background-color: #d0e8ff;
-            border-color: #8ecaff;
+            background-color: #111827;
+            color: #fff;
         }
 
         .chat-input-area {
-            flex-shrink: 0;
             display: flex;
-            gap: 10px;
-            padding: 10px;
+            padding: 12px 16px;
             border-top: 1px solid #eee;
-            background-color: white;
+            gap: 10px;
         }
 
         .chat-input-area input {
-            flex-grow: 1;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            flex: 1;
+            border-radius: 20px;
+            padding: 10px 14px;
             font-size: 14px;
+            border: 1px solid #aaa;
         }
 
         .chat-input-area button {
-            background-color: #3b82f6;
-            color: #fff;
+            background-color: #111827;
+            color: white;
             border: none;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-size: 14px;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .chat-tip {
+            font-size: 13px;
+            padding: 8px 16px;
+            background-color: white;
+            border-top: 1px solid #eee;
+            color: #222;
+            text-align: left;
         }
 
         #chatbotClose {
             position: absolute;
-            top: 5px;
-            right: 10px;
-            background: transparent;
+            top: 10px;
+            right: 12px;
+            background: none;
             border: none;
             font-size: 18px;
             cursor: pointer;
-            z-index: 1200;
-        }
-
-        .tip-box {
-            font-size: 14px;
-            color: #222;
-            margin: 10px 0;
         }
     </style>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const toggleBtn = document.getElementById('chatbotToggle');
             const popup = document.getElementById('chatbotPopup');
             const closeBtn = document.getElementById('chatbotClose');
             const chatWindow = document.getElementById("chatWindow");
-
             const inputField = popup.querySelector(".chat-input-area input");
             const sendButton = popup.querySelector(".chat-input-area button");
 
+            // ✅ [1] 토글 버튼으로 열기/닫기
             toggleBtn.addEventListener('click', () => {
-                popup.style.display = 'block';
-                toggleBtn.style.display = 'none';
+                popup.classList.toggle('show');
             });
 
+            // ✅ [2] X 버튼으로 닫기
             closeBtn.addEventListener('click', () => {
-                popup.style.display = 'none';
-                toggleBtn.style.display = 'block';
+                popup.classList.remove('show');
             });
 
+            // ✅ [3] 메시지 전송
             sendButton.addEventListener("click", () => {
                 const query = inputField.value.trim();
                 if (!query) return;
@@ -235,20 +225,19 @@
                         botMessage.className = "chat-message bot";
                         botMessage.textContent = data.response;
                         chatWindow.appendChild(botMessage);
-                        chatWindow.scrollTop = chatWindow.scrollHeight; // 자동 스크롤
+                        chatWindow.scrollTop = chatWindow.scrollHeight;
                     })
-                    .catch(err => {
+                    .catch(() => {
                         const errorMessage = document.createElement("div");
                         errorMessage.className = "chat-message bot";
                         errorMessage.textContent = "⚠️ 서버 연결에 실패했습니다.";
                         chatWindow.appendChild(errorMessage);
-                        console.error("Error:", err);
                     });
             });
 
+            // ✅ [4] Enter 키로 전송
             inputField.addEventListener("keydown", function (event) {
-                if (event.isComposing) return;
-                if (event.key === "Enter") {
+                if (event.key === "Enter" && !event.isComposing) {
                     event.preventDefault();
                     sendButton.click();
                 }

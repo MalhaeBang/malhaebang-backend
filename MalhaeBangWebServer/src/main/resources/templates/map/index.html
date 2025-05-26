@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <title>Kakao 지도 - 내 주소 ➔ 아파트 길찾기</title>
+    <link href="assets/img/malhaebang/logo_low.png" rel="icon">
+    <link href="assets/img/malhaebang/logo_low.png" rel="apple-touch-icon">
 
     <!-- Vendor CSS -->
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -548,7 +550,15 @@
                 document.getElementById("folderConfirmBtn").onclick = () => {
                     if (selectedFolderId) {
                         saveToFolder(houseId, selectedFolderId);
-                        bootstrap.Modal.getInstance(document.getElementById("folderSelectModal")).hide();
+
+                        const modalElement = document.getElementById("folderSelectModal");
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide();
+
+                        // ✅ 회색 백그라운드 제거
+                        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = 'auto';
                     } else {
                         alert("폴더를 선택해주세요.");
                     }

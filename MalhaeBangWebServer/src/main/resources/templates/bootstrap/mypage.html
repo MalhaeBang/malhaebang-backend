@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Page</title>
+    <link href="assets/img/malhaebang/logo_low.png" rel="icon">
+    <link href="assets/img/malhaebang/logo_low.png" rel="apple-touch-icon">
 
     <!-- CSS -->
     <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -14,6 +16,7 @@
         body {
             background-color: #ffffff;
             color: #000;
+            font-family: 'Noto Sans KR', sans-serif;
         }
 
         .mypage-wrapper {
@@ -22,47 +25,104 @@
         }
 
         .mypage-sidebar {
-            width: 200px;
+            width: 220px;
             padding: 20px;
-            border-right: 1px solid #333;
-            height: 80vh;
-
+            border-right: 1px solid #ddd;
+            height: 100%;
         }
 
-        .mypage-sidebar h2 {
-            font-size: 28px;
-            margin-bottom: 30px;
-        }
-
-        .mypage-sidebar ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .mypage-sidebar li {
-            padding: 10px 0;
-            cursor: pointer;
-            color: #ccc;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .mypage-sidebar li.active {
-            color: #000;
+        .mypage-title {
+            font-size: 24px;
             font-weight: bold;
+            margin-bottom: 10px;
+            color: #001f60;
         }
 
-        .mypage-sidebar li.active::before {
-            content: '\25B6';
+        .mypage-divider {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 10px 0 20px 0;
+        }
+
+        /* 공통 메뉴 스타일 */
+        .mypage-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-item {
+            padding: 12px 16px;
+            border-top: 1px solid #eee;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+            position: relative;
+        }
+
+        .menu-item:first-child {
+            border-top: none;
+        }
+
+        .menu-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .menu-item.active {
+            background-color: #f5f5f5;
+            border-left: 4px solid #007bff;
+            color: #007bff;
+        }
+
+        .menu-item.active::before {
+            content: none;
             position: absolute;
-            left: 0;
-            color: #aaa;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: #007bff;
+            border-radius: 50%;
+        }
+
+        /* 폴더 토글 영역 */
+        .sidebar-toggle {
+            cursor: pointer;
+            font-weight: bold;
+            color: #111;
+            margin-top: 20px;
+            padding-left: 10px;
+            font-size: 16px;
+        }
+
+        .folder-list {
+            list-style: none;
+            padding-left: 20px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .folder-list.active {
+            display: block;
+        }
+
+        .folder-btn {
+            padding: 6px 0;
+            cursor: pointer;
+            color: #555;
             font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .folder-btn:hover {
+            text-decoration: underline;
+            color: #000;
         }
 
         .content-area {
             flex-grow: 1;
-            padding: 20px 40px;
+            padding: 30px 40px;
         }
 
         .tab-content {
@@ -104,12 +164,12 @@
         .favorite-item.expanded .favorite-details {
             display: block;
         }
-        .sidebar-label {
-            padding: 10px 0;
-            font-weight: bold;
-            color: #999;
-            padding-left: 10px;
-            cursor: default;
+
+        h4 {
+            line-height: 1.5 !important;
+        }
+        h5 {
+            line-height: 2.5 !important;
         }
     </style>
 </head>
@@ -121,11 +181,16 @@
 <main class="main">
     <div class="container-fluid mypage-wrapper">
         <div class="mypage-sidebar">
-            <h2>My page</h2>
-            <ul>
-                <li class="tab-btn section-title active" data-target="info">기본 정보</li>
-                <li class="sidebar-label section-title">찜 목록</li>
+            <h2 class="mypage-title">My page</h2>
+            <hr class="mypage-divider">
+            <ul class="mypage-menu">
+                <li class="menu-item tab-btn active" data-target="info">기본 정보</li>
+                <li class="menu-item tab-btn" data-target="favorites">찜 목록</li>
+            </ul>
 
+            <hr class="mypage-divider"> <!-- 메뉴 하단 구분선 -->
+
+            <ul class="folder-list" id="folderList">
                 <li th:each="folder : ${likedFolders}"
                     class="tab-btn folder-btn"
                     th:data-folder-id="${folder.folderId}"
@@ -178,8 +243,8 @@
 
                                 <!-- 주요 설명 -->
                                 <div class="favorite-description" style="margin-top: 5px;">
-                                    <span th:text="${liked.house.area} + '㎡'"></span><br>
-                                    <span th:text="${liked.house.feature}"></span>
+                                    <span th:text="${liked.house.areaSize} + '㎡'"></span><br>
+                                    <span th:text="${liked.house.houseFeature}"></span>
                                 </div>
 
 
@@ -190,11 +255,11 @@
                                     🏢 층수: <span th:text="${liked.house.floor}"></span><br>
                                     📦 거래 방식: <span th:text="${liked.house.depositType}"></span><br>
                                     🅿️ 주차: <span th:text="${liked.house.parking}"></span><br>
-                                    💡 관리비: <span th:text="${liked.house.MFee} + '만원'"></span><br>
+                                    💡 관리비: <span th:text="${liked.house.mfee} + '만원'"></span><br>
                                     ⏰ 입주 가능일: <span th:text="${liked.house.aFrom}"></span><br>
                                     🧑‍💼 중개사 정보: <span th:text="${liked.house.agentInfo}"></span><br>
                                     📞 중개 수수료: <span th:text="${liked.house.agentComm}"></span><br>
-                                    🛏 방 개수: <span th:text="${liked.house.roomsCnt}"></span><br>
+                                    🛏 방 개수: <span th:text="${liked.house.roomsCount}"></span><br>
                                     🧰 옵션: <span th:text="${liked.house.options}"></span><br>
                                     📅 등록일: <span th:text="${liked.house.postedAt}"></span><br>
                                     🏙 지역: <span th:text="${liked.house.gu} + ' ' + ${liked.house.dong}"></span><br>
@@ -209,66 +274,77 @@
         </div>
     </div>
 </main>
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-<!-- Footer fragment -->
-<!--<footer th:replace="footer :: footer"></footer>-->
 
 <script>
-    const tabContents = document.querySelectorAll('.tab-content');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const folderBtns = document.querySelectorAll('.folder-btn'); // ✅ 미리 정의
-    const folderGroups = document.querySelectorAll('.favorite-folder-group');
+    document.addEventListener("DOMContentLoaded", () => {
+        const tabContents = document.querySelectorAll('.tab-content');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const folderBtns = document.querySelectorAll('.folder-btn');
+        const folderGroups = document.querySelectorAll('.favorite-folder-group');
 
-    // 🔁 기존 tab-btn 로직 유지
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        // 탭 버튼 클릭 시 전환
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
 
-            const target = btn.getAttribute('data-target');
-            tabContents.forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.id === target) tab.classList.add('active');
+                const target = btn.getAttribute('data-target');
+                tabContents.forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.id === target) tab.classList.add('active');
+                });
             });
         });
-    });
 
-    // ✅ 찜 폴더 클릭 시 favorites 탭 활성화 + 해당 폴더만 표시
-    folderBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // 강제 favorites 탭 활성화
-            tabContents.forEach(tab => tab.classList.remove('active'));
-            document.getElementById('favorites').classList.add('active');
+        // 폴더 클릭 시 favorites 탭 + 해당 폴더만 표시
+        folderBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                tabContents.forEach(tab => tab.classList.remove('active'));
+                document.getElementById('favorites').classList.add('active');
 
-            // 사이드바 active 처리
-            tabBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
 
-            const folderId = btn.getAttribute('data-folder-id');
-
-            // 폴더 그룹만 표시
-            folderGroups.forEach(group => {
-                group.style.display = (group.getAttribute('data-folder-id') === folderId) ? 'block' : 'none';
+                const folderId = btn.getAttribute('data-folder-id');
+                folderGroups.forEach(group => {
+                    group.style.display = (group.getAttribute('data-folder-id') === folderId) ? 'block' : 'none';
+                });
             });
         });
-    });
 
-    // 🔁 상세 정보 토글
-    const items = document.querySelectorAll('.favorite-item');
-    items.forEach(item => {
-        item.addEventListener('click', () => {
-            item.classList.toggle('expanded');
+        // 상세 정보 토글
+        const items = document.querySelectorAll('.favorite-item');
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('expanded');
+            });
         });
-    });
 
-    // ✅ 페이지 로딩 시 첫 폴더 자동 클릭
-    window.addEventListener('DOMContentLoaded', () => {
+        // ✅ 기본 진입 시: 찜 목록 탭과 첫 폴더 활성화
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        const favoritesTab = document.getElementById('favorites');
+        if (favoritesTab) favoritesTab.classList.add('active');
+
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const favoritesMenu = document.querySelector('.menu-item[data-target="favorites"]');
+        if (favoritesMenu) favoritesMenu.classList.add('active');
+
+        const folderList = document.getElementById("folderList");
+        if (folderList) folderList.classList.add("active");
+
         const firstFolderBtn = document.querySelector('.folder-btn');
         if (firstFolderBtn) {
-            firstFolderBtn.click();
+            const folderId = firstFolderBtn.getAttribute('data-folder-id');
+            document.querySelectorAll('.favorite-folder-group').forEach(group => {
+                group.style.display = (group.getAttribute('data-folder-id') === folderId) ? 'block' : 'none';
+            });
+
+            document.querySelectorAll('.folder-btn').forEach(b => b.classList.remove('active'));
+            firstFolderBtn.classList.add('active');
         }
     });
-
 </script>
 <div th:replace="~{fragments/chatbot :: chatbot}"></div>
 
