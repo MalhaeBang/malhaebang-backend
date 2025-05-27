@@ -34,8 +34,8 @@
         }
 
         #map {
-            width: 100%;
-            height: calc(100vh - 80px);
+            flex-grow: 1;
+            position: relative;
         }
 
         #filter-container {
@@ -90,10 +90,36 @@
             }
 
             #map {
-                height: calc(100vh - 460px); /* 상단 + 목록 패널 */
+                height: calc(100vh - 460px);
             }
         }
 
+        #iframe-sidepanel {
+            display: none;
+            width: 420px;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            border-left: 1px solid #ccc;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        #iframe-sidepanel iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #iframe-sidepanel button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1100;
+            background: none;
+            border: none;
+            font-size: 20px;
+        }
     </style>
 </head>
 
@@ -103,6 +129,7 @@
 <!-- 본문 -->
 
 <main class="main d-flex" style="flex-direction: column;">
+
     <!-- 필터 -->
     <div id="filter-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; height: 50px">
         <!-- 각 select 그대로 -->
@@ -134,17 +161,21 @@
     </div>
 
     <!-- 본문 (지도 + 목록) -->
+    <!-- 지도, 목록, 추천 패널 통합 -->
     <div style="display: flex; flex: 1; height: calc(100vh - 160px);">
-        <!-- 매물 목록 패널 -->
-        <div id="house-list-panel" style="width: 300px; overflow-y: auto; background-color: #f0f0f0;">
-            <!-- JS로 목록 삽입 -->
-        </div>
+        <!-- 왼쪽: 목록 -->
+        <div id="house-list-panel" style="width: 300px; background-color: #f0f0f0;"></div>
 
-        <!-- 지도 -->
-        <div id="map" style="flex-grow: 1;"></div>
+        <!-- 오른쪽: iframe 패널 (지도의 오른쪽이 아니라, 목록의 바로 오른쪽!) -->
+        <div id="iframe-sidepanel">
+            <iframe id="iframe-content" src="" width="100%" height="100%" frameborder="0"></iframe>
+            <button onclick="closeIframe()" class="btn btn-light btn-sm" style="position:absolute; top:10px; right:10px;">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div id="map" style="flex-grow: 1; position: relative;"></div>
     </div>
     <!-- 폴더 선택 모달 -->
-
     <div class="modal fade" id="folderSelectModal" tabindex="-1" aria-labelledby="folderSelectModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -152,13 +183,11 @@
                     <h5 class="modal-title" id="folderSelectModalLabel">폴더 선택</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
-                <!-- 모달 내부 수정 -->
                 <div class="modal-body">
                     <div class="mb-3">
                         <input type="text" id="newFolderName" class="form-control" placeholder="새 폴더 이름 입력" />
                         <button type="button" class="btn btn-secondary mt-2" onclick="createNewFolder()">폴더 생성</button>
                     </div>
-<!--                    <ul id="folder-list" class="list-group"></ul>-->
                     <ul id="folder-list" class="list-group" style="max-height: 300px; overflow-y: auto;"></ul>
                 </div>
                 <div class="modal-footer">
@@ -169,6 +198,8 @@
         </div>
     </div>
 </main>
+
+
 
 <!-- 기타 UI -->
 <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
@@ -182,11 +213,12 @@
 <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
 <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-<script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoAppKey}&libraries=services|"></script>
-<script src="assets/js/main.js"></script>
+<script th:src="|https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoAppKey}&libraries=services,clusterer|"></script><script src="assets/js/main.js"></script>
 
 <!-- 지도 스크립트 -->
 <script>
+
+
 
     const mapContainer = document.getElementById("map");
     const mapOption = {
@@ -196,11 +228,16 @@
     const map = new kakao.maps.Map(mapContainer, mapOption);
     const geocoder = new kakao.maps.services.Geocoder();
     const infowindows = [];
+    let clusterer;
     let markers = [];
     let polygons = [];
     let userPosition = null;
     let userAddress = null;
-
+    clusterer = new kakao.maps.MarkerClusterer({
+        map: map,
+        averageCenter: true,
+        minLevel: 5
+    });
     // === 현재 위치 마커 표시 ===
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
@@ -260,7 +297,6 @@
         const dong = document.getElementById("filter-dong").value;
 
         if (!depositType || !direction || !parking || !gu || !dong) {
-            // 하나라도 선택되지 않았으면 마커 제거
             markers.forEach(m => m.setMap(null));
             markers = [];
             infowindows.forEach(iw => iw.close());
@@ -280,8 +316,10 @@
                 // 1. 기존 마커/인포윈도우 제거
                 markers.forEach(m => m.setMap(null));
                 markers = [];
+                clusterer.clear();
                 infowindows.forEach(iw => iw.close());
                 infowindows.length = 0;
+                const newMarkers = [];
 
                 // ✅ 사이드바 초기화
                 const listPanel = document.getElementById("house-list-panel");
@@ -291,6 +329,7 @@
                 data.forEach((apt, idx) => {
                     const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
                     const marker = new kakao.maps.Marker({ map, position: coords });
+                    newMarkers.push(marker);
                     markers.push(marker);
 
                     const infowindow = new kakao.maps.InfoWindow({
@@ -323,8 +362,14 @@
 
                     infowindows.push(infowindow);
                     kakao.maps.event.addListener(marker, "click", function () {
-                        infowindows.forEach(iw => iw.close());
-                        infowindow.open(map, marker);
+                        const houseNum = apt.num;
+                        const iframe = document.getElementById("iframe-content");
+                        const panel = document.getElementById("iframe-sidepanel");
+                        panel.style.display = "none";
+                        iframe.src = "";
+
+                        iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+                        panel.style.display = "block";
                     });
 
                     // ✅ 사이드바 목록에 추가
@@ -343,7 +388,6 @@
 
                     starSpan.addEventListener("click", function (e) {
                         e.stopPropagation();
-                        console.log("⭐ 별 클릭됨", apt.houseId);
 
                         openFolderSelectModal(apt.houseId);
                     });
@@ -372,8 +416,13 @@
                     // 클릭 시 지도 이동
                     houseDiv.addEventListener("click", () => {
                         map.panTo(coords);
-                        infowindows.forEach(iw => iw.close());
-                        infowindow.open(map, marker);
+                        const houseNum = apt.num;
+
+                        const iframe = document.getElementById("iframe-content");
+                        iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+
+                        const sidePanel = document.getElementById("iframe-sidepanel");
+                        sidePanel.style.display = "block";
                     });
 
                     // 조립 후 패널에 추가
@@ -381,7 +430,13 @@
                     houseDiv.appendChild(body);
                     listPanel.appendChild(houseDiv);
                 });
+                clusterer.addMarkers(newMarkers);
             });
+    }
+
+    function closeIframe() {
+        const panel = document.getElementById("iframe-sidepanel");
+        panel.style.display = "none";
     }
 
     function drawFilteredPolygons(regionName) {
@@ -518,8 +573,6 @@
         fetch("/api/like/folders")
             .then(res => res.json())
             .then(folders => {
-                console.log("📁 폴더 개수:", folders.length);  // ← 반드시 출력해보세요
-                console.log("📁 폴더들:", folders);            // ← 실제 객체 배열 출력
                 const list = document.getElementById("folder-list");
                 list.innerHTML = "";
                 selectedFolderId = null;
@@ -527,7 +580,6 @@
                 folders.forEach(folder => {
                     const li = document.createElement("li");
                     li.className = "list-group-item list-group-item-action";
-                    // li.textContent = folder.folderName;
                     li.textContent = `${folder.folderName} (ID: ${folder.folderId})`;
                     li.addEventListener("click", () => {
                         list.querySelectorAll(".active").forEach(el => el.classList.remove("active"));
@@ -564,7 +616,6 @@
                     }
                 };
 
-                // 모달 열기
                 const modal = new bootstrap.Modal(document.getElementById("folderSelectModal"));
                 modal.show();
             });
@@ -574,7 +625,6 @@
             method: "POST"
         }).then(res => res.text())
             .then(msg => {
-                console.log(msg);
                 alert("찜 목록에 추가되었습니다.");
             });
     }
@@ -602,7 +652,6 @@
             })
             .catch(err => {
                 alert("폴더 생성 중 오류가 발생했습니다.");
-                console.error(err);
             });
     }
 

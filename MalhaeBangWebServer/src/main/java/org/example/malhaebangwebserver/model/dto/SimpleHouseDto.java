@@ -34,6 +34,8 @@ public class SimpleHouseDto {
     private Double latitude;
     private Double longitude;
     private String gptDescription;
+    private String finalEmbedding;
+
 
     public SimpleHouseDto(Integer houseId, Double latitude, Double longitude, String title, String price, String address, Integer floor,
                           String depositType, Integer mFee, String aFrom, Integer agentComm, String agentInfo,
@@ -66,5 +68,6 @@ public class SimpleHouseDto {
         this.houseFeature = houseFeature;
         this.houseExplanations = houseExplanations;
         this.num = num;
+
     }
 }

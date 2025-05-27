@@ -112,6 +112,10 @@ public class House {
     @Column(columnDefinition = "TEXT")
     private String gptDescription;
 
+    @Lob
+    @Column(name = "final_embedding", columnDefinition = "LONGTEXT")
+    private String finalEmbedding;
+
     @Setter
     private Double latitude;
 
