@@ -35,13 +35,14 @@ public class SimpleHouseDto {
     private Double longitude;
     private String gptDescription;
     private String finalEmbedding;
+    private String safetyGrade;
 
 
     public SimpleHouseDto(Integer houseId, Double latitude, Double longitude, String title, String price, String address, Integer floor,
                           String depositType, Integer mFee, String aFrom, Integer agentComm, String agentInfo,
                           Integer roomsCnt, String options, String postedAt, String gu, String dong,
                           String imgUrl, String areaSize, String direction, String builtDate,
-                          Integer parking, String buildingType, String houseFeature, String houseExplanations, Long num) {
+                          Integer parking, String buildingType, String houseFeature, String houseExplanations, Long num, String safetyGrade) {
         this.houseId = houseId;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -68,6 +69,6 @@ public class SimpleHouseDto {
         this.houseFeature = houseFeature;
         this.houseExplanations = houseExplanations;
         this.num = num;
-
+        this.safetyGrade = safetyGrade;
     }
 }

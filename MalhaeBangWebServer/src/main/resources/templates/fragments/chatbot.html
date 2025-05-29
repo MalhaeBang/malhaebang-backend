@@ -10,6 +10,7 @@
                 <h1>말해방</h1>
                 <p>AI가 바로 답변해 드려요</p>
             </div>
+            <button id="chatbotClose" class="chatbot-close-btn">×</button>
         </header>
 
         <main class="chatbot-layout">
@@ -20,7 +21,7 @@
             </div>
 
             <div class="chat-input-area">
-                <input type="text" placeholder="조건을 입력해 주세요." />
+                <input type="text" placeholder="조건을 자세하게 입력해주세요." />
                 <button>전송</button>
             </div>
         </main>
@@ -173,14 +174,28 @@
             text-align: left;
         }
 
-        #chatbotClose {
+        .chatbot-close-btn {
             position: absolute;
             top: 10px;
             right: 12px;
             background: none;
             border: none;
-            font-size: 18px;
+            font-size: 24px;
             cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .chatbot-close-btn:hover {
+            background-color: #f0f0f0;
+            color: #333;
         }
     </style>
 
@@ -199,9 +214,11 @@
             });
 
             // ✅ [2] X 버튼으로 닫기
-            closeBtn.addEventListener('click', () => {
-                popup.classList.remove('show');
-            });
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    popup.classList.remove('show');
+                });
+            }
 
             // ✅ [3] 메시지 전송
             sendButton.addEventListener("click", () => {
@@ -213,6 +230,7 @@
                 userMessage.textContent = query;
                 chatWindow.appendChild(userMessage);
                 inputField.value = "";
+                chatWindow.scrollTop = chatWindow.scrollHeight;
 
                 fetch("http://localhost:8000/query", {
                     method: "POST",
@@ -232,6 +250,7 @@
                         errorMessage.className = "chat-message bot";
                         errorMessage.textContent = "⚠️ 서버 연결에 실패했습니다.";
                         chatWindow.appendChild(errorMessage);
+                        chatWindow.scrollTop = chatWindow.scrollHeight;
                     });
             });
 

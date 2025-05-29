@@ -2149,3 +2149,17 @@ main {
   color: #aaa;
   padding-left: 20px;
 }
+
+.recent-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+}
+
+.item-title {
+  color: #0d6efd;
+}
+
+.item-detail {
+  margin: 0;
+}

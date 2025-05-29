@@ -59,13 +59,49 @@
             color: #ffffff;
         }
         #house-list-panel .house-item {
-            border-bottom: 1px solid #ccc;
-            padding: 10px;
-            background-color: white;
+            border-bottom: none;
+            padding: 15px;
+            margin-bottom: 12px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         #house-list-panel .house-item:hover {
-            background-color: #eaeaea;
+            background-color: #f9f9f9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        #house-list-panel .house-item .topLine {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        #house-list-panel .house-item .topLine strong {
+            font-size: 1rem;
+            color: #333;
+        }
+        #house-list-panel .house-item .favorite-toggle {
+            font-size: 1.1rem;
+            color: #ccc;
+            transition: color 0.2s ease;
+        }
+        #house-list-panel .house-item .favorite-toggle .bi-star-fill {
+            color: #ffc107;
+        }
+        #house-list-panel .house-item .house-info {
+            flex: 1;
+            padding: 0 10px;
+            overflow: hidden;
+            white-space: normal;
+            word-break: break-all;
+        }
+
+        #house-list-panel .house-item .house-info p {
+            margin: 0;
+            line-height: 1.5;
         }
         .main.d-flex {
             display: flex;
@@ -132,20 +168,18 @@
 
     <!-- 필터 -->
     <div id="filter-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; height: 50px">
-        <!-- 각 select 그대로 -->
         <select id="filter-depositType" class="form-select">
             <option value="" selected disabled hidden>거래방식</option>
-
             <option value="상관없음">상관없음</option>
         </select>
 
-        <select id="filter-direction" class="form-select">
-            <option value="" selected disabled hidden>채광방향</option>
+        <select id="filter-safetyGrade" class="form-select">
+            <option value="" selected disabled hidden>안전지수</option>
             <option value="상관없음">상관없음</option>
         </select>
 
-        <select id="filter-parking" class="form-select">
-            <option value="" selected disabled hidden>주차여부</option>
+        <select id="filter-price" class="form-select">
+            <option value="" selected disabled hidden>가격 범위</option>
             <option value="상관없음">상관없음</option>
         </select>
 
@@ -290,26 +324,46 @@
 
     function loadFilteredHouses() {
         // 필터 값 읽기
-        const depositType = document.getElementById("filter-depositType").value;
-        const direction = document.getElementById("filter-direction").value;
-        const parking = document.getElementById("filter-parking").value;
-        const gu = document.getElementById("filter-gu").value;
-        const dong = document.getElementById("filter-dong").value;
+        const depositTypeSelect = document.getElementById("filter-depositType");
+        const safetyGradeSelect = document.getElementById("filter-safetyGrade");
+        const priceSelect = document.getElementById("filter-price");
+        const guSelect = document.getElementById("filter-gu");
+        const dongSelect = document.getElementById("filter-dong");
 
-        if (!depositType || !direction || !parking || !gu || !dong) {
+        const depositType = depositTypeSelect.value;
+        const safetyGrade = safetyGradeSelect.value;
+        const priceRange = priceSelect.value;
+        const gu = guSelect.value;
+        const dong = dongSelect.value;
+
+
+        // ✅ 모든 필터가 '상관없음'이 아닌지 확인
+        if (depositType === "" || depositType === "상관없음" ||
+            safetyGrade === "" || safetyGrade === "상관없음" ||
+            priceRange === "" || priceRange === "상관없음" ||
+            gu === "" || gu === "상관없음" ||
+            dong === "" || dong === "상관없음") {
+            // 조건 불충족 시 목록 및 마커 초기화
             markers.forEach(m => m.setMap(null));
             markers = [];
+            clusterer.clear(); // 클러스터러의 마커도 지워야 합니다.
             infowindows.forEach(iw => iw.close());
             infowindows.length = 0;
-            return;
+            const listPanel = document.getElementById("house-list-panel");
+            listPanel.innerHTML = ""; // 사이드바 목록 초기화
+            return; // API 호출 없이 종료
         }
 
+        // 모든 필터가 선택되었으면 API 호출 및 결과 처리
         const params = new URLSearchParams();
-        if (depositType !== "상관없음") params.append("type", depositType);
-        if (direction !== "상관없음") params.append("direction", direction);
-        if (parking !== "상관없음") params.append("parking", parking);
-        if (gu !== "상관없음") params.append("gu", gu);
-        if (dong !== "상관없음") params.append("dong", dong);
+        // 모든 값이 '상관없음'이 아닌 것을 확인했으므로, 해당 값 그대로 넘깁니다.
+        params.append("type", depositType);
+        params.append("safetyGrade", safetyGrade);
+        params.append("priceRange", priceRange);
+        params.append("gu", gu);
+        params.append("dong", dong);
+
+
         fetch(`/map/houses?${params.toString()}`)
             .then(res => res.json())
             .then(data => {
@@ -328,7 +382,54 @@
                 // 2. 새 데이터 처리
                 data.forEach((apt, idx) => {
                     const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
-                    const marker = new kakao.maps.Marker({ map, position: coords });
+
+                    // safety_grade에 따른 마커 이미지 설정
+                    console.log('Safety Grade:', apt.safetyGrade, 'Type:', typeof apt.safetyGrade);
+                    let markerImage;
+                    switch(apt.safetyGrade) {
+                        case '매우안전':
+                            markerImage = new kakao.maps.MarkerImage(
+                                "/assets/img/marker/marker_green.png"
+                                ,new kakao.maps.Size(39, 45)
+                            );
+                            break;
+                        case '안전':
+                            markerImage = new kakao.maps.MarkerImage(
+                                "/assets/img/marker/marker_blue.png"
+                                ,new kakao.maps.Size(39, 45)
+                            );
+                            break;
+                        case '보통':
+                            markerImage = new kakao.maps.MarkerImage(
+                                "/assets/img/marker/marker_yellow.png"
+                                ,new kakao.maps.Size(39, 45)
+                            );
+                            break;
+                        case '주의':
+                            markerImage = new kakao.maps.MarkerImage(
+                                "/assets/img/marker/marker_orange.png"
+                                ,new kakao.maps.Size(39, 45)
+                            );
+                            break;
+                        case '위험':
+                            markerImage = new kakao.maps.MarkerImage(
+                                "/assets/img/marker/marker_red.png"
+                                ,new kakao.maps.Size(39, 45)
+                            );
+                            break;
+                        default:
+                            // 안전지수가 '상관없음'이거나 없는 경우 기본 마커
+                            markerImage = new kakao.maps.MarkerImage(
+                                "/assets/img/marker/marker_blue.png"
+                                ,new kakao.maps.Size(24, 35)
+                            );
+                    }
+
+                    const marker = new kakao.maps.Marker({
+                        map,
+                        position: coords,
+                        image: markerImage // 안전지수에 따라 설정된 이미지 사용
+                    });
                     newMarkers.push(marker);
                     markers.push(marker);
 
@@ -338,23 +439,24 @@
                             🏠 ${apt.title}<br>
                             💰 가격: ${apt.price}<br>
                             📍 주소: ${apt.address}<br>
-                            📐 면적: ${apt.area}<br>
-                            🧭 방향: ${apt.direction}<br>
-                            🏢 층수: ${apt.floor}<br>
-                            📦 거래 방식: ${apt.depositType}<br>
-                            🅿️ 주차: ${apt.parking}<br>
-                            💡 관리비: ${apt.mfee}<br>
-                            ⏰ 입주 가능일: ${apt.afrom}<br>
-                            🧑‍💼 중개사 정보: ${apt.agentInfo}<br>
-                            📞 중개 수수료: ${apt.agentComm}<br>
-                            🛏 방 개수: ${apt.roomsCnt}<br>
-                            🧰 옵션: ${apt.options}<br>
-                            📅 등록일: ${apt.postedAt}<br>
-                            🏙 지역: ${apt.gu} ${apt.dong}<br>
-                            🏠 건물유형: ${apt.buildingType}<br>
-                            🏗 준공일: ${apt.builtDate}<br>
-                            📝 정보: ${apt.feature}<br>
-                            📝 설명: ${apt.explanations}<br><br>
+                            📐 면적: ${apt.areaSize || ''}<br>
+                            🧭 방향: ${apt.direction || ''}<br>
+                            🏢 층수: ${apt.floor !== undefined && apt.floor !== null ? apt.floor + '층' : ''}<br>
+                            📦 거래 방식: ${apt.depositType || ''}<br>
+                            🏢 주차: ${apt.parking !== undefined && apt.parking !== null ? (apt.parking === 1 ? '가능' : '불가능') : ''}<br>
+                            💡 관리비: ${apt.mFee !== undefined && apt.mFee !== null ? apt.mFee + '만원' : ''}<br>
+                            ⏰ 입주 가능일: ${apt.aFrom || ''}<br>
+                            🧑‍💼 중개사 정보: ${apt.agentInfo || ''}<br>
+                            📞 중개 수수료: ${apt.agentComm !== undefined && apt.agentComm !== null ? apt.agentComm + '만원' : ''}<br>
+                            🛏 방 개수: ${apt.roomsCnt || ''}<br>
+                            🧰 옵션: ${apt.options || ''}<br>
+                            📅 등록일: ${apt.postedAt || ''}<br>
+                            🏙 지역: ${apt.gu || ''} ${apt.dong || ''}<br>
+                            🏠 건물유형: ${apt.buildingType || ''}<br>
+                            🏗 준공일: ${apt.builtDate || ''}<br>
+                            📝 정보: ${apt.houseFeature || ''}<br>
+                            📝 설명: ${apt.houseExplanations || ''}<br>
+                            🛡 안전지수: ${apt.safetyGrade || '정보 없음'}<br><br>
                         <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.address}')">길찾기</button>
                     </div>
                 `
@@ -365,11 +467,19 @@
                         const houseNum = apt.num;
                         const iframe = document.getElementById("iframe-content");
                         const panel = document.getElementById("iframe-sidepanel");
-                        panel.style.display = "none";
-                        iframe.src = "";
+                        // 패널이 이미 열려있는 경우 닫고 다시 열지 않음 (깜빡임 방지)
+                        // if (panel.style.display === "block") return; // 필요에 따라 이 라인 사용 가능
 
-                        iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
-                        panel.style.display = "block";
+                        panel.style.display = "none"; // 일단 닫고
+                        iframe.src = ""; // iframe src 비우기
+
+                        // 지연을 주어 부드러운 전환 효과
+                        setTimeout(() => {
+                             iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+                             panel.style.display = "block";
+                        }, 50); // 50ms 지연
+
+
                     });
 
                     // ✅ 사이드바 목록에 추가
@@ -387,8 +497,7 @@
                     }
 
                     starSpan.addEventListener("click", function (e) {
-                        e.stopPropagation();
-
+                        e.stopPropagation(); // 이벤트 버블링 중지 (아이템 클릭 이벤트와 분리)
                         openFolderSelectModal(apt.houseId);
                     });
 
@@ -398,31 +507,45 @@
 
                     // 헤더 라인 조립
                     const topLine = document.createElement("div");
-                    topLine.style.display = "flex";
-                    topLine.style.justifyContent = "space-between";
-                    topLine.style.alignItems = "center";
+                    topLine.className = "topLine";
                     topLine.appendChild(title);
                     topLine.appendChild(starSpan);
 
                     // 상세 정보
                     const body = document.createElement("div");
+                    body.className = "house-info";
+                     // apt.price는 "전세 1억 / 월세 50만원" 형태의 문자열
                     body.innerHTML = `
                     💰 가격: ${apt.price || ""}<br>
                     📦 거래 방식: ${apt.depositType || ""}<br>
                     🧭 방향: ${apt.direction || ""}<br>
-                    🏢 층수: ${apt.floor || ""}<br>
-                      `;
+                    🏢 층수: ${apt.floor !== undefined && apt.floor !== null ? apt.floor + '층' : ''}<br>
+                    💡 관리비: ${apt.mFee !== undefined && apt.mFee !== null ? apt.mFee + '만원' : ''}<br>
+                    `;
 
-                    // 클릭 시 지도 이동
+                    // 클릭 시 지도 이동 및 iframe 열기
                     houseDiv.addEventListener("click", () => {
-                        map.panTo(coords);
+                        map.panTo(coords); // 지도 이동
                         const houseNum = apt.num;
+                         const iframe = document.getElementById("iframe-content");
+                         const sidePanel = document.getElementById("iframe-sidepanel");
 
-                        const iframe = document.getElementById("iframe-content");
-                        iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+                         // 패널이 이미 열려있고 같은 매물이면 닫기 토글
+                         // if (sidePanel.style.display === "block" && iframe.src.includes(`house_num=${houseNum}`)) {
+                         //     closeIframe();
+                         //     return;
+                         // }
 
-                        const sidePanel = document.getElementById("iframe-sidepanel");
-                        sidePanel.style.display = "block";
+
+                        sidePanel.style.display = "none"; // 일단 닫고
+                         iframe.src = ""; // iframe src 비우기
+
+                         // 지연을 주어 부드러운 전환 효과
+                         setTimeout(() => {
+                             iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+                             sidePanel.style.display = "block";
+                         }, 50); // 50ms 지연
+
                     });
 
                     // 조립 후 패널에 추가
@@ -487,13 +610,14 @@
                     const select = document.getElementById(id);
                     const placeholder = {
                         "filter-depositType": "거래방식",
-                        "filter-direction": "채광방향",
-                        "filter-parking": "주차 여부",
+                        "filter-safetyGrade": "안전지수",
+                        "filter-price": "가격 범위",
                         "filter-gu": "지역구",
                         "filter-dong": "동"
                     };
                     select.innerHTML = `<option value="" selected disabled hidden>${placeholder[id]}</option>`;
                     select.innerHTML += `<option value="상관없음">상관없음</option>`;
+                    
                     data.forEach(item => {
                         const option = document.createElement("option");
                         option.value = item;
@@ -503,16 +627,17 @@
                 });
         };
 
+        // 거래방식, 안전지수, 지역구 목록 로드
         fillSelect("filter-depositType", "/api/filters/depositType");
-        fillSelect("filter-direction", "/api/filters/direction");
-        fillSelect("filter-parking", "/api/filters/parking");
+        fillSelect("filter-safetyGrade", "/api/filters/safetyGrade");
 
-        // gu + 동 + 초기 polygon 처리
+        // 지역구 로드 및 초기 polygon 그리기
         fetch("/api/filters/gu")
             .then(res => res.json())
             .then(data => {
                 const guSelect = document.getElementById("filter-gu");
                 guSelect.innerHTML = '<option value="" selected disabled hidden>지역구</option>';
+                guSelect.innerHTML += '<option value="상관없음">상관없음</option>';
                 data.forEach(item => {
                     const option = document.createElement("option");
                     option.value = item;
@@ -522,23 +647,56 @@
 
                 if (data.length > 0) {
                     drawFilteredPolygons("상관없음");
-
                 }
+            });
+    }
+
+    // 가격 범위 목록을 백엔드에서 가져와서 업데이트하는 함수
+    function updatePriceRangeOptions(selectedDepositType) {
+        const priceSelect = document.getElementById("filter-price");
+        const pricePlaceholder = "가격 범위";
+
+        // API 호출
+        fetch(`/api/filters/price?depositType=${encodeURIComponent(selectedDepositType || "전세")}`)
+            .then(res => res.json())
+            .then(data => {
+                priceSelect.innerHTML = `<option value="" selected disabled hidden>${pricePlaceholder}</option>`;
+                priceSelect.innerHTML += `<option value="상관없음">상관없음</option>`;
+
+                data.forEach(range => {
+                    const option = document.createElement("option");
+                    option.value = range; // 예: "1억 이하", "20만원대" 등의 문자열
+                    option.text = range;
+                    priceSelect.appendChild(option);
+                });
+                // 가격 범위 드롭다운의 선택값을 초기화합니다.
+                priceSelect.value = "";
             });
     }
 
     document.addEventListener("DOMContentLoaded", function () {
         loadFilterOptions();
 
-        document.getElementById("filter-depositType").addEventListener("change", loadFilteredHouses);
-        document.getElementById("filter-direction").addEventListener("change", loadFilteredHouses);
-        document.getElementById("filter-parking").addEventListener("change", loadFilteredHouses);
+        // 초기 로딩 시 거래방식의 기본값에 따라 가격 범위 로드
+        const initialDepositTypeSelect = document.getElementById("filter-depositType");
+        updatePriceRangeOptions(initialDepositTypeSelect.value || "전세"); // 기본값을 '전세'로 설정
+
+        // 거래방식 변경 시 가격 범위 업데이트 및 매물 로드
+        initialDepositTypeSelect.addEventListener("change", function() {
+            const selectedType = this.value;
+            updatePriceRangeOptions(selectedType); // 가격 범위 목록 업데이트
+            loadFilteredHouses(); // 필터 변경 시 매물 다시 로드
+        });
+
+        document.getElementById("filter-safetyGrade").addEventListener("change", loadFilteredHouses);
+        document.getElementById("filter-price").addEventListener("change", loadFilteredHouses);
 
         document.getElementById("filter-gu").addEventListener("change", function () {
             const gu = this.value;
             const dongSelect = document.getElementById("filter-dong");
             dongSelect.innerHTML = "<option value='' selected disabled hidden>동</option>";
-            if (gu !== "전체") {
+            dongSelect.innerHTML += '<option value="상관없음">상관없음</option>';
+            if (gu !== "상관없음") {
                 fetch(`/api/filters/dong?gu=${encodeURIComponent(gu)}`)
                     .then(res => res.json())
                     .then(data => {
