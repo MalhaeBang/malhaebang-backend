@@ -26,7 +26,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final LikedFolderRepository likedFolderRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
-        log.info("✅ [OAuth2] CustomOAuth2UserService 실행됨");
+        log.info(" [OAuth2] CustomOAuth2UserService 실행됨");
 
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oauth2User = delegate.loadUser(request);
@@ -34,8 +34,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String registrationId = request.getClientRegistration().getRegistrationId(); // ex: "kakao","naver", "google"
         Map<String, Object> attributes = oauth2User.getAttributes();
 
-        log.info("🔎 registrationId = {}", registrationId);
-        log.info("🔎 attributes = {}", attributes);
+        log.info("registrationId = {}", registrationId);
+        log.info("attributes = {}", attributes);
 
         String email = null;
         String nickname = null;
@@ -61,8 +61,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 throw new OAuth2AuthenticationException("지원하지 않는 OAuth 로그인입니다.");
             }
 
-            log.info("📧 email = {}", email);
-            log.info("🙋 nickname = {}", nickname);
+            log.info("email = {}", email);
+            log.info("nickname = {}", nickname);
 
             Optional<User> existingUser = userRepository.findByUserEmail(email);
 
@@ -78,19 +78,19 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 user = existingUser.get();
 
                 if (user.getIsDeleted()) {
-                    // 재가입 처리
                     user.setIsDeleted(false);
                     user.setUserNickname(generateUniqueNickname(nickname));
                     user.setUserPw(UUID.randomUUID().toString());
                     user.setCreatedAt(LocalDateTime.now());
-                    user.setLoginType(loginType);  // ✔ 여기서 재사용
+                    user.setLoginType(loginType);
+                    user.setIsVerified(true);
                     userRepository.save(user);
-                    log.info("♻️ 탈퇴한 유저 재가입 처리: {}", user.getUserEmail());
+                    log.info("탈퇴한 유저 재가입 처리: {}", user.getUserEmail());
                 } else {
                     if (!user.getLoginType().name().equalsIgnoreCase(registrationId)) {
                         throw new OAuth2AuthenticationException("ALREADY_REGISTERED_WITH_" + user.getLoginType());
                     }
-                    log.info("✅ 기존 유저 로그인: {}", user.getUserEmail());
+                    log.info("기존 유저 로그인: {}", user.getUserEmail());
                 }
 
             } else {
@@ -101,9 +101,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .createdAt(LocalDateTime.now())
                         .isDeleted(false)
                         .loginType(loginType)
+                        .isVerified(true)
                         .build();
                 User savedUser = userRepository.save(user);
-                log.info("🆕 새 유저 저장 완료: {}", savedUser.getUserEmail());
+                log.info("새 유저 저장 완료: {}", savedUser.getUserEmail());
 
                 LikedFolder defaultFolder = LikedFolder.builder()
                         .user(savedUser)
@@ -112,12 +113,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .build();
                 likedFolderRepository.save(defaultFolder);
                 user = savedUser;
-                log.info("🆕 새 유저 저장 완료: {}", user.getUserEmail());
+                log.info("새 유저 저장 완료: {}", user.getUserEmail());
             }
 
             return new CustomUserDetails(user, attributes);
         } catch (Exception e) {
-            log.error("❌ [OAuth2] 사용자 정보 처리 중 오류 발생", e);
+            log.error("[OAuth2] 사용자 정보 처리 중 오류 발생", e);
             throw new OAuth2AuthenticationException(registrationId.toUpperCase() + " 사용자 정보 파싱 실패");
         }
     }

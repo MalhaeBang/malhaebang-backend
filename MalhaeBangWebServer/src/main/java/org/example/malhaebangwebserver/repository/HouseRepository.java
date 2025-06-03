@@ -75,5 +75,15 @@ public interface HouseRepository extends JpaRepository<House, Integer> {
     
     @Query("SELECT AVG(h.monthlyRent) FROM House h WHERE h.depositType = '월세'")
     Double avgWolseRent();
+
+    @Query("SELECT new org.example.malhaebangwebserver.model.dto.SimpleHouseDto(" +
+           "h.houseId, h.latitude, h.longitude, h.title, h.price, h.address, h.floor, " +
+           "h.depositType, h.mfee, h.aFrom, h.agentComm, h.agentInfo, " +
+           "h.roomsCount, h.options, h.postedAt, h.gu, h.dong, " +
+           "h.imgUrl, h.areaSize, h.direction, h.builtDate, " +
+           "h.parking, h.buildingType, h.houseFeature, h.houseExplanations, h.houseNum, h.safetyGrade) " +
+           "FROM House h " +
+           "WHERE h.houseId = :houseId")
+    SimpleHouseDto findSimpleDtoById(@Param("houseId") Integer houseId);
 }
 

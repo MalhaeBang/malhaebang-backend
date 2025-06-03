@@ -10,27 +10,27 @@ public class SimpleHouseDto {
     private String title;
     private String price;
     private String address;
-    private Integer floor;          // Integer
+    private String floor;
     private String depositType;
-    private Integer mFee;           // Integer
+    private Integer mFee;
     private String aFrom;
-    private Integer agentComm;      // Integer
+    private Integer agentComm;
     private String agentInfo;
-    private Integer roomsCnt;       // Integer
+    private Integer roomsCnt;
     private String options;
     private String postedAt;
     private String gu;
     private String dong;
     private String imgUrl;
-    private String areaSize;        // 엔티티명과 동일하게 변경
+    private String areaSize;
     private String direction;
     private String builtDate;
-    private Integer parking;        // Integer
+    private Integer parking;
     private String buildingType;
-    private String houseFeature;    // 엔티티명과 동일하게 변경
-    private String houseExplanations; // 엔티티명과 동일하게 변경
+    private String houseFeature;
+    private String houseExplanations;
     private Long num;
-    private Boolean isLiked;        // 필요하면 유지
+    private Boolean isLiked;
     private Double latitude;
     private Double longitude;
     private String gptDescription;
@@ -38,7 +38,7 @@ public class SimpleHouseDto {
     private String safetyGrade;
 
 
-    public SimpleHouseDto(Integer houseId, Double latitude, Double longitude, String title, String price, String address, Integer floor,
+    public SimpleHouseDto(Integer houseId, Double latitude, Double longitude, String title, String price, String address, String floor,
                           String depositType, Integer mFee, String aFrom, Integer agentComm, String agentInfo,
                           Integer roomsCnt, String options, String postedAt, String gu, String dong,
                           String imgUrl, String areaSize, String direction, String builtDate,

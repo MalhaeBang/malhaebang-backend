@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이메일 인증 - MalhaeBang</title>
+
+    <!-- Vendor CSS -->
+    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/assets/css/main.css" rel="stylesheet">
+    <link href="/assets/img/malhaebang/logo_low.png" rel="icon">
+    <link href="/assets/img/malhaebang/logo_low.png" rel="apple-touch-icon">
+
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #ffffff 100%);
+            background-attachment: fixed;
+            color: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        main.main {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .verification-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+            animation: slideInUp 1s ease-out forwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logo-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 47px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #495057 0%, #212529 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtitle {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .icon.success {
+            color: #28a745;
+        }
+
+        .icon.error {
+            color: #dc3545;
+        }
+
+        .message {
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .message.success {
+            color: #155724;
+        }
+
+        .message.error {
+            color: #721c24;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #343a40 0%, #212529 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 58, 64, 0.3);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #6c757d;
+            border: 2px solid #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="index-page">
+
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="main">
+    <div class="verification-container">
+
+        <!-- 로고 섹션 -->
+        <h2 class="logo-title">MalHaeBang</h2>
+        <h3 class="logo-subtitle">말로 찾는 나만의 공간</h3>
+
+        <!-- 성공/실패 아이콘 -->
+        <div th:if="${success}" class="icon success">✅</div>
+        <div th:if="${!success}" class="icon error">❌</div>
+
+        <!-- 메시지 -->
+        <div th:class="'message ' + (${success} ? 'success' : 'error')" th:text="${message}"></div>
+
+        <!-- 버튼들 -->
+        <div th:if="${success}">
+            <a href="/login" class="btn btn-primary">로그인하기</a>
+            <a href="/" class="btn btn-secondary">홈으로</a>
+        </div>
+        <div th:if="${!success}">
+            <a href="/signup" class="btn btn-primary">다시 회원가입</a>
+            <a href="/" class="btn btn-secondary">홈으로</a>
+        </div>
+
+    </div>
+</main>
+
+<!-- Vendor JS -->
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+
+</body>
+</html> 

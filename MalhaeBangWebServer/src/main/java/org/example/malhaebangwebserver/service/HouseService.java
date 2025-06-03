@@ -43,11 +43,11 @@ public class HouseService {
                 email, PageRequest.of(0, 3)
         );
 
-        // ✅ 로그로 데이터 확인
-        System.out.println("📌 [찜] 조회된 찜 개수: " + recentLiked.size());
+        //  로그로 데이터 확인
+        System.out.println("[찜] 조회된 찜 개수: " + recentLiked.size());
         recentLiked.forEach(liked -> {
             House house = liked.getHouse();
-            System.out.println("🏠 찜 매물: " + house.getTitle() + " / " + house.getPrice() + " / " + house.getGu() + " " + house.getDong());
+            System.out.println("찜 매물: " + house.getTitle() + " / " + house.getPrice() + " / " + house.getGu() + " " + house.getDong());
         });
 
         return recentLiked.stream().map(liked -> {
@@ -72,9 +72,12 @@ public class HouseService {
         // 전월세 비율 계산 (월세:전세 형태로 반환, 정수 비율로 간단히 표현)
         String ratio = "0:0";
         if (total > 0) {
-            // 최대공약수를 구하여 비율을 간단하게 만듭니다.
             long gcd = gcd(jeonse, wolse);
-            ratio = (jeonse / gcd) + ":" + (wolse / gcd);
+            if (gcd != 0) {
+                ratio = (jeonse / gcd) + ":" + (wolse / gcd);
+            } else {
+                ratio = "0:0";
+            }
         }
 
         Map<String, Object> stats = new HashMap<>();

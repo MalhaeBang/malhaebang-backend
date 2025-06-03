@@ -5,20 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>아이디 찾기 - MalhaeBang</title>
 
+    <!-- Vendor CSS -->
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/css/main.css" rel="stylesheet">
     <link href="assets/img/malhaebang/logo_low.png" rel="icon">
     <link href="assets/img/malhaebang/logo_low.png" rel="apple-touch-icon">
 
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #ffffff;
-            color: #000000;
-            height: 100vh;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #ffffff 100%);
+            background-attachment: fixed;
+            color: #000;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 배경 파티클 효과 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(108, 117, 125, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
         }
 
         main.main {
@@ -26,115 +60,445 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 100px 0 60px;
+            padding: 40px 20px;
+            z-index: 2;
+            position: relative;
+            min-height: calc(100vh - 80px);
         }
 
         .findid-container {
             width: 100%;
-            max-width: 500px;
-            padding: 40px 30px;
-            border: 1px solid #333;
-            border-radius: 10px;
-            background: #fff;
-            color: #000;
+            max-width: 520px;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideInUp 1s ease-out forwards;
         }
 
-        .findid-container h2 {
+        @keyframes slideInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .findid-container .logo-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 47px !important;
             font-weight: bold;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #495057 0%, #212529 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center !important;
+            margin-bottom: 5px;
+            color: transparent !important;
+        }
+
+        .findid-container .logo-subtitle {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #6c757d;
+            text-align: center !important;
+            margin-bottom: 35px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .findid-container h2:not(.logo-title) {
+            font-size: 28px;
+            font-weight: bold;
+            color: #212529;
+            margin-bottom: 15px;
             text-align: left;
-            margin-bottom: 20px;
+            animation: slideInLeft 1s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { 
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .findid-container p {
             font-size: 15px;
-            color: #444;
-            margin-bottom: 30px;
-            line-height: 1.5;
+            color: #6c757d;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            animation: fadeIn 1.8s ease-out;
         }
 
         .form-group {
             margin-bottom: 30px;
+            position: relative;
+            animation: slideInUp 1.2s ease-out;
         }
 
-        .form-group label {
+        .form-label {
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             display: block;
-            color: #000;
+            color: #495057;
+            font-size: 15px;
+            letter-spacing: 0.5px;
         }
 
         .form-control {
-            background: none;
-            border: none;
-            border-bottom: 1px solid #ccc;
-            border-radius: 0;
-            color: #000;
-            padding: 10px 0;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(108, 117, 125, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
             font-size: 16px;
-            height: 40px;
+            color: #333;
+            width: 100%;
+            height: 55px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
 
         .form-control:focus {
-            background: none;
-            border-bottom: 2px solid #000;
-            box-shadow: none;
+            background: rgba(255, 255, 255, 1);
+            border: 2px solid #495057;
+            box-shadow: 0 0 0 3px rgba(73, 80, 87, 0.1);
             outline: none;
+            transform: translateY(-2px) scale(1.01);
         }
 
-        ::placeholder {
-            color: rgba(0, 0, 0, 0.3);
+        .form-control::placeholder {
+            color: rgba(108, 117, 125, 0.6);
+            font-style: italic;
         }
 
         .btn-findid {
             width: 100%;
-            background: #000;
+            background: linear-gradient(135deg, #343a40 0%, #212529 100%);
             color: #fff;
             font-weight: bold;
             font-size: 18px;
-            border-radius: 12px;
-            height: 50px;
             margin-top: 20px;
+            border-radius: 12px;
+            height: 55px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 1.5s ease-out;
+        }
+
+        .btn-findid::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-findid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(52, 58, 64, 0.3);
+        }
+
+        .btn-findid:hover::before {
+            left: 100%;
+        }
+
+        .btn-findid:active {
+            transform: translateY(0);
+        }
+
+        /* 결과 메시지 스타일 */
+        .result-message {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .result-message.success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 2px solid rgba(40, 167, 69, 0.3);
+            color: #155724;
+        }
+
+        .result-message.error {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid rgba(220, 53, 69, 0.3);
+            color: #721c24;
+        }
+
+        .result-message strong {
+            color: #212529;
+        }
+
+        .result-message a {
+            color: #495057;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .result-message a:hover {
+            color: #212529;
+            transform: scale(1.05);
+        }
+
+        .result-message a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #495057 0%, #212529 100%);
+            transition: width 0.3s ease;
+        }
+
+        .result-message a:hover::after {
+            width: 100%;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .findid-container {
+                margin: 20px;
+                padding: 30px 25px;
+            }
+
+            .logo-title {
+                font-size: 32px;
+            }
+
+            .findid-container h2 {
+                font-size: 24px;
+            }
+
+            .form-control, .btn-findid {
+                height: 50px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .findid-container {
+                padding: 25px 20px;
+            }
+
+            .logo-title {
+                font-size: 28px;
+            }
+
+            .findid-container h2 {
+                font-size: 22px;
+            }
+        }
+
+        /* 로딩 스피너 */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff40;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 성공/에러 메시지 애니메이션 */
+        .alert-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .alert-message.show {
+            transform: translateX(0);
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f44336, #da190b);
         }
     </style>
 </head>
 
 <body class="index-page">
 
+<!-- 배경 파티클 효과 -->
+<div class="particles" id="particles"></div>
+
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: header}"></div>
 
 <main class="main">
     <div class="findid-container">
+
+        <!-- 로고 섹션 -->
+        <h2 class="logo-title">MalHaeBang</h2>
+        <h3 class="logo-subtitle">말로 찾는 나만의 공간</h3>
+
         <h2>아이디 확인</h2>
         <p>회원가입 시 등록한 이메일 주소를 입력해 주세요.<br>가입 여부를 확인 후 비밀번호 재설정을 도와드립니다.</p>
 
-        <form method="post" action="/findid">
+        <form method="post" action="/findid" id="findidForm">
             <div class="form-group">
-                <label for="email">이메일 주소</label>
+                <label for="email" class="form-label">이메일 주소</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="malhaebang@malhaebang.com" required>
             </div>
-            <button type="submit" class="btn btn-primary btn-findid">가입 여부 확인</button>
+            <button type="submit" class="btn btn-primary btn-findid">
+                <span class="btn-text">가입 여부 확인</span>
+                <div class="loading-spinner"></div>
+            </button>
         </form>
 
         <!-- 결과 메시지 -->
-        <div class="mt-4">
+        <div th:if="${emailFound != null}" class="result-message" th:classappend="${emailFound} ? 'success' : 'error'">
             <p th:if="${emailFound}">
-                입력하신 이메일 <strong th:text="${email}"></strong>은 가입된 계정입니다.<br>
-                <a th:href="@{/findpassword}">👉 비밀번호를 재설정하시겠어요?</a>
+                입력하신 이메일 <strong th:text="${email}"></strong>은 가입된 계정입니다.<br><br>
+                <a th:href="@{/findpassword}">비밀번호를 재설정하시겠어요?</a>
             </p>
-            <p th:if="${emailFound == false}" class="text-danger">
-                해당 이메일로 가입된 계정을 찾을 수 없습니다.<br>
+            <p th:if="${emailFound == false}">
+                해당 이메일로 가입된 계정을 찾을 수 없습니다.<br><br>
                 <a th:href="@{/signup}">회원가입 하러 가기</a>
             </p>
         </div>
     </div>
 </main>
 
-<!-- 푸터 -->
-<!--<footer th:replace="footer :: footer"></footer>-->
-
+<!-- Vendor JS -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/main.js"></script>
+
+<script>
+    // 파티클 생성
+    function createParticles() {
+        const particles = document.getElementById('particles');
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            const size = Math.random() * 5 + 1;
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            const duration = Math.random() * 3 + 3;
+            
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.animationDuration = duration + 's';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            
+            particles.appendChild(particle);
+        }
+    }
+
+    // 알림 메시지 표시
+    function showAlert(message, type = 'error') {
+        const alert = document.createElement('div');
+        alert.className = `alert-message alert-${type}`;
+        alert.textContent = message;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => alert.classList.add('show'), 100);
+        
+        setTimeout(() => {
+            alert.classList.remove('show');
+            setTimeout(() => document.body.removeChild(alert), 300);
+        }, 3000);
+    }
+
+    // 이메일 유효성 검사
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // 폼 제출 처리
+    document.getElementById('findidForm').addEventListener('submit', function(e) {
+        const email = document.getElementById('email').value;
+        const button = this.querySelector('.btn-findid');
+        const buttonText = button.querySelector('.btn-text');
+        const spinner = button.querySelector('.loading-spinner');
+        
+        // 이메일 유효성 검사
+        if (!validateEmail(email)) {
+            e.preventDefault();
+            showAlert('올바른 이메일 형식을 입력해주세요.', 'error');
+            return;
+        }
+        
+        // 로딩 상태 표시
+        buttonText.textContent = '확인 중...';
+        spinner.style.display = 'inline-block';
+        button.disabled = true;
+        
+        // 실제 제출은 계속 진행
+    });
+
+    // 입력 필드 애니메이션
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.transform = 'translateY(-2px) scale(1.01)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+
+    // 페이지 로드 시 초기화
+    window.addEventListener('load', function() {
+        createParticles();
+    });
+
+    // 반응형 파티클 재조정
+    window.addEventListener('resize', function() {
+        const particles = document.getElementById('particles');
+        particles.innerHTML = '';
+        createParticles();
+    });
+</script>
 
 </body>
 </html>

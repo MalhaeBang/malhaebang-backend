@@ -16,70 +16,70 @@ public class House {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "house_id")
+    @Column(name = "house_id", nullable = false)
     private Integer houseId;
 
-    @Column(nullable = false)
+    @Column
     private String title;
 
-    @Column(nullable = false)
+    @Column
     private String price;
 
-    @Column(nullable = false)
+    @Column
     private String address;
 
-    @Column(nullable = false)
-    private Integer floor;
+    @Column
+    private String floor;
 
-    @Column(name = "deposit_type", nullable = false)
+    @Column(name = "deposit_type")
     private String depositType;
 
     @Column(name = "management_fee")
     private Integer mfee;
 
-    @Column(name = "available_from", nullable = false)
+    @Column(name = "available_from")
     private String aFrom;
 
-    @Column(name = "house_num", nullable = false)
+    @Column(name = "house_num")
     private Long houseNum;
 
     @Column(name = "agent_comm")
     private Integer agentComm;
 
-    @Column(name = "agent_info", nullable = false)
+    @Column(name = "agent_info")
     private String agentInfo;
 
-    @Column(name = "rooms_count", nullable = false)
+    @Column(name = "rooms_count")
     private Integer roomsCount;
 
     @Column(columnDefinition = "TEXT")
     private String options;
 
-    @Column(name = "posted_at", nullable = false)
+    @Column(name = "posted_at")
     private String postedAt;
 
-    @Column(nullable = false)
+    @Column
     private String gu;
 
-    @Column(nullable = false)
+    @Column
     private String dong;
 
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
-    @Column(name = "area_size", nullable = false)
+    @Column(name = "area_size")
     private String areaSize;
 
-    @Column(nullable = false)
+    @Column
     private String direction;
 
     @Column(name = "built_date")
     private String builtDate;
 
-    @Column(nullable = false)
+    @Column
     private Integer parking;
 
-    @Column(name = "building_type", nullable = false)
+    @Column(name = "building_type")
     private String buildingType;
 
     @Column(name = "house_feature", columnDefinition = "TEXT")
@@ -87,9 +87,6 @@ public class House {
 
     @Column(name = "house_explanations", columnDefinition = "TEXT")
     private String houseExplanations;
-
-    @Column(name = "apt_name")
-    private String aptName;
 
     @Column(name = "safety_grade")
     private String safetyGrade;
@@ -122,9 +119,8 @@ public class House {
     @Setter
     private Double longitude;
 
-    // 관계 필드 예시
-    @OneToOne(mappedBy = "house", fetch = FetchType.LAZY)
-    private SafetyScore safetyScore;
+    @Column
+    private String safetyScore;
 
     @OneToMany(mappedBy = "house")
     private List<HouseKeyword> houseKeywords;
