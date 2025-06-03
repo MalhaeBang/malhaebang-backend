@@ -34,7 +34,6 @@ class House(models.Model):
     rooms_count = models.IntegerField()
     space = models.IntegerField(null=True, blank=True)
     total_floor = models.IntegerField(null=True, blank=True)
-    apt_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = 'house'       # 실제 DB 테이블 이름
