@@ -22,6 +22,7 @@
         .mypage-wrapper {
             display: flex;
             min-height: 80vh;
+            flex-direction: row;
         }
 
         .mypage-sidebar {
@@ -29,6 +30,8 @@
             padding: 20px;
             border-right: 1px solid #ddd;
             height: 100%;
+            background-color: #ffffff;
+            flex-shrink: 0;
         }
 
         .mypage-title {
@@ -58,6 +61,9 @@
             font-weight: bold;
             color: #000;
             position: relative;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
         }
 
         .menu-item:first-child {
@@ -65,13 +71,15 @@
         }
 
         .menu-item:hover {
-            background-color: #f9f9f9;
+            background-color: #f0f0f0;
+            transform: translateX(2px);
         }
 
         .menu-item.active {
-            background-color: #f5f5f5;
+            background-color: #e3f2fd;
             border-left: 4px solid #007bff;
             color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.1);
         }
 
         .menu-item.active::before {
@@ -108,21 +116,31 @@
         }
 
         .folder-btn {
-            padding: 6px 0;
+            padding: 8px 12px;
             cursor: pointer;
             color: #555;
             font-size: 14px;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            border-radius: 4px;
+            margin-bottom: 3px;
+            display: block;
         }
 
         .folder-btn:hover {
-            text-decoration: underline;
+            background-color: #f5f5f5;
             color: #000;
+        }
+
+        .folder-btn.active {
+            background-color: #e8f4fd;
+            color: #007bff;
+            font-weight: 600;
         }
 
         .content-area {
             flex-grow: 1;
             padding: 30px 40px;
+            background-color: #ffffff;
         }
 
         .tab-content {
@@ -135,12 +153,20 @@
 
         .favorite-item {
             background: #ffffff;
-            border: 2px solid #000;
-            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
             color: #000;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .favorite-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.1);
+            transform: translateY(-2px);
         }
 
         .favorite-icon {
@@ -152,24 +178,318 @@
         .favorite-description {
             font-size: 14px;
             color: #444;
+            margin-top: 8px;
         }
 
         .favorite-details {
-            display: none;
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 14px;
             color: #222;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
         .favorite-item.expanded .favorite-details {
-            display: block;
+            max-height: 500px;
+            opacity: 1;
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        .favorite-item:not(.expanded) .favorite-details {
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                padding: 0 15px;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+                padding: 15px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                max-height: 500px;
+                padding: 15px;
+            }
+            to {
+                opacity: 0;
+                max-height: 0;
+                padding: 0 15px;
+            }
         }
 
         h4 {
             line-height: 1.5 !important;
+            color: #212529;
+            font-weight: 600;
         }
         h5 {
             line-height: 2.5 !important;
+            color: #495057;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* 버튼 스타일 개선 */
+        .btn-change {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-change:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 1024px) {
+            .content-area {
+                padding: 25px 30px;
+            }
+            
+            .mypage-sidebar {
+                width: 200px;
+                padding: 15px;
+            }
+            
+            .mypage-title {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mypage-wrapper {
+                flex-direction: column;
+            }
+            
+            .mypage-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                padding: 20px;
+                order: 1;
+            }
+            
+            .content-area {
+                padding: 20px;
+                order: 2;
+            }
+            
+            .mypage-title {
+                font-size: 20px;
+                text-align: center;
+            }
+            
+            .mypage-menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            
+            .menu-item {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+                margin-bottom: 0;
+                padding: 10px 12px;
+            }
+            
+            .folder-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding-left: 0;
+                justify-content: center;
+            }
+            
+            .folder-list.active {
+                display: flex;
+            }
+            
+            .folder-btn {
+                flex: none;
+                min-width: 100px;
+                text-align: center;
+                margin-bottom: 0;
+            }
+            
+            .favorite-item {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            h4 {
+                font-size: 1.3rem;
+            }
+            
+            h5 {
+                font-size: 1.1rem;
+                line-height: 2 !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-area {
+                padding: 15px;
+            }
+            
+            .mypage-sidebar {
+                padding: 15px;
+            }
+            
+            .mypage-title {
+                font-size: 18px;
+            }
+            
+            .menu-item {
+                min-width: 100px;
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+            
+            .folder-btn {
+                min-width: 80px;
+                font-size: 13px;
+                padding: 6px 8px;
+            }
+            
+            .favorite-item {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .favorite-icon {
+                font-size: 20px;
+            }
+            
+            .favorite-description, .favorite-details {
+                font-size: 13px;
+            }
+            
+            .favorite-details {
+                padding: 12px;
+            }
+            
+            h4 {
+                font-size: 1.2rem;
+            }
+            
+            h5 {
+                font-size: 1rem;
+                line-height: 1.8 !important;
+            }
+            
+            .btn-change, .btn-danger {
+                width: 100%;
+                margin-bottom: 10px;
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* 모바일 가로 모드 */
+        @media (max-width: 812px) and (orientation: landscape) {
+            .mypage-wrapper {
+                flex-direction: row;
+            }
+            
+            .mypage-sidebar {
+                width: 200px;
+                border-right: 1px solid #ddd;
+                border-bottom: none;
+            }
+            
+            .mypage-menu {
+                display: block;
+            }
+            
+            .folder-list {
+                display: none;
+            }
+            
+            .folder-list.active {
+                display: block;
+            }
+        }
+
+        /* 터치 디바이스 최적화 */
+        @media (hover: none) and (pointer: coarse) {
+            .menu-item, .folder-btn, .favorite-item {
+                padding: 14px 16px;
+            }
+            
+            .menu-item:hover, .folder-btn:hover, .favorite-item:hover {
+                transform: none;
+            }
+        }
+
+        /* 접근성 개선 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* 다크 모드 미디어 쿼리 (미래 대비) */
+        @media (prefers-color-scheme: dark) {
+            /* 현재는 라이트 모드만 지원하므로 비활성화 */
+        }
+
+        /* 고해상도 디스플레이 최적화 */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .favorite-icon {
+                font-size: 25px;
+            }
+        }
+
+        /* 화면 너비별 컨테이너 최적화 */
+        @media (min-width: 1200px) {
+            .content-area {
+                max-width: 900px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .content-area {
+                max-width: 1000px;
+            }
         }
     </style>
 </head>
@@ -216,8 +536,6 @@
                 </form>
             </div>
 
-
-
             <div id="favorites" class="tab-content">
                 <h4 th:text="${user.userNickname.contains('_') ? #strings.substringBefore(user.userNickname, '_') : user.userNickname} + '님, 찜하신 매물이예요.'"></h4>
 
@@ -247,8 +565,6 @@
                                     <span th:text="${liked.house.houseFeature}"></span>
                                 </div>
 
-
-
                                 <div class="favorite-details">
                                     📍 주소: <span th:text="${liked.house.address}"></span><br>
                                     🧭 방향: <span th:text="${liked.house.direction}"></span><br>
@@ -275,7 +591,6 @@
     </div>
 </main>
 <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {

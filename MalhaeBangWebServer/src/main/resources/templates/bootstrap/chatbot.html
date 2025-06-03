@@ -229,6 +229,40 @@
             filter: drop-shadow(-1px 0 0 #d1d5db);
         }
 
+        .house-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .house-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .house-card .title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .house-card .info {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        .house-card .location {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 8px;
+        }
+
         .chat-input-area {
             border-radius: 16px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
@@ -309,67 +343,6 @@
 
 <div th:replace="~{fragments/header :: header}"></div>
 <main class="chatbot-layout">
-    <!-- 사이드바 -->
-    <!--
-    <aside class="sidebar">
-        <div class="listing-card">
-            <div class="listing-header">
-                <strong>[집주인] 다가구</strong>
-                <span class="favorite-toggle" onclick="toggleFavorite(this)">
-                    <i class="bi bi-star"></i>
-                </span>
-            </div>
-            월세 1,000/70<br />
-            단독/다가구<br />
-            3/4층, 남동향<br />
-            #20000이하
-        </div>
-        <div class="listing-card">
-            <div class="listing-header">
-                <strong>[집주인] 단독</strong>
-                <span class="favorite-toggle" onclick="toggleFavorite(this)">
-                    <i class="bi bi-star"></i>
-                </span>
-            </div>
-            전세 2,000<br/>
-            단독/다가구<br/>
-            3/4층, 남동향<br/>
-            #20000이하
-        </div>
-        <div class="listing-card">
-            <div class="listing-header">
-                <strong>[집주인] 단독</strong>
-                <span class="favorite-toggle" onclick="toggleFavorite(this)">
-                    <i class="bi bi-star"></i>
-                </span>
-            </div>
-            월세 2,000/80<br/>
-            단독/다가구<br/>
-            중/4층, 북향<br/>
-            #20000이하
-        </div>
-        <div class="listing-card">
-            <div class="listing-header">
-                <strong>[집주인] 메트로망</strong>
-                <span class="favorite-toggle" onclick="toggleFavorite(this)">
-                    <i class="bi bi-star"></i>
-                </span>
-            </div>
-            월세 1,000/57<br/>
-            오피스텔
-        </div>
-        <div class="listing-card">
-            <div class="listing-header">
-                <strong>[집주인] 메트로망</strong>
-                <span class="favorite-toggle" onclick="toggleFavorite(this)">
-                    <i class="bi bi-star"></i>
-                </span>
-            </div>
-            월세 1,000/57<br/>
-            오피스텔
-        </div>
-    </aside>
-    -->
 
     <!-- 메인 -->
     <div class="chatbot-main">
@@ -396,93 +369,182 @@
         </div>
     </div>
 </main>
-</body>
+
+<!-- Vendor JS -->
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/aos/aos.js"></script>
+<script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const chatWindow = document.getElementById("chatWindow");
-        const inputField = document.querySelector(".chat-input-area input");
-        const sendButton = document.querySelector(".chat-input-area button");
+    // --- 모든 함수 정의는 DOMContentLoaded 리스너 밖에 위치 ---
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const query = urlParams.get('query');
+    const API_URL = "http://localhost:8000";
+    const chatHistoryKey = 'malhaebangChatHistory'; // localStorage에 사용할 키
 
-        if (query) {
-            const userMessage = document.createElement("div");
-            userMessage.className = "chat-message user";
-            userMessage.textContent = decodeURIComponent(query);
-            chatWindow.appendChild(userMessage);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+    // 챗봇 메시지 기록을 저장할 배열 (메모리 상에서 관리)
+    let chatHistory = []; // ✅ 새로운 배열 추가
 
-            fetch("http://localhost:8000/query", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({query})
-            })
-                .then(res => res.json())
-                .then(data => {
-                    console.log("서버 응답:", data.response);
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot";
-                    botMessage.textContent = data.response;
-                    chatWindow.appendChild(botMessage);
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                })
-                .catch(err => {
-                    console.error("fetch 오류:", err);
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot";
-                    botMessage.textContent = "⚠️ 서버 연결에 실패했습니다.";
-                    chatWindow.appendChild(botMessage);
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                });
+    // 매물 카드 생성 함수 (기존 코드 유지)
+    function createHouseCard(house) {
+        console.log("Creating card for house:", house); // 어떤 데이터가 넘어오는지 콘솔에 출력
+        const card = document.createElement("div");
+        card.className = "chat-message bot house-card"; // 챗봇 메시지 스타일 + 매물 카드 스타일 적용
+
+        // 속성 값을 안전하게 가져오고 문자열로 변환하는 헬퍼 함수
+        const safeGetString = (value) => {
+            if (value === undefined || value === null) return '';
+            if (typeof value === 'object') {
+                try { return JSON.stringify(value); } catch (e) { return '[객체 변환 오류]'; }
+            }
+            return String(value);
+        };
+
+         // 가격 정보 포맷팅 함수 (이미 정의되어 있어야 함 - 이 함수는 이 스크립트 블록 하단에 있습니다.)
+         // function formatPrice(val) { ... }
+
+        // 백엔드에서 넘어오는 실제 속성 이름(Elasticsearch _source 필드 기준)을 활용하여 카드 내용 구성
+        const source = house._source || {}; // _source가 없을 경우 빈 객체 사용
+
+        const gu = safeGetString(source.gu);
+        const dong = safeGetString(source.dong);
+        const address = `${gu} ${dong}`.trim();
+
+        const depositType = safeGetString(source.deposit_type);
+        const deposit = (source.deposit !== undefined && source.deposit !== null) ? formatPrice(source.deposit) : '';
+        const monthlyRent = (source.monthly_rent !== undefined && source.monthly_rent !== null) ? formatPrice(source.monthly_rent) : '';
+        const priceInfo = `${depositType} ${deposit} / ${monthlyRent}`.trim();
+
+        const areaSize = safeGetString(source.area_size);
+        const floor = (source.floor !== undefined && source.floor !== null) ? safeGetString(source.floor) : '-';
+        const totalFloor = (source.total_floor !== undefined && source.total_floor !== null) ? safeGetString(source.total_floor) : '-';
+        const floorInfo = `${floor}/${totalFloor}층`;
+
+        const rooms = (source.rooms_count !== undefined && source.rooms_count !== null) ? safeGetString(source.rooms_count) : '-';
+        const bath = (source.bath_count !== undefined && source.bath_count !== null) ? safeGetString(source.bath_count) : '-';
+        const roomBathInfo = `방: ${rooms} / 욕실: ${bath}`;
+
+        const parking = source.parking;
+        const parkingInfo = (parking === 1) ? '가능' : ((parking === 0) ? '불가' : '');
+
+        const safetyGrade = safeGetString(source.safety_grade);
+        const options = source.options;
+        const matchedConditions = (options && options !== '옵션 정보 없음') ? safeGetString(options) : '';
+        const walkingInfo = ''; // 도보 거리 정보는 현재 _source에 없으므로 표시하지 않음
+
+        const houseFeature = safeGetString(source.house_feature);
+        const houseExplanation = safeGetString(source.house_explanations); // 설명은 표시하지 않지만 값은 가져옴
+        const houseId = safeGetString(source.house_id);
+        const title = safeGetString(source.title);
+
+        let cardHtml = `
+            <div class="title">${title || address || '매물 정보'}</div>
+        `;
+
+        if (priceInfo.trim()) {
+            cardHtml += `<div class="info">${priceInfo}</div>`;
+        }
+        if (areaSize) {
+             cardHtml += `<div class="info">${areaSize}</div>`;
+        }
+         if (floor !== '-' || totalFloor !== '-') {
+             cardHtml += `<div class="info">${floorInfo}</div>`;
+         }
+         if (rooms !== '-' || bath !== '-') {
+              cardHtml += `<div class="info">${roomBathInfo}</div>`;
+         }
+         if (safetyGrade) {
+             cardHtml += `<div class="info">안전등급: ${safetyGrade}</div>`;
+         }
+
+        if (address) {
+             cardHtml += `<div class="location">${address}</div>`;
         }
 
-        // 버튼 클릭 시 입력된 값으로 챗봇 응답 요청
-        sendButton.addEventListener("click", () => {
-            const query = inputField.value.trim();
-            if (!query) return;
 
-            // 사용자 메시지 표시
-            const userMessage = document.createElement("div");
-            userMessage.className = "chat-message user";
-            userMessage.textContent = query;
-            chatWindow.appendChild(userMessage);
-            inputField.value = "";
-            chatWindow.scrollTop = chatWindow.scrollHeight;
 
-            // FastAPI로 POST 요청
-            fetch("http://localhost:8000/query", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({query})
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot";
-                    botMessage.textContent = data.response;
-                    chatWindow.appendChild(botMessage);
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                })
-                .catch(err => {
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot";
-                    botMessage.textContent = "⚠️ 서버 연결에 실패했습니다.";
-                    chatWindow.appendChild(botMessage);
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                    console.error("Error:", err);
-                });
-        });
+        card.innerHTML = cardHtml;
 
-        inputField.addEventListener("keydown", function (event) {
-            if (event.isComposing) return;
-            if (event.key === "Enter") {
-                event.preventDefault();
-                sendButton.click();
+        // 클릭 이벤트: 지도 페이지로 이동 (houseId를 쿼리 파라미터로 전달)
+        card.addEventListener("click", () => {
+            if (source.house_id) {
+                window.location.href = `/map?houseId=${source.house_id}`;
             }
         });
-    });
 
+        return card;
+    }
+
+    // 메시지를 chatWindow에 추가하고 기록 배열에 저장하는 함수
+    function addMessageToChat(type, content) {
+        const chatWindow = document.getElementById("chatWindow");
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `chat-message ${type}`;
+
+        let historyEntry;
+
+        if (type === 'bot' && content && content._source) { // 매물 카드 데이터인 경우
+            const houseCard = createHouseCard(content); // createHouseCard 함수 사용
+            chatWindow.appendChild(houseCard);
+            // 기록에는 원본 데이터와 타입을 저장
+            historyEntry = { type: type, houseData: content };
+        } else { // 일반 텍스트 메시지인 경우
+            messageDiv.textContent = content;
+            chatWindow.appendChild(messageDiv);
+            // 기록에는 텍스트와 타입을 저장
+            historyEntry = { type: type, text: content };
+        }
+
+        chatHistory.push(historyEntry);
+        saveChatHistory();
+        chatWindow.scrollTop = chatWindow.scrollHeight; // 스크롤 최신 위치로
+    }
+
+
+    // 현재 대화 기록 배열을 localStorage에 저장
+    function saveChatHistory() {
+        // chatHistory 배열 자체를 JSON 문자열로 변환하여 저장
+        localStorage.setItem(chatHistoryKey, JSON.stringify(chatHistory));
+    }
+
+    // 저장된 대화 기록 불러오기 및 표시
+    function loadChatHistory() {
+        const savedHistory = localStorage.getItem(chatHistoryKey);
+        if (savedHistory) {
+            try {
+                // localStorage에서 기록을 읽어와 chatHistory 배열에 파싱
+                chatHistory = JSON.parse(savedHistory);
+                const chatWindow = document.getElementById("chatWindow");
+                 // 기존 메시지 모두 지우기 (팁 박스 제외)
+                 chatWindow.querySelectorAll('.chat-message:not(.tip-box)').forEach(msg => msg.remove());
+
+                // 복원된 기록 배열 순회하며 화면에 메시지/카드 추가
+                chatHistory.forEach(entry => {
+                    if (entry.houseData) { // 매물 카드 데이터가 있는 경우
+                        const houseCard = createHouseCard(entry.houseData);
+                        chatWindow.appendChild(houseCard);
+                    } else if (entry.text) { // 일반 텍스트 메시지인 경우
+                        const messageDiv = document.createElement("div");
+                        messageDiv.className = `chat-message ${entry.type}`;
+                        messageDiv.textContent = entry.text;
+                        chatWindow.appendChild(messageDiv);
+                    }
+                });
+
+                chatWindow.scrollTop = chatWindow.scrollHeight; // 로드 후 스크롤 최신 위치로
+            } catch (e) {
+                console.error("Error loading chat history from localStorage:", e);
+                chatHistory = []; // 오류 발생 시 기록 초기화
+                localStorage.removeItem(chatHistoryKey); // 파싱 오류 시 데이터 삭제
+            }
+        } else {
+             chatHistory = []; // 저장된 기록이 없으면 빈 배열로 초기화
+        }
+    }
+
+
+    // 나머지 함수들 (toggleFavorite, formatPrice, round)은 기존 위치 유지
     function toggleFavorite(elem) {
         const icon = elem.querySelector("i");
 
@@ -493,5 +555,197 @@
         // 색상 적용용 클래스 토글
         elem.classList.toggle("active");
     }
+
+    // NLP 서버의 Python format_price 함수를 JavaScript로 포팅
+    function formatPrice(val) {
+        if (val === undefined || val === null) return '';
+        const num = parseInt(val, 10);
+        if (isNaN(num)) return '';
+
+        if (num >= 100000000) {
+            const uk = Math.floor(num / 100000000);
+            const man = Math.floor((num % 100000000) / 10000);
+            return `${uk}억 ${man.toLocaleString()}만원`;
+        } else if (num >= 10000) {
+            return `${Math.floor(num / 10000).toLocaleString()}만원`;
+        }
+        return `${num.toLocaleString()}원`;
+    }
+
+    // 숫자를 지정된 소수점 자리에서 반올림하는 헬퍼 함수
+    function round(num, decimalPlaces = 0) {
+        if (typeof num !== 'number' || num === null) return num;
+        const factor = Math.pow(10, decimalPlaces);
+        return Math.round(num * factor) / factor;
+    }
+
+
+    // --- DOMContentLoaded 이벤트 리스너 시작 ---
+    document.addEventListener("DOMContentLoaded", function () {
+        const chatWindow = document.getElementById("chatWindow");
+        const inputField = document.querySelector(".chat-input-area input");
+        const sendButton = document.querySelector(".chat-input-area button");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+        const targetHouseId = urlParams.get('houseId');
+
+        // ✅ 페이지 로딩 시 localStorage에서 대화 기록 불러오기
+        // houseId나 초기 쿼리가 없는 일반적인 페이지 로딩 시에만 기록 로드
+        if (!targetHouseId && !query) {
+             loadChatHistory();
+        }
+
+         // 초기 스크롤 최신 메시지로 이동 (기록 로드 후 또는 정적 메시지 표시 후)
+         // loadChatHistory 함수 내에서 이미 스크롤 처리함
+         // chatWindow.scrollTop = chatWindow.scrollHeight;
+
+
+        if (query) {
+            // URL 파라미터로 쿼리가 전달된 경우 (continue 시나리오)
+            // 사용자 메시지 추가 (기존 코드 수정: addMessageToChat 사용)
+             addMessageToChat('user', decodeURIComponent(query));
+
+            // FastAPI로 POST 요청
+            fetch(`${API_URL}/query`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({query: decodeURIComponent(query)})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("서버 응답 전체:", data); // 서버 응답 전체 로그 추가
+
+                    // 서버 응답 처리
+                    if (Array.isArray(data.response) && data.response.length > 0) {
+                         const houseList = data.response;
+                         houseList.forEach(item => {
+                            const houseData = item.hit ? item.hit : item;
+                            if (houseData && houseData._source) {
+                                 // 매물 카드는 addMessageToChat 함수 내에서 createHouseCard 호출 및 추가
+                                 addMessageToChat('bot', houseData); // ✅ 원본 데이터 전달
+                            } else {
+                                 console.warn("Unexpected house data format:", houseData);
+                            }
+                         });
+                    } else if (data.response) {
+                        addMessageToChat('bot', data.response); // ✅ 텍스트 전달
+                    } else {
+                         addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다."); // ✅ 텍스트 전달
+                    }
+                    // addMessageToChat 내에서 스크롤 및 저장 처리함
+                    // chatWindow.scrollTop = chatWindow.scrollHeight;
+                    // saveChatHistory();
+                })
+                .catch((err) => {
+                    console.error("Fetch error:", err);
+                    addMessageToChat('bot', "⚠️ 서버 연결 중 오류가 발생했습니다."); // ✅ 텍스트 전달
+                     // addMessageToChat 내에서 스크롤 및 저장 처리함
+                     // chatWindow.scrollTop = chatWindow.scrollHeight;
+                     // saveChatHistory(); // ✅ 에러 메시지도 저장
+                });
+        }
+
+        // 버튼 클릭 시 입력된 값으로 챗봇 응답 요청
+        sendButton.addEventListener("click", () => {
+            const query = inputField.value.trim();
+            if (!query) return;
+
+            // 사용자 메시지 표시 및 저장 (✅ addMessageToChat 사용)
+            addMessageToChat('user', query); // ✅ addMessageToChat 사용
+            inputField.value = "";
+            // addMessageToChat 내에서 스크롤 및 저장 처리함
+            // chatWindow.scrollTop = chatWindow.scrollHeight;
+            // saveChatHistory();
+
+            fetch(`${API_URL}/query`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({query})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("서버 응답 전체:", data);
+                     // 서버 응답 처리 (✅ addMessageToChat 사용)
+                     if (Array.isArray(data.response) && data.response.length > 0) {
+                         const houseList = data.response;
+                         houseList.forEach(item => {
+                             const houseData = item.hit ? item.hit : item;
+                            if (houseData && houseData._source) {
+                                 addMessageToChat('bot', houseData); // ✅ 원본 데이터 전달
+                            } else {
+                                 console.warn("Unexpected house data format:", houseData);
+                            }
+                         });
+                    } else if (data.response) {
+                        addMessageToChat('bot', data.response); // ✅ 텍스트 전달
+                    } else {
+                         addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다."); // ✅ 텍스트 전달
+                    }
+                    // addMessageToChat 내에서 스크롤 및 저장 처리함
+                    // chatWindow.scrollTop = chatWindow.scrollHeight;
+                    // saveChatHistory();
+                })
+                .catch((err) => {
+                    console.error("Error:", err);
+                    addMessageToChat('bot', "⚠️ 서버 연결 중 오류가 발생했습니다."); // ✅ 텍스트 전달
+                    // addMessageToChat 내에서 스크롤 및 저장 처리함
+                    // chatWindow.scrollTop = chatWindow.scrollHeight;
+                    // saveChatHistory();
+                });
+        });
+
+        // Enter 키 입력 시 전송 버튼 클릭 (기존 코드 유지)
+        inputField.addEventListener("keydown", function (event) {
+            if (event.isComposing) return;
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendButton.click();
+            }
+        });
+
+        // map 페이지에서 넘어온 houseId 처리 로직 (기존 코드 유지, chatbot에서는 특별히 할 일 없음)
+        // ...
+
+    }); // DOMContentLoaded 끝
+
+    // 이 하단의 함수들은 원래 DOMContentLoaded 밖에 있었습니다.
+    // 이 위치를 유지하는 것이 올바른 스코프 관리입니다.
+
+    // 나머지 함수들 (toggleFavorite, formatPrice, round)
+    function toggleFavorite(elem) {
+        const icon = elem.querySelector("i");
+
+        // 별 아이콘 모양 토글
+        icon.classList.toggle("bi-star");
+        icon.classList.toggle("bi-star-fill");
+
+        // 색상 적용용 클래스 토글
+        elem.classList.toggle("active");
+    }
+
+    // NLP 서버의 Python format_price 함수를 JavaScript로 포팅
+    function formatPrice(val) {
+        if (val === undefined || val === null) return '';
+        const num = parseInt(val, 10);
+        if (isNaN(num)) return '';
+
+        if (num >= 100000000) {
+            const uk = Math.floor(num / 100000000);
+            const man = Math.floor((num % 100000000) / 10000);
+            return `${uk}억 ${man.toLocaleString()}만원`;
+        } else if (num >= 10000) {
+            return `${Math.floor(num / 10000).toLocaleString()}만원`;
+        }
+        return `${num.toLocaleString()}원`;
+    }
+
+    // 숫자를 지정된 소수점 자리에서 반올림하는 헬퍼 함수
+    function round(num, decimalPlaces = 0) {
+        if (typeof num !== 'number' || num === null) return num;
+        const factor = Math.pow(10, decimalPlaces);
+        return Math.round(num * factor) / factor;
+    }
 </script>
+</body>
 </html>
