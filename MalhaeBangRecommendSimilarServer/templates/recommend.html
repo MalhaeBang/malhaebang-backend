@@ -92,8 +92,7 @@
 </head>
 <body>
 
-<div class="container-main">
-  <a href="{{ url_for('house_list') }}" class="close-button" aria-label="Close">&times;</a>
+
   {% if target %}
   <div class="detail_contents_inner">
     <!-- 이미지 슬라이더 -->
@@ -137,7 +136,6 @@
         <div class="main_photo_wrap">
             <img src="{{ target.thumbnail }}" class="d-block w-100" style="border-radius: 8px; max-height: 300px; object-fit: contain;" alt="매물 썸네일">
         </div>
-    </div>
     {% endif %}
 
     <!-- 매물 기본 정보 -->
@@ -165,6 +163,12 @@
             <i class="bi bi-info-circle" style="color: #5e5e5e; margin-right: 4px;"></i>
         </span>
         {% endif %}
+        {% if target.safety_score %}
+        <span class="feature" style="color: #5e5e5e;">
+          {{ target.safety_score }}
+          </span>
+        {% endif %}
+
       </div>
     </div>
 

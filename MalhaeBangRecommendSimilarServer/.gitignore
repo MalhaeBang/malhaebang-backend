@@ -1,2 +1,3 @@
 venv
 *.db
+faiss_index.faiss

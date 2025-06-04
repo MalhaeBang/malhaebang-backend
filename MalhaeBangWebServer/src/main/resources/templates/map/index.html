@@ -39,14 +39,15 @@
         }
 
         #filter-container {
-            background-color: #0d1d34;
+            background: linear-gradient(135deg, #0d1d34 0%, #1a2942 100%);
             width: 100%;
-
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
             margin: 0;
+            transition: all 0.3s ease;
+            position: relative;
         }
         .form-select {
             margin: 0;
@@ -54,9 +55,11 @@
             min-width: 120px;
             padding: 6px 12px;
             border-radius: 8px;
-            border: 1px solid #ffffff;
-            background-color: #0d1d34;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.1);
             color: #ffffff;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
         #house-list-panel .house-item {
             border-bottom: none;
@@ -67,6 +70,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            color: #000000;
         }
         #house-list-panel .house-item:hover {
             background-color: #f9f9f9;
@@ -81,14 +85,27 @@
         }
         #house-list-panel .house-item .topLine strong {
             font-size: 1rem;
-            color: #333;
+            color: #000000;
         }
         #house-list-panel .house-item .favorite-toggle {
             font-size: 1.1rem;
             color: #ccc;
-            transition: color 0.2s ease;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
         }
+        
+        #house-list-panel .house-item .favorite-toggle:hover {
+            background-color: rgba(255, 193, 7, 0.1);
+            transform: scale(1.1);
+        }
+        
         #house-list-panel .house-item .favorite-toggle .bi-star-fill {
+            color: #ffc107;
+        }
+        
+        #house-list-panel .house-item .favorite-toggle .bi-star:hover {
             color: #ffc107;
         }
         #house-list-panel .house-item .house-info {
@@ -114,6 +131,15 @@
             border-right: 1px solid #ccc;
             height: 100%;
             overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 320px;
+            min-width: 320px;
+            max-width: 320px;
+            flex-shrink: 0;
+        }
+        #house-list-panel.show {
+            transform: translateX(0);
         }
         @media (max-width: 768px) {
             .main.d-flex > div:last-child {
@@ -122,7 +148,14 @@
 
             #house-list-panel {
                 width: 100%;
+                min-width: 100%;
+                max-width: 100%;
                 height: 300px;
+                transform: translateY(-100%);
+            }
+
+            #house-list-panel.show {
+                transform: translateY(0);
             }
 
             #map {
@@ -133,12 +166,17 @@
         #iframe-sidepanel {
             display: none;
             width: 420px;
-            height: 100%;
             background: white;
             z-index: 1000;
             border-left: 1px solid #ccc;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
             position: relative;
+            height: 100%;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #iframe-sidepanel.show {
+            transform: translateX(0);
         }
 
         #iframe-sidepanel iframe {
@@ -155,6 +193,313 @@
             background: none;
             border: none;
             font-size: 20px;
+        }
+
+        /* 토스트 알림 시스템 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #ffffff; /* 배경 흰색 */
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #007bff;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+            min-width: 300px;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+            background: #ffffff; /* 배경 흰색 */
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .toast.info {
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .toast.warning {
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .toast-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.6;
+            margin-left: 10px;
+            padding: 0;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        /* 로딩 스피너 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 필터 로딩 상태 */
+        .filter-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .filter-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff40;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* 결과 카운터 */
+        .results-counter {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background: #ffffff; /* 배경 흰색 */
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            color: #000000; /* 글자색 검은색 */
+            z-index: 1000;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .results-counter.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* 필터 스타일 개선 */
+        .form-select:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-select:focus {
+            border-color: #007bff;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        /* 모바일 최적화 스타일 */
+        @media (max-width: 768px) {
+            #filter-container {
+                height: auto;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .form-select {
+                width: 100%;
+                margin: 4px 0;
+                font-size: 14px;
+            }
+
+            #house-list-panel {
+                width: 100%;
+                height: 40vh;
+                transform: translateY(-100%);
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                z-index: 1000;
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            #house-list-panel.show {
+                transform: translateY(0);
+            }
+
+            #map {
+                height: calc(100vh - 200px);
+            }
+
+            .results-counter {
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%) translateY(20px);
+                background: #ffffff; /* 배경 흰색 */
+                backdrop-filter: blur(10px);
+                padding: 8px 16px;
+                border-radius: 20px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                font-size: 14px;
+                color: #000000; /* 글자색 검은색 */
+            }
+
+            .results-counter.show {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            .toast {
+                width: 90%;
+                max-width: none;
+                margin: 0 auto;
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+
+            .toast-container {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100%;
+                padding: 0 16px;
+            }
+
+            #iframe-sidepanel {
+                width: 100%;
+                height: 100vh;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 2000;
+            }
+
+            #iframe-sidepanel button {
+                top: 16px;
+                right: 16px;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .house-item {
+                padding: 12px;
+                margin-bottom: 8px;
+            }
+
+            .house-item .topLine strong {
+                font-size: 0.9rem;
+            }
+
+            .house-item .house-info {
+                font-size: 0.85rem;
+            }
+
+            .favorite-toggle {
+                font-size: 1rem;
+            }
+        }
+
+        /* 태블릿 최적화 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #filter-container {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .form-select {
+                min-width: 140px;
+            }
+
+            #house-list-panel {
+                width: 280px;
+            }
+
+            #iframe-sidepanel {
+                width: 380px;
+            }
+        }
+
+        /* 다크 모드 지원 */
+        @media (prefers-color-scheme: dark) {
+            .house-item {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+
+            .house-item:hover {
+                background-color: #2a2a2a;
+            }
+
+            .house-item .topLine strong {
+                color: #ffffff;
+            }
+
+            .toast {
+                background: rgba(40, 40, 40, 0.95);
+                color: #ffffff;
+            }
+
+            .results-counter {
+                background: rgba(40, 40, 40, 0.95);
+                color: #ffffff;
+            }
         }
     </style>
 </head>
@@ -198,7 +543,8 @@
     <!-- 지도, 목록, 추천 패널 통합 -->
     <div style="display: flex; flex: 1; height: calc(100vh - 160px);">
         <!-- 왼쪽: 목록 -->
-        <div id="house-list-panel" style="width: 300px; background-color: #f0f0f0;"></div>
+        <div id="house-list-panel" style="width: 300px; background-color: #f0f0f0; display: none;">
+        </div>
 
         <!-- 오른쪽: iframe 패널 (지도의 오른쪽이 아니라, 목록의 바로 오른쪽!) -->
         <div id="iframe-sidepanel">
@@ -209,6 +555,20 @@
         </div>
         <div id="map" style="flex-grow: 1; position: relative;"></div>
     </div>
+    
+    <!-- 결과 카운터 -->
+    <div class="results-counter" id="results-counter">
+        <span id="results-text">매물을 검색해보세요</span>
+    </div>
+    
+    <!-- 로딩 오버레이 -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- 토스트 컨테이너 -->
+    <div class="toast-container" id="toast-container"></div>
+    
     <!-- 폴더 선택 모달 -->
     <div class="modal fade" id="folderSelectModal" tabindex="-1" aria-labelledby="folderSelectModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -252,7 +612,205 @@
 <!-- 지도 스크립트 -->
 <script>
 
+    // ========== 유틸리티 함수들 ==========
+    
+    // 토스트 알림 시스템
+    function showToast(message, type = 'info', duration = 3000) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icon = {
+            success: '✅',
+            error: '❌', 
+            warning: '⚠️',
+            info: 'ℹ️'
+        }[type] || 'ℹ️';
+        
+        toast.innerHTML = `
+            ${icon} ${message}
+            <button class="toast-close" onclick="closeToast(this)">×</button>
+        `;
+        
+        container.appendChild(toast);
+        
+        // 애니메이션으로 표시
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // 자동 제거
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    container.removeChild(toast);
+                }
+            }, 300);
+        }, duration);
+        
+        return toast;
+    }
+    
+    function closeToast(button) {
+        const toast = button.parentElement;
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }
+    
+    // 로딩 상태 관리
+    function showLoading(message = '로딩 중...') {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'flex';
+        if (message !== '로딩 중...') {
+            showToast(message, 'info', 1000);
+        }
+    }
+    
+    function hideLoading() {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'none';
+    }
+    
+    // 결과 카운터 업데이트
+    function updateResultsCounter(count, isVisible = true) {
+        const counter = document.getElementById('results-counter');
+        const text = document.getElementById('results-text');
+        
+        if (count === 0) {
+            text.textContent = '검색 결과가 없습니다';
+        } else if (count === 1) {
+            text.textContent = '1개의 매물을 찾았습니다';
+        } else {
+            text.textContent = `${count}개의 매물을 찾았습니다`;
+        }
+        
+        if (isVisible) {
+            counter.classList.add('show');
+        } else {
+            counter.classList.remove('show');
+        }
+    }
+    
+    // 사이드바 애니메이션
+    function showSidebar() {
+        const sidebar = document.getElementById('house-list-panel');
+        sidebar.style.display = 'block';
+        setTimeout(() => {
+            sidebar.classList.add('show');
+            adjustMapSize();
+        }, 50);
+    }
+    
+    function hideSidebar() {
+        const sidebar = document.getElementById('house-list-panel');
+        sidebar.classList.remove('show');
+        setTimeout(() => {
+            sidebar.style.display = 'none';
+            adjustMapSize();
+        }, 300);
+    }
+    
+    // iframe 패널 애니메이션
+    function showIframePanel() {
+        const panel = document.getElementById('iframe-sidepanel');
+        const iframe = document.getElementById('iframe-content');
+        
+        // 매물 정보 로딩 toast 표시
+        showToast('매물 정보를 불러오는 중입니다...', 'info', 4000);
+        
+        // iframe 로드 완료 시 성공 메시지 표시
+        iframe.onload = function() {
+            // iframe의 src가 설정되어 있을 때만 성공 메시지 표시
+            if (iframe.src && iframe.src.includes('recommend_ui')) {
+                showToast('매물 정보를 불러왔습니다!', 'success', 1500);
+            }
+        };
+        
+        panel.style.display = 'block';
+        setTimeout(() => {
+            panel.classList.add('show');
+            adjustMapSize();
+        }, 50);
+    }
+    
+    function hideIframePanel() {
+        const panel = document.getElementById('iframe-sidepanel');
+        panel.classList.remove('show');
+        setTimeout(() => {
+            panel.style.display = 'none';
+            adjustMapSize();
+        }, 300);
+    }
+    
+    // 필터 로딩 상태
+    function setFilterLoading(selectElement, isLoading) {
+        if (isLoading) {
+            selectElement.classList.add('filter-loading');
+            selectElement.disabled = true;
+        } else {
+            selectElement.classList.remove('filter-loading');
+            selectElement.disabled = false;
+        }
+    }
+    
+    // 디바운스 함수 (성능 최적화)
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // 키보드 단축키
+    function setupKeyboardShortcuts() {
+        document.addEventListener('keydown', function(e) {
+            // ESC 키로 패널 닫기
+            if (e.key === 'Escape') {
+                const iframePanel = document.getElementById('iframe-sidepanel');
+                if (iframePanel.style.display !== 'none') {
+                    closeIframe();
+                }
+            }
+            
+            // Ctrl+M으로 지도 중심 현재 위치로 이동
+            if (e.ctrlKey && e.key === 'm' && userPosition) {
+                map.setCenter(new kakao.maps.LatLng(userPosition.lat, userPosition.lng));
+                e.preventDefault();
+            }
+            
+            // Ctrl+R로 필터 초기화
+            if (e.ctrlKey && e.key === 'r') {
+                resetFilters();
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // 필터 초기화 함수
+    function resetFilters() {
+        const selects = ['filter-depositType', 'filter-safetyGrade', 'filter-price', 'filter-gu', 'filter-dong'];
+        selects.forEach(id => {
+            const select = document.getElementById(id);
+            select.selectedIndex = 0;
+        });
+        
+        // 기존 마커와 사이드바 정리
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+        clusterer.clear();
+        hideSidebar();
+        updateResultsCounter(0, false);
+    }
 
+    // ========== 기존 카카오맵 코드 ==========
 
     const mapContainer = document.getElementById("map");
     const mapOption = {
@@ -283,7 +841,7 @@
                 map,
                 position: new kakao.maps.LatLng(lat, lng),
                 image: new kakao.maps.MarkerImage(
-                    "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png",
+                    "/assets/img/marker/marker_main.png",
                     new kakao.maps.Size(24, 35)
                 )
             });
@@ -299,10 +857,6 @@
             alert("위치 정보를 가져올 수 없습니다.");
         });
     }
-
-    kakao.maps.event.addListener(map, "click", () => {
-        infowindows.forEach(iw => iw.close());
-    });
 
     function startNavigation(destX, destY, destName) {
         if (!userPosition || !userAddress) {
@@ -322,6 +876,9 @@
         }
     }
 
+    // 디바운스된 필터 로딩 함수
+    const debouncedLoadFilteredHouses = debounce(loadFilteredHouses, 500);
+
     function loadFilteredHouses() {
         // 필터 값 읽기
         const depositTypeSelect = document.getElementById("filter-depositType");
@@ -336,38 +893,54 @@
         const gu = guSelect.value;
         const dong = dongSelect.value;
 
-
-        // ✅ 모든 필터가 '상관없음'이 아닌지 확인
+        // 단기임대인 경우 안전지수, 가격 조건 제외, 나머지는 모든 필터가 선택되어야 함
+        const isShortTerm = depositType === "단기임대";
+        const safetyCondition = isShortTerm ? true : (safetyGrade !== "" && safetyGrade !== "상관없음");
+        const priceCondition = isShortTerm ? true : (priceRange !== "" && priceRange !== "상관없음");
+        
         if (depositType === "" || depositType === "상관없음" ||
-            safetyGrade === "" || safetyGrade === "상관없음" ||
-            priceRange === "" || priceRange === "상관없음" ||
+            !safetyCondition ||
+            !priceCondition ||
             gu === "" || gu === "상관없음" ||
             dong === "" || dong === "상관없음") {
-            // 조건 불충족 시 목록 및 마커 초기화
+            
+            // 조건 불충족 시 정리
             markers.forEach(m => m.setMap(null));
             markers = [];
-            clusterer.clear(); // 클러스터러의 마커도 지워야 합니다.
+            clusterer.clear();
             infowindows.forEach(iw => iw.close());
             infowindows.length = 0;
-            const listPanel = document.getElementById("house-list-panel");
-            listPanel.innerHTML = ""; // 사이드바 목록 초기화
-            return; // API 호출 없이 종료
+            
+            hideSidebar();
+            updateResultsCounter(0, false);
+            return;
         }
 
-        // 모든 필터가 선택되었으면 API 호출 및 결과 처리
+        // 로딩 상태 표시
+        showLoading();
+        
+        // API 호출용 파라미터 설정
         const params = new URLSearchParams();
-        // 모든 값이 '상관없음'이 아닌 것을 확인했으므로, 해당 값 그대로 넘깁니다.
         params.append("type", depositType);
-        params.append("safetyGrade", safetyGrade);
-        params.append("priceRange", priceRange);
+        // 단기임대가 아닐 때만 안전지수, 가격 범위 추가
+        if (!isShortTerm) {
+            params.append("safetyGrade", safetyGrade);
+            params.append("priceRange", priceRange);
+        }
         params.append("gu", gu);
         params.append("dong", dong);
 
-
         fetch(`/map/houses?${params.toString()}`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('검색 중 오류가 발생했습니다');
+                }
+                return res.json();
+            })
             .then(data => {
-                // 1. 기존 마커/인포윈도우 제거
+                hideLoading();
+                
+                // 기존 마커/인포윈도우 제거
                 markers.forEach(m => m.setMap(null));
                 markers = [];
                 clusterer.clear();
@@ -375,118 +948,77 @@
                 infowindows.length = 0;
                 const newMarkers = [];
 
-                // ✅ 사이드바 초기화
+                // 사이드바 초기화
                 const listPanel = document.getElementById("house-list-panel");
                 listPanel.innerHTML = "";
 
-                // 2. 새 데이터 처리
+                if (data.length === 0) {
+                    hideSidebar();
+                    updateResultsCounter(0, true);
+                    showToast('검색 조건에 맞는 매물이 없습니다', 'warning', 4000);
+                    return;
+                }
+
+                // 사이드바 표시
+                showSidebar();
+                updateResultsCounter(data.length, true);
+                
+                // 매물 데이터 처리
                 data.forEach((apt, idx) => {
                     const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
 
-                    // safety_grade에 따른 마커 이미지 설정
-                    console.log('Safety Grade:', apt.safetyGrade, 'Type:', typeof apt.safetyGrade);
+                    // 이모지 제거하고 순수 텍스트만 추출
+                    const cleanSafetyGrade = apt.safetyGrade ? 
+                        apt.safetyGrade.replace(/[🟢🔵🟡🟠🔴⚪️❓❌]/g, '').trim() : '';
+                    
                     let markerImage;
-                    switch(apt.safetyGrade) {
-                        case '매우안전':
-                            markerImage = new kakao.maps.MarkerImage(
-                                "/assets/img/marker/marker_green.png"
-                                ,new kakao.maps.Size(39, 45)
-                            );
+                    switch(cleanSafetyGrade) {
+                        case '매우 안전':
+                            markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_green.png", new kakao.maps.Size(39, 45));
                             break;
                         case '안전':
-                            markerImage = new kakao.maps.MarkerImage(
-                                "/assets/img/marker/marker_blue.png"
-                                ,new kakao.maps.Size(39, 45)
-                            );
+                            markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_blue.png", new kakao.maps.Size(39, 45));
                             break;
                         case '보통':
-                            markerImage = new kakao.maps.MarkerImage(
-                                "/assets/img/marker/marker_yellow.png"
-                                ,new kakao.maps.Size(39, 45)
-                            );
+                            markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_yellow.png", new kakao.maps.Size(39, 45));
                             break;
                         case '주의':
-                            markerImage = new kakao.maps.MarkerImage(
-                                "/assets/img/marker/marker_orange.png"
-                                ,new kakao.maps.Size(39, 45)
-                            );
+                            markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_orange.png", new kakao.maps.Size(39, 45));
                             break;
                         case '위험':
-                            markerImage = new kakao.maps.MarkerImage(
-                                "/assets/img/marker/marker_red.png"
-                                ,new kakao.maps.Size(39, 45)
-                            );
+                            markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_red.png", new kakao.maps.Size(39, 45));
                             break;
                         default:
-                            // 안전지수가 '상관없음'이거나 없는 경우 기본 마커
-                            markerImage = new kakao.maps.MarkerImage(
-                                "/assets/img/marker/marker_blue.png"
-                                ,new kakao.maps.Size(24, 35)
-                            );
+                            markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_blue.png", new kakao.maps.Size(24, 35));
                     }
 
                     const marker = new kakao.maps.Marker({
                         map,
                         position: coords,
-                        image: markerImage // 안전지수에 따라 설정된 이미지 사용
+                        image: markerImage
                     });
                     newMarkers.push(marker);
                     markers.push(marker);
 
-                    const infowindow = new kakao.maps.InfoWindow({
-                        content: `
-                    <div style="padding:10px;font-size:14px;">
-                            🏠 ${apt.title}<br>
-                            💰 가격: ${apt.price}<br>
-                            📍 주소: ${apt.address}<br>
-                            📐 면적: ${apt.areaSize || ''}<br>
-                            🧭 방향: ${apt.direction || ''}<br>
-                            🏢 층수: ${apt.floor !== undefined && apt.floor !== null ? apt.floor + '층' : ''}<br>
-                            📦 거래 방식: ${apt.depositType || ''}<br>
-                            🏢 주차: ${apt.parking !== undefined && apt.parking !== null ? (apt.parking === 1 ? '가능' : '불가능') : ''}<br>
-                            💡 관리비: ${apt.mFee !== undefined && apt.mFee !== null ? apt.mFee + '만원' : ''}<br>
-                            ⏰ 입주 가능일: ${apt.aFrom || ''}<br>
-                            🧑‍💼 중개사 정보: ${apt.agentInfo || ''}<br>
-                            📞 중개 수수료: ${apt.agentComm !== undefined && apt.agentComm !== null ? apt.agentComm + '만원' : ''}<br>
-                            🛏 방 개수: ${apt.roomsCnt || ''}<br>
-                            🧰 옵션: ${apt.options || ''}<br>
-                            📅 등록일: ${apt.postedAt || ''}<br>
-                            🏙 지역: ${apt.gu || ''} ${apt.dong || ''}<br>
-                            🏠 건물유형: ${apt.buildingType || ''}<br>
-                            🏗 준공일: ${apt.builtDate || ''}<br>
-                            📝 정보: ${apt.houseFeature || ''}<br>
-                            📝 설명: ${apt.houseExplanations || ''}<br>
-                            🛡 안전지수: ${apt.safetyGrade || '정보 없음'}<br><br>
-                        <button onclick="startNavigation(${apt.longitude}, ${apt.latitude}, '${apt.address}')">길찾기</button>
-                    </div>
-                `
-                    });
-
-                    infowindows.push(infowindow);
-                    kakao.maps.event.addListener(marker, "click", function () {
+                    // 마커 클릭 이벤트
+                    kakao.maps.event.addListener(marker, 'click', function() {
+                        infowindows.forEach(iw => iw.close());
+                        
                         const houseNum = apt.num;
                         const iframe = document.getElementById("iframe-content");
-                        const panel = document.getElementById("iframe-sidepanel");
-                        // 패널이 이미 열려있는 경우 닫고 다시 열지 않음 (깜빡임 방지)
-                        // if (panel.style.display === "block") return; // 필요에 따라 이 라인 사용 가능
-
-                        panel.style.display = "none"; // 일단 닫고
-                        iframe.src = ""; // iframe src 비우기
-
-                        // 지연을 주어 부드러운 전환 효과
+                        
+                        showIframePanel();
+                        
                         setTimeout(() => {
-                             iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
-                             panel.style.display = "block";
-                        }, 50); // 50ms 지연
-
-
+                            iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+                        }, 100);
                     });
 
-                    // ✅ 사이드바 목록에 추가
+                    // 사이드바 목록 아이템 생성
                     const houseDiv = document.createElement("div");
                     houseDiv.className = "house-item";
 
-                    // 찜 버튼 생성 + 이벤트 바인딩
+                    // 찜 버튼 개선 (토글 기능)
                     const starSpan = document.createElement("span");
                     starSpan.className = "favorite-toggle";
                     starSpan.dataset.houseId = apt.houseId;
@@ -497,70 +1029,98 @@
                     }
 
                     starSpan.addEventListener("click", function (e) {
-                        e.stopPropagation(); // 이벤트 버블링 중지 (아이템 클릭 이벤트와 분리)
-                        openFolderSelectModal(apt.houseId);
+                        e.stopPropagation();
+                        toggleFavorite(apt.houseId, starSpan);
                     });
 
-                    // 제목 엘리먼트
+                    // 제목과 내용 구성
                     const title = document.createElement("strong");
                     title.textContent = apt.title || "";
 
-                    // 헤더 라인 조립
                     const topLine = document.createElement("div");
                     topLine.className = "topLine";
                     topLine.appendChild(title);
                     topLine.appendChild(starSpan);
 
-                    // 상세 정보
                     const body = document.createElement("div");
                     body.className = "house-info";
-                     // apt.price는 "전세 1억 / 월세 50만원" 형태의 문자열
                     body.innerHTML = `
-                    💰 가격: ${apt.price || ""}<br>
-                    📦 거래 방식: ${apt.depositType || ""}<br>
-                    🧭 방향: ${apt.direction || ""}<br>
-                    🏢 층수: ${apt.floor !== undefined && apt.floor !== null ? apt.floor + '층' : ''}<br>
-                    💡 관리비: ${apt.mFee !== undefined && apt.mFee !== null ? apt.mFee + '만원' : ''}<br>
+                        💰 가격: ${apt.price || ""}<br>
+                        📦 거래 방식: ${apt.depositType || ""}<br>
+                        🧭 방향: ${apt.direction || ""}<br>
+                        🏢 층수: ${apt.floor !== undefined && apt.floor !== null ? apt.floor + '층' : ''}<br>
+                        💡 관리비: ${apt.mfee !== undefined && apt.mfee !== null ? apt.mfee + '원' : '0원'}<br>
                     `;
 
-                    // 클릭 시 지도 이동 및 iframe 열기
-                    houseDiv.addEventListener("click", () => {
-                        map.panTo(coords); // 지도 이동
-                        const houseNum = apt.num;
-                         const iframe = document.getElementById("iframe-content");
-                         const sidePanel = document.getElementById("iframe-sidepanel");
-
-                         // 패널이 이미 열려있고 같은 매물이면 닫기 토글
-                         // if (sidePanel.style.display === "block" && iframe.src.includes(`house_num=${houseNum}`)) {
-                         //     closeIframe();
-                         //     return;
-                         // }
-
-
-                        sidePanel.style.display = "none"; // 일단 닫고
-                         iframe.src = ""; // iframe src 비우기
-
-                         // 지연을 주어 부드러운 전환 효과
-                         setTimeout(() => {
-                             iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
-                             sidePanel.style.display = "block";
-                         }, 50); // 50ms 지연
-
-                    });
-
-                    // 조립 후 패널에 추가
                     houseDiv.appendChild(topLine);
                     houseDiv.appendChild(body);
                     listPanel.appendChild(houseDiv);
+
+                    // 목록 클릭 이벤트
+                    houseDiv.addEventListener("click", function() {
+                        const houseNum = apt.num;
+                        const iframe = document.getElementById("iframe-content");
+                        
+                        showIframePanel();
+                        
+                        setTimeout(() => {
+                            iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+                        }, 100);
+                        
+                        // 지도 중심을 해당 매물로 이동
+                        map.setCenter(new kakao.maps.LatLng(apt.latitude, apt.longitude));
+                    });
                 });
+                
                 clusterer.addMarkers(newMarkers);
+                showToast(`${data.length}개의 매물을 찾았습니다!`, 'success', 3000);
+            })
+            .catch(error => {
+                hideLoading();
+                console.error("Error fetching houses:", error);
+                updateResultsCounter(0, true);
             });
     }
 
     function closeIframe() {
         const panel = document.getElementById("iframe-sidepanel");
-        panel.style.display = "none";
+        const mapContainer = document.getElementById("map");
+        const listPanel = document.getElementById("house-list-panel");
+        
+        // iframe 패널 숨기기 (애니메이션 적용)
+        hideIframePanel();
     }
+
+    // 지도 크기 자동 조정 함수 개선
+    function adjustMapSize() {
+        const mapContainer = document.getElementById("map");
+        const listPanel = document.getElementById("house-list-panel");
+        const sidePanel = document.getElementById("iframe-sidepanel");
+        
+        const listPanelWidth = listPanel.classList.contains('show') ? listPanel.offsetWidth : 0;
+        const sidePanelWidth = sidePanel.classList.contains('show') ? sidePanel.offsetWidth : 0;
+        
+        mapContainer.style.width = `calc(100% - ${listPanelWidth}px - ${sidePanelWidth}px)`;
+        
+        // 지도 레이아웃 갱신
+        setTimeout(() => {
+            map.relayout();
+        }, 50);
+    }
+
+    // 윈도우 리사이즈 시에도 지도 크기 조정
+    window.addEventListener('resize', function() {
+        adjustMapSize();
+    });
+
+    // 지도 클릭 시 인포윈도우 닫기 및 크기 재조정
+    kakao.maps.event.addListener(map, "click", () => {
+        infowindows.forEach(iw => iw.close());
+        // 지도 클릭 시에도 크기 재조정 (안전장치)
+        setTimeout(() => {
+            adjustMapSize();
+        }, 10);
+    });
 
     function drawFilteredPolygons(regionName) {
         polygons.forEach(p => p.setMap(null));
@@ -604,10 +1164,17 @@
 
     function loadFilterOptions() {
         const fillSelect = (id, url) => {
+            const select = document.getElementById(id);
+            setFilterLoading(select, true);
+            
             fetch(url)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('필터 옵션 로딩 실패');
+                    }
+                    return res.json();
+                })
                 .then(data => {
-                    const select = document.getElementById(id);
                     const placeholder = {
                         "filter-depositType": "거래방식",
                         "filter-safetyGrade": "안전지수",
@@ -619,23 +1186,39 @@
                     select.innerHTML += `<option value="상관없음">상관없음</option>`;
                     
                     data.forEach(item => {
-                        const option = document.createElement("option");
-                        option.value = item;
-                        option.text = item;
-                        select.appendChild(option);
+                        // null이나 빈 값이 아닌 경우에만 옵션 추가
+                        if (item && item !== 'null' && item.trim() !== '') {
+                            const option = document.createElement("option");
+                            option.value = item;
+                            option.text = item;
+                            select.appendChild(option);
+                        }
                     });
+                    
+                    setFilterLoading(select, false);
+                })
+                .catch(error => {
+                    console.error(`Error loading ${id}:`, error);
+                    setFilterLoading(select, false);
                 });
         };
 
-        // 거래방식, 안전지수, 지역구 목록 로드
+        // 거래방식, 안전지수 로드
         fillSelect("filter-depositType", "/api/filters/depositType");
         fillSelect("filter-safetyGrade", "/api/filters/safetyGrade");
 
-        // 지역구 로드 및 초기 polygon 그리기
+        // 지역구 로드
+        const guSelect = document.getElementById("filter-gu");
+        setFilterLoading(guSelect, true);
+        
         fetch("/api/filters/gu")
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('지역구 로딩 실패');
+                }
+                return res.json();
+            })
             .then(data => {
-                const guSelect = document.getElementById("filter-gu");
                 guSelect.innerHTML = '<option value="" selected disabled hidden>지역구</option>';
                 guSelect.innerHTML += '<option value="상관없음">상관없음</option>';
                 data.forEach(item => {
@@ -644,61 +1227,161 @@
                     option.text = item;
                     guSelect.appendChild(option);
                 });
-
+                
+                setFilterLoading(guSelect, false);
                 if (data.length > 0) {
                     drawFilteredPolygons("상관없음");
                 }
+            })
+            .catch(error => {
+                console.error("Error loading gu:", error);
+                setFilterLoading(guSelect, false);
             });
     }
 
-    // 가격 범위 목록을 백엔드에서 가져와서 업데이트하는 함수
-    function updatePriceRangeOptions(selectedDepositType) {
-        const priceSelect = document.getElementById("filter-price");
-        const pricePlaceholder = "가격 범위";
+    // 안전지수 필터 업데이트
+    function updateSafetyGradeOptions(selectedDepositType) {
+        console.log("updateSafetyGradeOptions 호출:", selectedDepositType); // 디버깅용
+        const safetySelect = document.getElementById("filter-safetyGrade");
+        
+        // 단기임대인 경우 안전지수 비활성화
+        if (selectedDepositType === "단기임대") {
+            console.log("안전지수 비활성화 (단기임대)"); // 디버깅용
+            safetySelect.innerHTML = `<option value="" selected disabled hidden>안전지수</option>`;
+            safetySelect.innerHTML += `<option value="상관없음">상관없음</option>`;
+            safetySelect.disabled = true;
+        } else {
+            console.log("안전지수 활성화"); // 디버깅용
+            safetySelect.disabled = false;
+            
+            // 안전지수 옵션들을 다시 로드
+            setFilterLoading(safetySelect, true);
+            fetch("/api/filters/safetyGrade")
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('안전지수 로딩 실패');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    safetySelect.innerHTML = `<option value="" selected disabled hidden>안전지수</option>`;
+                    safetySelect.innerHTML += `<option value="상관없음">상관없음</option>`;
+                    
+                    data.forEach(item => {
+                        // null이나 빈 값이 아닌 경우에만 옵션 추가
+                        if (item && item !== 'null' && item.trim() !== '') {
+                            const option = document.createElement("option");
+                            option.value = item;
+                            option.text = item;
+                            safetySelect.appendChild(option);
+                        }
+                    });
+                    
+                    setFilterLoading(safetySelect, false);
+                })
+                .catch(error => {
+                    console.error("Error reloading safety grades:", error);
+                    setFilterLoading(safetySelect, false);
+                });
+        }
+    }
 
-        // API 호출
-        fetch(`/api/filters/price?depositType=${encodeURIComponent(selectedDepositType || "전세")}`)
-            .then(res => res.json())
+    // 가격 범위 업데이트 (개선)
+    function updatePriceRangeOptions(selectedDepositType) {
+        console.log("updatePriceRangeOptions 호출:", selectedDepositType); // 디버깅용
+        const priceSelect = document.getElementById("filter-price");
+        setFilterLoading(priceSelect, true);
+
+        // 거래방식이 선택되지 않았거나 "상관없음", "단기임대"인 경우 가격 범위 비활성화
+        if (!selectedDepositType || selectedDepositType === "" || selectedDepositType === "상관없음" || selectedDepositType === "단기임대") {
+            console.log("가격 범위 비활성화"); // 디버깅용
+            priceSelect.innerHTML = `<option value="" selected disabled hidden>가격 범위</option>`;
+            priceSelect.innerHTML += `<option value="상관없음">상관없음</option>`;
+            priceSelect.disabled = true;
+            setFilterLoading(priceSelect, false);
+            return;
+        }
+
+        console.log("API 호출:", selectedDepositType); // 디버깅용
+        // 월세 또는 전세가 선택된 경우에만 API 호출
+        fetch(`/api/filters/price?depositType=${encodeURIComponent(selectedDepositType)}`)
+            .then(res => {
+                console.log("API 응답:", res.status); // 디버깅용
+                if (!res.ok) {
+                    throw new Error('가격 범위 로딩 실패');
+                }
+                return res.json();
+            })
             .then(data => {
-                priceSelect.innerHTML = `<option value="" selected disabled hidden>${pricePlaceholder}</option>`;
+                console.log("가격 범위 데이터:", data); // 디버깅용
+                priceSelect.innerHTML = `<option value="" selected disabled hidden>가격 범위</option>`;
                 priceSelect.innerHTML += `<option value="상관없음">상관없음</option>`;
 
                 data.forEach(range => {
                     const option = document.createElement("option");
-                    option.value = range; // 예: "1억 이하", "20만원대" 등의 문자열
+                    option.value = range;
                     option.text = range;
                     priceSelect.appendChild(option);
                 });
-                // 가격 범위 드롭다운의 선택값을 초기화합니다.
+                
                 priceSelect.value = "";
+                priceSelect.disabled = false;
+                setFilterLoading(priceSelect, false);
+                console.log("가격 범위 업데이트 완료"); // 디버깅용
+            })
+            .catch(error => {
+                console.error("Error loading price ranges:", error);
+                priceSelect.disabled = false;
+                setFilterLoading(priceSelect, false);
             });
     }
 
     document.addEventListener("DOMContentLoaded", function () {
+        // 키보드 단축키 설정
+        setupKeyboardShortcuts();
+        
+        // 필터 옵션 로드
         loadFilterOptions();
 
-        // 초기 로딩 시 거래방식의 기본값에 따라 가격 범위 로드
+        // 초기 가격 범위는 거래방식 선택 전까지 비활성화
         const initialDepositTypeSelect = document.getElementById("filter-depositType");
-        updatePriceRangeOptions(initialDepositTypeSelect.value || "전세"); // 기본값을 '전세'로 설정
+        updatePriceRangeOptions(initialDepositTypeSelect.value);
 
-        // 거래방식 변경 시 가격 범위 업데이트 및 매물 로드
+        // 거래방식 변경 이벤트 (즉시 반응)
         initialDepositTypeSelect.addEventListener("change", function() {
             const selectedType = this.value;
-            updatePriceRangeOptions(selectedType); // 가격 범위 목록 업데이트
-            loadFilteredHouses(); // 필터 변경 시 매물 다시 로드
+            console.log("거래방식 변경:", selectedType); // 디버깅용
+            updateSafetyGradeOptions(selectedType);
+            updatePriceRangeOptions(selectedType);
+            debouncedLoadFilteredHouses();
         });
 
-        document.getElementById("filter-safetyGrade").addEventListener("change", loadFilteredHouses);
-        document.getElementById("filter-price").addEventListener("change", loadFilteredHouses);
+        // 필터 변경 이벤트들 (디바운스 적용)
+        document.getElementById("filter-safetyGrade").addEventListener("change", debounce(function() {
+            debouncedLoadFilteredHouses();
+        }, 300));
+        
+        document.getElementById("filter-price").addEventListener("change", debounce(function() {
+            debouncedLoadFilteredHouses();
+        }, 300));
 
+        // 지역구 변경 이벤트
         document.getElementById("filter-gu").addEventListener("change", function () {
             const gu = this.value;
             const dongSelect = document.getElementById("filter-dong");
+            
+            setFilterLoading(dongSelect, true);
             dongSelect.innerHTML = "<option value='' selected disabled hidden>동</option>";
             dongSelect.innerHTML += '<option value="상관없음">상관없음</option>';
+            
             if (gu !== "상관없음") {
                 fetch(`/api/filters/dong?gu=${encodeURIComponent(gu)}`)
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error('동 목록 로딩 실패');
+                        }
+                        return res.json();
+                    })
                     .then(data => {
                         data.forEach(d => {
                             const option = document.createElement("option");
@@ -706,21 +1389,102 @@
                             option.text = d;
                             dongSelect.appendChild(option);
                         });
+                        setFilterLoading(dongSelect, false);
+                    })
+                    .catch(error => {
+                        console.error("Error loading dong:", error);
+                        setFilterLoading(dongSelect, false);
                     });
+            } else {
+                setFilterLoading(dongSelect, false);
             }
 
             drawFilteredPolygons(gu);
-            loadFilteredHouses();
+            debouncedLoadFilteredHouses();
         });
 
+        // 동 변경 이벤트
         document.getElementById("filter-dong").addEventListener("change", function () {
             const dong = this.value;
             drawFilteredPolygons(dong);
-            loadFilteredHouses();
+            debouncedLoadFilteredHouses();
         });
+
+        // URL 파라미터 확인 (개별 매물 표시)
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetHouseId = urlParams.get('houseId');
+
+        if (targetHouseId) {
+            showLoading('특정 매물을 불러오는 중...');
+            
+            fetch(`/map/houses?houseId=${encodeURIComponent(targetHouseId)}`)
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('매물 정보를 찾을 수 없습니다');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    hideLoading();
+                    
+                    if (data && data.length > 0) {
+                        const apt = data[0];
+                        const coords = new kakao.maps.LatLng(apt.latitude, apt.longitude);
+
+                        // 기존 마커 정리
+                        markers.forEach(m => m.setMap(null));
+                        markers = [];
+                        clusterer.clear();
+
+                        // 마커 이미지 설정
+                        const cleanSafetyGrade = apt.safetyGrade ? 
+                            apt.safetyGrade.replace(/[🟢🔵🟡🟠🔴⚪️❓❌]/g, '').trim() : '';
+                        
+                        let markerImage;
+                        switch(cleanSafetyGrade) {
+                            case '매우안전': markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_green.png", new kakao.maps.Size(39, 45)); break;
+                            case '안전': markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_blue.png", new kakao.maps.Size(39, 45)); break;
+                            case '보통': markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_yellow.png", new kakao.maps.Size(39, 45)); break;
+                            case '주의': markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_orange.png", new kakao.maps.Size(39, 45)); break;
+                            case '위험': markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_red.png", new kakao.maps.Size(39, 45)); break;
+                            default: markerImage = new kakao.maps.MarkerImage("/assets/img/marker/marker_blue.png", new kakao.maps.Size(24, 35));
+                        }
+
+                        const marker = new kakao.maps.Marker({
+                            map,
+                            position: coords,
+                            image: markerImage
+                        });
+
+                        map.setCenter(coords);
+                        
+                        // 마커 클릭 이벤트
+                        kakao.maps.event.addListener(marker, 'click', function() {
+                            const houseNum = apt.num;
+                            const iframe = document.getElementById("iframe-content");
+                            
+                            showIframePanel();
+                            
+                            setTimeout(() => {
+                                iframe.src = `http://localhost:5003/recommend_ui?house_num=${houseNum}`;
+                            }, 100);
+                        });
+
+                        // 자동으로 추천 패널 열기
+                        kakao.maps.event.trigger(marker, 'click');
+                        updateResultsCounter(1, true);
+                        
+                    } else {
+                        updateResultsCounter(0, true);
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error("Error fetching house by ID:", error);
+                    updateResultsCounter(0, true);
+                });
+        }
     });
-
-
 
 
     let selectedFolderId = null;
@@ -728,9 +1492,16 @@
 
     function openFolderSelectModal(houseId) {
         lastHouseId = houseId;
+        
         fetch("/api/like/folders")
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                }
+                return res.json();
+            })
             .then(folders => {
+                hideLoading();
+                
                 const list = document.getElementById("folder-list");
                 list.innerHTML = "";
                 selectedFolderId = null;
@@ -748,11 +1519,10 @@
                     list.appendChild(li);
                 });
 
-                // 폴더 없을 때 안내 추가
                 if (folders.length === 0) {
                     const li = document.createElement("li");
                     li.className = "list-group-item";
-                    li.textContent = "폴더가 없습니다.";
+                    li.textContent = "폴더가 없습니다. 새 폴더를 생성해보세요.";
                     list.appendChild(li);
                 }
 
@@ -760,57 +1530,117 @@
                 document.getElementById("folderConfirmBtn").onclick = () => {
                     if (selectedFolderId) {
                         saveToFolder(houseId, selectedFolderId);
-
+                        
                         const modalElement = document.getElementById("folderSelectModal");
                         const modalInstance = bootstrap.Modal.getInstance(modalElement);
                         modalInstance.hide();
 
-                        // ✅ 회색 백그라운드 제거
+                        // 회색 백그라운드 제거
                         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
                         document.body.classList.remove('modal-open');
                         document.body.style.overflow = 'auto';
-                    } else {
-                        alert("폴더를 선택해주세요.");
                     }
                 };
 
                 const modal = new bootstrap.Modal(document.getElementById("folderSelectModal"));
                 modal.show();
+            })
+            .catch(error => {
+                hideLoading();
+                console.error("Error loading folders:", error);
             });
     }
+    
     function saveToFolder(houseId, folderId) {
+        
         fetch(`/api/like/${houseId}/folder/${folderId}`, {
             method: "POST"
-        }).then(res => res.text())
-            .then(msg => {
-                alert("찜 목록에 추가되었습니다.");
-            });
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('찜 추가 실패');
+            }
+            return res.text();
+        })
+        .then(msg => {
+            hideLoading();
+            
+            // UI 업데이트: 해당 매물의 별 아이콘 채우기
+            const starIcon = document.querySelector(`[data-house-id="${houseId}"] i`);
+            if (starIcon) {
+                starIcon.classList.remove("bi-star");
+                starIcon.classList.add("bi-star-fill");
+            }
+            
+            // 필터링된 결과에서 해당 매물의 isLiked 상태도 업데이트
+            // (다시 검색하지 않고도 UI 상태 일관성 유지)
+        })
+        .catch(error => {
+            hideLoading();
+            console.error("Error saving to folder:", error);
+        });
     }
 
     function createNewFolder() {
         const newFolderName = document.getElementById("newFolderName").value.trim();
         if (!newFolderName) {
-            alert("폴더 이름을 입력해주세요.");
             return;
         }
+
 
         fetch("/api/like/folder", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ folderName: newFolderName })
         })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("폴더 생성 실패");
+            }
+            return res.text();
+        })
+        .then(msg => {
+            hideLoading();
+            document.getElementById("newFolderName").value = "";
+            openFolderSelectModal(lastHouseId); 
+        })
+        .catch(err => {
+            hideLoading();
+            console.error("Error creating folder:", err);
+        });
+    }
+
+    // 찜하기 토글 함수 (개선된 UX)
+    function toggleFavorite(houseId, starElement) {
+        const starIcon = starElement.querySelector('i');
+        const isCurrentlyLiked = starIcon.classList.contains('bi-star-fill');
+        
+        if (isCurrentlyLiked) {
+
+            fetch(`/api/like/${houseId}`, {
+                method: 'POST'
+            })
             .then(res => {
-                if (!res.ok) throw new Error("폴더 생성 실패");
+                if (!res.ok) {
+                    throw new Error('찜 해제 실패');
+                }
                 return res.text();
             })
             .then(msg => {
-                alert(msg);
-                document.getElementById("newFolderName").value = "";
-                openFolderSelectModal(lastHouseId); // 폴더 목록 갱신
+                hideLoading();
+                
+                // UI 업데이트: 빈 별표로 변경
+                starIcon.classList.remove('bi-star-fill');
+                starIcon.classList.add('bi-star');
             })
-            .catch(err => {
-                alert("폴더 생성 중 오류가 발생했습니다.");
+            .catch(error => {
+                hideLoading();
+                console.error('Error removing like:', error);
             });
+        } else {
+            // 찜하지 않은 상태 -> 폴더 선택 모달 열기
+            openFolderSelectModal(houseId);
+        }
     }
 
 </script>
@@ -818,5 +1648,3 @@
 </body>
 
 </html>
-
-

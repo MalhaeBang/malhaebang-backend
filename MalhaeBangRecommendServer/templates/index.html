@@ -5,130 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>대출 마스터</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
+        /* 기본 스타일 */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f0f2f5;
-            padding: 30px;
+            background: linear-gradient(to right, #ffffff, #f0f0f0);
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
         }
 
-        h1 {
-            font-size: 2.5rem;
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 0.5s ease-in-out;
+            transform: translateY(20px);
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 모바일 최적화 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                margin-top: 15px;
+                margin-bottom: 15px;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .chat-box {
+                max-height: 200px;
+                padding: 15px;
+            }
+
+            .bot {
+                font-size: 0.9rem;
+                padding: 8px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group input,
+            .input-group select {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .btn-primary {
+                width: 100%;
+                padding: 12px;
+            }
+
+            .list-group-item {
+                padding: 15px;
+            }
+
+            .loan-name {
+                font-size: 1rem;
+                padding: 10px 15px;
+                max-width: 100%;
+            }
+
+            .row {
+                margin-left: -10px;
+                margin-right: -10px;
+            }
+
+            .col-md-6 {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+
+        /* 태블릿 최적화 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 20px;
+                margin: 20px auto;
+            }
+
+            .chat-box {
+                max-height: 250px;
+            }
+
+            .loan-name {
+                max-width: 90%;
+            }
+        }
+
+        /* 데스크톱 최적화 */
+        @media (min-width: 1025px) {
+            .container {
+                padding: 40px;
+                margin: 40px auto;
+            }
+        }
+
+        /* 기존 스타일 유지 */
+        h1, h2 {
             color: #333;
             font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        /* 사용자 말풍선 스타일 */
-        .user-bubble {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            text-align: right;
-            max-width: 70%;
-            margin-left: auto;
-        }
-
-        /* 로봇 말풍선 초록색 */
-        .bot {
-            color: #28a745;
-            padding: 10px;
-        }
-
-        .profile-bubble {
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            max-width: 70%;
-        }
-
-        .chat-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        h1 i, h2 i {
+            margin-right: 10px;
+            color: #007bff;
         }
 
         .chat-box {
-            border: 1px solid #ddd;
+            border: none;
             padding: 20px;
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
+            margin-bottom: 25px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .bot {
+            color: #495057;
+            padding: 15px 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            max-width: 90%;
+            word-break: break-word;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+            line-height: 1.6;
+        }
+
+        .bot strong {
+            color: #007bff;
+        }
+
+        .form-group label strong {
+            color: #007bff;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            padding: 10px;
         }
 
         .input-group {
             display: flex;
-            justify-content: space-between;
+            margin-bottom: 20px;
         }
 
-        .input-group input {
+        .input-group input,
+        .input-group select {
             flex: 1;
             margin-right: 10px;
-            border-radius: 30px;
+            border-radius: 5px;
             padding: 10px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
+            border: 1px solid #ced4da;
         }
 
-        .input-group button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            cursor: pointer;
-            border-radius: 30px;
-            font-size: 0.9rem;
+        .input-group input:last-child,
+        .input-group select:last-child {
+            margin-right: 0;
         }
 
-        .input-group button:hover {
-            background-color: #0056b3;
-        }
-
-        .container {
-            padding-top: 50px;
-        }
-
-        /* 버튼 스타일 */
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            border-radius: 30px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             background-color: #0056b3;
-            border-color: #0056b3;
+            border-color: #004085;
+            transform: translateY(-2px);
         }
 
         .alert-info {
-            background-color: #e9f7fd;
-            border-color: #b8d9e6;
-            color: #2c3e50;
+            background-color: #cce5ff;
+            border-color: #b8daff;
+            color: #004085;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            padding: 15px;
         }
 
-        /* 리스트 스타일 */
+        .alert-info p {
+            margin-bottom: 5px;
+        }
+
+        .alert-info strong {
+            color: #002752;
+        }
+
         .list-group-item {
             border-radius: 10px;
-            margin-bottom: 10px;
-            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            background-color: #fff;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: none;
         }
 
         .list-group-item:hover {
-            background-color: #f1f1f1;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         }
 
         .loan-name {
@@ -137,92 +260,114 @@
             padding: 12px 20px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 1.3rem;
-            display: block;
-            margin: 0 auto;
+            font-size: 1.2rem;
+            display: inline-block;
+            margin: 0 auto 15px auto;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             text-align: center;
-            max-width: 60%;
+            max-width: 80%;
         }
 
-        /* 호버 효과 추가 */
         .loan-name:hover {
             background-color: #0056b3;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        /* 카드의 버튼을 중앙 정렬 */
-        .btn-container {
-            margin-top: auto;
-            text-align: center;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .list-group-item strong {
-            font-size: 1.2rem;
-            color: #333;
+            color: #007bff;
         }
 
-        .alert-info strong {
-            font-weight: bold;
-            color: #007bff;
+        .list-group-item p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .btn-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* 스크롤바 스타일링 */
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <h1 class="text-center">💰 대출 마스터</h1>
+<div class="container">
+    <h1 class="text-center"><i class="fas fa-coins"></i> 대출 마스터</h1>
 
     <div class="chat-box" id="chat-box">
-        <div class="bot">🤖 안녕하세요! 전세 금액과 자금, 프로필 키워드를 입력해 주세요. 조건에 맞는 대출을 추천해드릴게요!</div>
+        <div class="bot">안녕하세요! 전세 금액과 자금, 프로필 키워드를 입력해 주세요. 조건에 맞는 대출을 추천해드릴게요!</div>
     </div>
 
     <form method="POST" action="/">
-        <div class="form-group">
-            <input type="text" class="form-control" id="user_input" name="user_input" placeholder="예: 전세 2억5천, 자금 1억" required value="{{ user_input or '' }}">
-        </div>
-
-        <div class="form-group">
-            <label for="user_profile"><strong>💡 키워드 선택:</strong></label>
-            <select class="form-control" id="user_profile" name="user_profile" required>
-                <option value="" disabled {% if not user_profile %}selected{% endif %}>선택하세요</option>
-                <option value="청년" {% if user_profile == '청년' %}selected{% endif %}>청년</option>
-                <option value="직장인" {% if user_profile == '직장인' %}selected{% endif %}>직장인</option>
-                <option value="전세자금" {% if user_profile == '전세자금' %}selected{% endif %}>전세자금</option>
-                <option value="담보" {% if user_profile == '담보' %}selected{% endif %}>담보</option>
-                <option value="신혼" {% if user_profile == '신혼' %}selected{% endif %}>신혼부부</option>
-                <option value="농업" {% if user_profile == '농업' %}selected{% endif %}>농업종사자</option>
-                <option value="의료인" {% if user_profile == '의료인' %}selected{% endif %}>의료인</option>
-                <option value="공무원" {% if user_profile == '공무원' %}selected{% endif %}>공무원</option>
-                <option value="교직원" {% if user_profile == '교직원' %}selected{% endif %}>교직원</option>
-                <option value="사업자" {% if user_profile == '사업자' %}selected{% endif %}>사업자</option>
-                <option value="군인" {% if user_profile == '군인' %}selected{% endif %}>군인</option>
-                <option value="금융인" {% if user_profile == '금융인' %}selected{% endif %}>금융인</option>
-                <option value="외국인" {% if user_profile == '외국인' %}selected{% endif %}>외국인</option>
-                <option value="퇴직" {% if user_profile == '퇴직' %}selected{% endif %}>퇴직</option>
-                <option value="국가유공자" {% if user_profile == '국가유공자' %}selected{% endif %}>국가유공자</option>
-                <option value="가족" {% if user_profile == '가족' %}selected{% endif %}>가족</option>
-                <option value="무주택" {% if user_profile == '무주택' %}selected{% endif %}>무주택</option>
-                <option value="보증금" {% if user_profile == '보증금' %}selected{% endif %}>보증금</option>
-                <option value="서민" {% if user_profile == '서민' %}selected{% endif %}>서민</option>
-                <option value="월세" {% if user_profile == '월세' %}selected{% endif %}>월세</option>
-                <option value="공공주택" {% if user_profile == '공공주택' %}selected{% endif %}>공공주택</option>
-                <option value="대환" {% if user_profile == '대환' %}selected{% endif %}>대환</option>
-                <option value="전세사기" {% if user_profile == '전세사기' %}selected{% endif %}>전세사기</option>
-            </select>
+        <div class="row">
+            <div class="col-md-6">
+                 <div class="form-group">
+                     <label for="user_input"><strong><i class="fas fa-comment-dots"></i> 입력:</strong></label>
+                     <input type="text" class="form-control" id="user_input" name="user_input" placeholder="예: 전세 2억5천, 자금 1억" required value="{{ user_input or '' }}">
+                 </div>
+            </div>
+             <div class="col-md-6">
+                <div class="form-group">
+                    <label for="user_profile"><strong><i class="fas fa-tags"></i> 키워드 선택:</strong></label>
+                    <select class="form-control" id="user_profile" name="user_profile" required>
+                        <option value="" disabled {% if not user_profile %}selected{% endif %}>선택하세요</option>
+                        <option value="청년" {% if user_profile == '청년' %}selected{% endif %}>청년</option>
+                        <option value="직장인" {% if user_profile == '직장인' %}selected{% endif %}>직장인</option>
+                        <option value="전세자금" {% if user_profile == '전세자금' %}selected{% endif %}>전세자금</option>
+                        <option value="담보" {% if user_profile == '담보' %}selected{% endif %}>담보</option>
+                        <option value="신혼" {% if user_profile == '신혼' %}selected{% endif %}>신혼부부</option>
+                        <option value="농업" {% if user_profile == '농업' %}selected{% endif %}>농업종사자</option>
+                        <option value="의료인" {% if user_profile == '의료인' %}selected{% endif %}>의료인</option>
+                        <option value="공무원" {% if user_profile == '공무원' %}selected{% endif %}>공무원</option>
+                        <option value="교직원" {% if user_profile == '교직원' %}selected{% endif %}>교직원</option>
+                        <option value="사업자" {% if user_profile == '사업자' %}selected{% endif %}>사업자</option>
+                        <option value="군인" {% if user_profile == '군인' %}selected{% endif %}>군인</option>
+                        <option value="금융인" {% if user_profile == '금융인' %}selected{% endif %}>금융인</option>
+                        <option value="외국인" {% if user_profile == '외국인' %}selected{% endif %}>외국인</option>
+                        <option value="퇴직" {% if user_profile == '퇴직' %}selected{% endif %}>퇴직</option>
+                        <option value="국가유공자" {% if user_profile == '국가유공자' %}selected{% endif %}>국가유공자</option>
+                        <option value="가족" {% if user_profile == '가족' %}selected{% endif %}>가족</option>
+                        <option value="무주택" {% if user_profile == '무주택' %}selected{% endif %}>무주택</option>
+                        <option value="보증금" {% if user_profile == '보증금' %}selected{% endif %}>보증금</option>
+                        <option value="서민" {% if user_profile == '서민' %}selected{% endif %}>서민</option>
+                        <option value="월세" {% if user_profile == '월세' %}selected{% endif %}>월세</option>
+                        <option value="공공주택" {% if user_profile == '공공주택' %}selected{% endif %}>공공주택</option>
+                        <option value="대환" {% if user_profile == '대환' %}selected{% endif %}>대환</option>
+                        <option value="전세사기" {% if user_profile == '전세사기' %}selected{% endif %}>전세사기</option>
+                    </select>
+                </div>
+             </div>
         </div>
 
         <div class="form-group text-center">
-            <button type="submit" class="btn btn-primary">🎯 추천 받기</button>
+            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-search"></i> 추천 받기</button>
         </div>
 
     </form>
 
     {% if results %}
     <hr>
-    <h2>🤖 추천 대출 상품</h2><br>
+    <h2><i class="fas fa-handshake"></i> 추천 대출 상품</h2>
     <div class="alert alert-info">
         <p><strong>💸 보유 자금:</strong> {{ own_money }} </p>
         <p><strong>💰 희망 전세금:</strong> {{ rent_price }}</p>
@@ -232,30 +377,32 @@
     <ul class="list-group">
         {% for loan in results %}
         <li class="list-group-item">
-            <strong>
-                <span class="loan-name">{{ loan['name'] }}</span>
-            </strong><br>
-            <p><strong>🔑 특징:</strong> {{ loan['feature'] }}</p>
-            <p><strong>📉 금리:</strong> {{ loan['rate'] }}</p>
-            <p><strong>💰 한도:</strong> {{ loan['limit'] }}</p>
-            <p><strong>⏳ 대출 기간:</strong> {{ loan['period'] }}</p>
-            <p><strong>💡 추천 이유:</strong> {{ loan['reason'] }}</p>
+            <h5 class="loan-name">{{ loan['name'] }}</h5> <!-- h5 태그로 변경 -->
+            <p><strong><i class="fas fa-check-circle"></i> 특징:</strong> {{ loan['feature'] }}</p>
+            <p><strong><i class="fas fa-percent"></i> 금리:</strong> {{ loan['rate'] }}</p>
+            <p><strong><i class="fas fa-coins"></i> 한도:</strong> {{ loan['limit'] }}</p>
+            <p><strong><i class="fas fa-calendar-alt"></i> 대출 기간:</strong> {{ loan['period'] }}</p>
+            <p><strong><i class="fas fa-lightbulb"></i> 추천 이유:</strong> {{ loan['reason'] }}</p>
 
             <!-- 중앙 정렬된 '자세히 보기' 버튼 -->
             <div class="btn-container">
-                <a href="{{ loan['link'] }}" target="_blank" class="btn btn-primary">📖 자세히 보기</a>
+                <a href="{{ loan['link'] }}" target="_blank" class="btn btn-primary"><i class="fas fa-external-link-alt"></i> 자세히 보기</a>
             </div>
         </li>
         {% endfor %}
     </ul>
 
     {% else %}
-    <div class="alert alert-warning">
+    <div class="alert alert-warning text-center">
         조건에 맞는 대출 상품이 없습니다.
     </div>
 
     {% endif %}
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
 </html>
