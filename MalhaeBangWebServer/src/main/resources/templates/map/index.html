@@ -1552,28 +1552,34 @@
     }
     
     function saveToFolder(houseId, folderId) {
+        console.log('saveToFolder 호출:', houseId, folderId);
         
         fetch(`/api/like/${houseId}/folder/${folderId}`, {
             method: "POST"
         })
         .then(res => {
             if (!res.ok) {
-                throw new Error('찜 추가 실패');
             }
             return res.text();
         })
         .then(msg => {
             hideLoading();
-            
             // UI 업데이트: 해당 매물의 별 아이콘 채우기
             const starIcon = document.querySelector(`[data-house-id="${houseId}"] i`);
             if (starIcon) {
-                starIcon.classList.remove("bi-star");
+                starIcon.classList.remove("bi-star-fill");
                 starIcon.classList.add("bi-star-fill");
             }
             
-            // 필터링된 결과에서 해당 매물의 isLiked 상태도 업데이트
-            // (다시 검색하지 않고도 UI 상태 일관성 유지)
+            // iframe 내부의 별 아이콘도 업데이트
+            const iframe = document.getElementById("iframe-content");
+            if (iframe && iframe.contentWindow) {
+                const iframeStarIcon = iframe.contentWindow.document.querySelector(`[data-house-id="${houseId}"] i`);
+                if (iframeStarIcon) {
+                    iframeStarIcon.classList.remove("bi-star-fill");
+                    iframeStarIcon.classList.add("bi-star-fill");
+                }
+            }
         })
         .catch(error => {
             hideLoading();
@@ -1612,36 +1618,60 @@
 
     // 찜하기 토글 함수 (개선된 UX)
     function toggleFavorite(houseId, starElement) {
-        const starIcon = starElement.querySelector('i');
-        const isCurrentlyLiked = starIcon.classList.contains('bi-star-fill');
-        
-        if (isCurrentlyLiked) {
-
-            fetch(`/api/like/${houseId}`, {
-                method: 'POST'
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('찜 해제 실패');
-                }
-                return res.text();
-            })
-            .then(msg => {
-                hideLoading();
-                
-                // UI 업데이트: 빈 별표로 변경
-                starIcon.classList.remove('bi-star-fill');
-                starIcon.classList.add('bi-star');
-            })
-            .catch(error => {
-                hideLoading();
-                console.error('Error removing like:', error);
-            });
+        if (starElement) {
+            // 매물목록에서 별 클릭
+            const starIcon = starElement.querySelector('i');
+            const isCurrentlyLiked = starIcon.classList.contains('bi-star-fill');
+            if (isCurrentlyLiked) {
+                // 찜 해제
+                fetch(`/api/like/${houseId}`, { method: 'POST' })
+                    .then(res => {
+                        return res.text();
+                    })
+                    .then(() => {
+                        starIcon.classList.remove('bi-star-fill');
+                        starIcon.classList.add('bi-star');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                openFolderSelectModal(houseId);
+            }
         } else {
-            // 찜하지 않은 상태 -> 폴더 선택 모달 열기
+            // iframe에서 온 요청: 폴더 모달만 띄움, 별 UI는 iframe에서 처리
             openFolderSelectModal(houseId);
         }
     }
+
+    window.addEventListener('message', function(event) {
+        // if (event.origin !== "http://localhost:5003") return; // 필요시 보안 체크
+        if (event.data && event.data.type === 'toggleFavorite') {
+            toggleFavorite(event.data.houseId, null); // starElement 없이 호출
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.favorite-toggle').forEach(function(star) {
+            star.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var houseId = this.getAttribute('data-house-id');
+                // 부모에게 postMessage로 요청
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'toggleFavorite', houseId: houseId }, '*');
+                } else {
+                    // (테스트용) 직접 Spring API로 fetch 요청
+                    fetch(`/api/like/${houseId}`, { method: 'POST' })
+                      .then(res => res.text())
+                      .then(msg => {
+                          var icon = this.querySelector('i');
+                          icon.classList.remove('bi-star');
+                          icon.classList.add('bi-star-fill');
+                      });
+                }
+            });
+        });
+    });
 
 </script>
 

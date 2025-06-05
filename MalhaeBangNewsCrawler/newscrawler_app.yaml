@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: news-flask-server
+  labels:
+    app: news-flask
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: news-flask
+  template:
+    metadata:
+      labels:
+        app: news-flask
+    spec:
+      containers:
+        - name: flask
+          image: koreatstm/my-crawler-app:latest
+          ports:
+            - containerPort: 5000
+          command: ["python", "app.py"]
+          volumeMounts:
+            - name: data-volume
+              mountPath: /app/filtered_clustered_news.csv
+              subPath: filtered_clustered_news.csv
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: newscrawler_pvc

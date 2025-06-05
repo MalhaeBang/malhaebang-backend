@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -95,11 +96,13 @@ public class LikedController {
         House house = houseOpt.get();
         LikedFolder folder = folderOpt.get();
 
+        // 이미 찜한 매물인 경우 기존 찜을 삭제
         Optional<Liked> existingLike = likedRepository.findByUserAndHouse(user, house);
         if (existingLike.isPresent()) {
-            return ResponseEntity.ok("⚠ 이미 찜한 매물입니다.");
+            likedRepository.delete(existingLike.get());
         }
 
+        // 새로운 폴더에 찜 추가
         Liked liked = Liked.builder()
                 .user(user)
                 .house(house)
@@ -147,5 +150,21 @@ public class LikedController {
                 .build();
         likedFolderRepository.save(folder);
         return ResponseEntity.ok("폴더가 생성되었습니다.");
+    }
+
+    @DeleteMapping("{likedId}")
+    public ResponseEntity<?> deleteLike(@PathVariable Integer likedId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // likedId로 찜 엔티티 조회
+        Optional<Liked> likedOpt = likedRepository.findById(likedId);
+        if (likedOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("찜 정보를 찾을 수 없습니다.");
+        }
+        Liked liked = likedOpt.get();
+        // 본인 소유인지 체크
+        if (!liked.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
+        likedRepository.deleteById(likedId);
+        return ResponseEntity.ok().body("찜이 해제되었습니다.");
     }
 }

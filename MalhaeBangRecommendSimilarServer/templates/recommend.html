@@ -140,8 +140,11 @@
 
     <!-- 매물 기본 정보 -->
     <div class="main_info_area">
-      <div class="info_title_wrap">
-        <h4 class="info_title">{{ target.title | default('제목 없음') }}</h4>
+      <div class="info_title_wrap" style="display: flex; align-items: center; gap: 8px;">
+        <h4 class="info_title" style="margin-bottom:0;">{{ target.title | default('제목 없음') }}</h4>
+        <button class="btn btn-outline-warning favorite-toggle" data-house-id="{{ house_id }}">
+          <i class="bi {% if is_liked %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+        </button>
       </div>
       <div class="info_article_price">
         <span class="price">{{ target.price | default('가격 정보 없음') }}</span>
@@ -253,7 +256,6 @@
           <div class="text-muted small">{{ item.address }} ({{ item.gu }} {{ item.dong }})</div>
           <div>가격: {{ item.price }}</div>
           <div>면적: {{ item.space }}평</div>
-          <div class="similarity">유사도: {{ '%.3f'|format(item.similarity) }}</div>
         </div>
       </a>
       {% endfor %}
@@ -270,6 +272,27 @@
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.favorite-toggle').forEach(function(star) {
+            star.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var houseId = this.getAttribute('data-house-id');
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'toggleFavorite', houseId: houseId }, '*');
+                } else {
+                    // 직접 Spring API로 fetch 요청 (예시)
+                    fetch(`/api/like/${houseId}`, { method: 'POST' })
+                      .then(res => res.text())
+                      .then(msg => {
+                          var icon = this.querySelector('i');
+                          icon.classList.remove('bi-star');
+                          icon.classList.add('bi-star-fill');
+                      });
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: news-crawler-job
+spec:
+  schedule: "0 * * * *"  # 매 시간 0분마다 실행
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: crawler
+              image: koreatstm/my-crawler-app:latest
+              command: ["python", "main.py"]
+              volumeMounts:
+                - name: data-volume
+                  mountPath: /app/filtered_clustered_news.csv
+                  subPath: filtered_clustered_news.csv
+          restartPolicy: OnFailure
+          volumes:
+            - name: data-volume
+              persistentVolumeClaim:
+                claimName: newscrawler_pvc

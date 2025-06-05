@@ -1,0 +1,15 @@
+malhaebang-nlp:
+  build:
+    context: ./MalhaeBangNlpServer
+    dockerfile: Dockerfile
+  volumes:
+    - ./MalhaeBangNlpServer:/app
+  environment:
+    - MYSQL_HOST=malhaebang-mysql
+    - MYSQL_USER=root
+    - MYSQL_PASSWORD=1234
+    - MYSQL_DATABASE=malhaebang
+    - ES_HOST=elasticsearch
+  depends_on:
+    - malhaebang-mysql
+    - elasticsearch 

@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: real-estate-crawler
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+        - name: crawler
+          image: koreatstm/real-estate-crawler:latest
+          imagePullPolicy: Always
+          env:
+            - name: MYSQL_HOST
+              value: "mysql-service"
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password
+            - name: MYSQL_DATABASE
+              value: "real_estate"
+          volumeMounts:
+            - name: chrome-shm
+              mountPath: /dev/shm
+      restartPolicy: Never
+      volumes:
+        - name: chrome-shm
+          emptyDir:
+            medium: Memory

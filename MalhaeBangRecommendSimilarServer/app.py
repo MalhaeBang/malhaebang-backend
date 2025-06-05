@@ -163,6 +163,7 @@ def recommend_ui():
 
     target_series = row_match.iloc[0]
     target_dict = target_series.to_dict()
+    house_id = target_dict.get("house_id")  # house_id 컬럼이 있다고 가정
     logger.info(f"추천 대상 매물 정보: {target_dict}")
 
     # safety_score 없으면 기본값으로 대체
@@ -202,13 +203,25 @@ def recommend_ui():
     except Exception as e:
         logger.warning(f"추천 수행 중 오류 발생 (무시하고 UI만 렌더링): {e}")
 
+    with engine.connect() as conn:
+        # ... house_id 쿼리 ...
+        # 예시: user_id는 세션 등에서 받아와야 함
+        user_id = ... # 로그인 유저의 PK
+        result = conn.execute(
+            text("SELECT 1 FROM liked WHERE user_id = :user_id AND house_id = :house_id"),
+            {"user_id": user_id, "house_id": house_id}
+        )
+        is_liked = result.fetchone() is not None
+
     return render_template(
         "recommend.html",
         target=target_dict,
         title=target_dict["title"],
         house_num=house_num,
+        house_id=house_id,
         items=result_df.to_dict(orient="records"),
-        loads=json.loads
+        loads=json.loads,
+        is_liked=is_liked
     )
 
 @app.template_filter('from_json')
