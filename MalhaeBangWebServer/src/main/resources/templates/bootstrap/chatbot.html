@@ -337,6 +337,18 @@
                 padding: 12px 16px;
             }
         }
+
+        /* house-card는 margin을 0으로 덮어씀 */
+        .chat-message.house-card {
+            margin-bottom: 0;
+            margin-top: 0;
+            /* 필요하다면 padding도 조절 */
+        }
+
+        /* house-card끼리만 여백을 주고 싶으면 */
+        .chat-message.house-card + .chat-message.house-card {
+            margin-top: 12px;
+        }
     </style>
 </head>
 <body>
@@ -405,7 +417,7 @@
          // function formatPrice(val) { ... }
 
         // 백엔드에서 넘어오는 실제 속성 이름(Elasticsearch _source 필드 기준)을 활용하여 카드 내용 구성
-        const source = house._source || {}; // _source가 없을 경우 빈 객체 사용
+        const source = house._source || house; // _source가 없으면 house 자체 사용
 
         const gu = safeGetString(source.gu);
         const dong = safeGetString(source.dong);
@@ -479,26 +491,24 @@
     // 메시지를 chatWindow에 추가하고 기록 배열에 저장하는 함수
     function addMessageToChat(type, content) {
         const chatWindow = document.getElementById("chatWindow");
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `chat-message ${type}`;
-
         let historyEntry;
 
-        if (type === 'bot' && content && content._source) { // 매물 카드 데이터인 경우
-            const houseCard = createHouseCard(content); // createHouseCard 함수 사용
+        // 매물 데이터면 항상 카드로 출력
+        if (type === 'bot' && typeof content === 'object' && content !== null) {
+            const houseCard = createHouseCard(content);
             chatWindow.appendChild(houseCard);
-            // 기록에는 원본 데이터와 타입을 저장
             historyEntry = { type: type, houseData: content };
-        } else { // 일반 텍스트 메시지인 경우
+        } else { // 일반 텍스트 메시지
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `chat-message ${type}`;
             messageDiv.textContent = content;
             chatWindow.appendChild(messageDiv);
-            // 기록에는 텍스트와 타입을 저장
             historyEntry = { type: type, text: content };
         }
 
         chatHistory.push(historyEntry);
         saveChatHistory();
-        chatWindow.scrollTop = chatWindow.scrollHeight; // 스크롤 최신 위치로
+        chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
 
@@ -621,17 +631,12 @@
                          const houseList = data.response;
                          houseList.forEach(item => {
                             const houseData = item.hit ? item.hit : item;
-                            if (houseData && houseData._source) {
-                                 // 매물 카드는 addMessageToChat 함수 내에서 createHouseCard 호출 및 추가
-                                 addMessageToChat('bot', houseData); // ✅ 원본 데이터 전달
-                            } else {
-                                 console.warn("Unexpected house data format:", houseData);
-                            }
+                            addMessageToChat('bot', houseData);
                          });
                     } else if (data.response) {
-                        addMessageToChat('bot', data.response); // ✅ 텍스트 전달
+                        addMessageToChat('bot', data.response);
                     } else {
-                         addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다."); // ✅ 텍스트 전달
+                         addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다.");
                     }
                     // addMessageToChat 내에서 스크롤 및 저장 처리함
                     // chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -671,16 +676,12 @@
                          const houseList = data.response;
                          houseList.forEach(item => {
                              const houseData = item.hit ? item.hit : item;
-                            if (houseData && houseData._source) {
-                                 addMessageToChat('bot', houseData); // ✅ 원본 데이터 전달
-                            } else {
-                                 console.warn("Unexpected house data format:", houseData);
-                            }
+                            addMessageToChat('bot', houseData);
                          });
                     } else if (data.response) {
-                        addMessageToChat('bot', data.response); // ✅ 텍스트 전달
+                        addMessageToChat('bot', data.response);
                     } else {
-                         addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다."); // ✅ 텍스트 전달
+                         addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다.");
                     }
                     // addMessageToChat 내에서 스크롤 및 저장 처리함
                     // chatWindow.scrollTop = chatWindow.scrollHeight;

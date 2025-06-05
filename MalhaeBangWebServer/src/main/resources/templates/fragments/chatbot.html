@@ -197,6 +197,36 @@
             background-color: #f0f0f0;
             color: #333;
         }
+
+        .chat-message.house-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px 14px 12px 14px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #2d3748;
+            box-sizing: border-box;
+            max-width: 95%;
+        }
+        .chat-message.house-card .title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #2d3748;
+            font-size: 15px;
+        }
+        .chat-message.house-card .info {
+            font-size: 12px;
+            color: #4a5568;
+            margin-bottom: 2px;
+        }
+        .chat-message.house-card .location {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 6px;
+        }
     </style>
 
     <script>
@@ -252,16 +282,11 @@
                 const options = source.options;
                 const matchedConditions = (Array.isArray(options) ? options.join(', ') : safeGetString(options)).replace('옵션 정보 없음', '');
 
-                const walkingInfo = '';
-
                 const houseFeature = safeGetString(source.house_feature);
                 const houseId = safeGetString(source.house_id);
                 const title = safeGetString(source.title);
 
-                let cardHtml = `
-                    <div class="title">${title || address || '매물 정보'}</div>
-                `;
-
+                let cardHtml = `<div class="title">${title || address || '매물 정보'}</div>`;
                 if (priceInfo.trim()) { cardHtml += `<div class="info">💰 ${priceInfo}</div>`; }
                 if (areaSize) { cardHtml += `<div class="info">📐 ${areaSize}</div>`; }
                 if (floor !== '-' || totalFloor !== '-') { cardHtml += `<div class="info">🏙️ ${floorInfo}</div>`; }
@@ -269,7 +294,6 @@
                 if (parkingInfo) { cardHtml += `<div class="info">🅿️ 주차: ${parkingInfo}</div>`; }
                 if (safetyGrade) { cardHtml += `<div class="info">🔒 안전등급: ${safetyGrade}</div>`; }
                 if (matchedConditions) { cardHtml += `<div class="info">💡 일치 조건: ${matchedConditions}</div>`; }
-                if (walkingInfo) { cardHtml += `<div class="info">🚶‍♂️ ${walkingInfo}</div>`; }
                 if (address) { cardHtml += `<div class="location">📍 ${address}</div>`; }
                 if (houseFeature && houseFeature !== '-') { cardHtml += `<div class="info">✨ 특징: ${houseFeature}</div>`; }
                 if (houseId) { cardHtml += `<div class="info">🏷️ ID: ${houseId}</div>`; }
@@ -279,8 +303,6 @@
                 card.addEventListener("click", () => {
                     if (houseId) {
                         window.location.href = `/map?houseId=${houseId}`;
-                    } else {
-                        console.warn("Cannot navigate to map: houseId is missing.", source);
                     }
                 });
 
@@ -289,68 +311,27 @@
 
             function addMessageToChat(type, content) {
                 const chatWindow = document.getElementById("chatWindow");
+                let historyEntry;
 
-                const initialStaticMessages = chatWindow.querySelectorAll('.tip-box, .chat-message.bot'); // 정적 요소 선택
-                const initialStaticCount = initialStaticMessages.length; // 정적 요소 개수
-
-                 // 기존 메시지 중 동적으로 추가된 메시지만 삭제
-                Array.from(chatWindow.children).forEach((child, index) => {
-                     // 팁 박스가 아니고, 초기 정적 메시지 인덱스 범위를 벗어나는 메시지만 삭제
-                    // findIndex를 사용하여 해당 자식이 initialStaticMessages에 포함되어 있는지 확인하는 것이 더 정확합니다.
-                    const isStatic = Array.from(initialStaticMessages).some(staticMsg => staticMsg === child);
-
-                    // 팁 박스나 정적 메시지가 아니면 삭제
-                    if (!child.classList.contains('tip-box') && !isStatic) {
-                         child.remove();
-                    }
-                });
-
-
-                let historyEntry = null; // historyEntry 초기화
-                 let messageElement = null; // 실제로 DOM에 추가될 메시지/카드 엘리먼트
-
-                if (type === 'bot' && content && content._source) { // 봇 메시지이고, content가 매물 데이터 객체인 경우
-                     // ... createHouseCard 호출 및 추가 ...
-                     const houseCard = createHouseCard(content);
-                     chatWindow.appendChild(houseCard);
-                     messageElement = houseCard; // 엘리먼트 저장
-                     historyEntry = { type: 'bot', houseData: content };
-                } else { // 사용자 메시지이거나, 봇 메시지이지만 일반 텍스트인 경우
-                     const textContent = content !== null && content !== undefined ? String(content) : ''; // content를 안전하게 문자열로 변환
-                      if (textContent.trim()) { // 빈 문자열이 아닌 경우에만 추가
-                        const messageDiv = document.createElement("div");
-                        messageDiv.className = `chat-message ${type}`;
-                        messageDiv.textContent = textContent;
-                        chatWindow.appendChild(messageDiv);
-                        messageElement = messageDiv; // 엘리먼트 저장
-                        historyEntry = { type: type, text: textContent };
-                     } else {
-                         console.warn("Attempted to add empty or invalid text message:", content);
-                         return; // 빈 메시지는 기록하지 않고 종료
-                     }
+                if (type === 'bot' && typeof content === 'object' && content !== null) {
+                    const houseCard = createHouseCard(content);
+                    chatWindow.appendChild(houseCard);
+                    historyEntry = { type: type, houseData: content };
+                } else {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = `chat-message ${type}`;
+                    messageDiv.textContent = content;
+                    chatWindow.appendChild(messageDiv);
+                    historyEntry = { type: type, text: content };
                 }
 
-
-                // 팁 박스는 기록에서 제외
-                // messageElement가 정의되었고 팁 박스가 아닌 경우에만 기록
-                if (messageElement && !messageElement.classList.contains('tip-box')) { // messageElement가 실제로 DOM에 추가되었고 팁 박스가 아닌 경우
-                     // historyEntry는 이미 위에서 유효한 경우에만 생성됨
-                     if (historyEntry) {
-                        chatHistory.push(historyEntry);
-                        saveChatHistory();
-                     }
-                }
-
-
-                chatWindow.scrollTop = chatWindow.scrollHeight; // 스크롤 최신 위치로
+                chatHistory.push(historyEntry);
+                saveChatHistory();
+                chatWindow.scrollTop = chatWindow.scrollHeight;
             }
 
             function saveChatHistory() {
-                try {
-                    localStorage.setItem(chatHistoryKey, JSON.stringify(chatHistory));
-                } catch (e) {
-                    console.error("Failed to save chat history:", e);
-                }
+                localStorage.setItem(chatHistoryKey, JSON.stringify(chatHistory));
             }
 
             function loadChatHistory() {
@@ -358,25 +339,14 @@
                 if (savedHistory) {
                     try {
                         chatHistory = JSON.parse(savedHistory);
-                        let clearAfterElement = chatWindow.querySelector('.chat-message.bot:last-of-type');
-                        if (clearAfterElement) {
-                            let nextElement = clearAfterElement.nextElementSibling;
-                            while (nextElement) {
-                                const toRemove = nextElement;
-                                nextElement = toRemove.nextElementSibling;
-                                if (!toRemove.classList.contains('tip-box')) {
-                                    toRemove.remove();
-                                }
-                            }
-                        } else {
-                            chatWindow.querySelectorAll('.chat-message:not(.tip-box)').forEach(msg => msg.remove());
-                        }
+                        const chatWindow = document.getElementById("chatWindow");
+                        chatWindow.querySelectorAll('.chat-message:not(.tip-box)').forEach(msg => msg.remove());
 
                         chatHistory.forEach(entry => {
                             if (entry.houseData) {
                                 const houseCard = createHouseCard(entry.houseData);
                                 chatWindow.appendChild(houseCard);
-                            } else if (entry.text !== undefined && entry.text !== null) {
+                            } else if (entry.text) {
                                 const messageDiv = document.createElement("div");
                                 messageDiv.className = `chat-message ${entry.type}`;
                                 messageDiv.textContent = entry.text;
@@ -389,7 +359,6 @@
                         console.error("Error loading chat history from localStorage:", e);
                         chatHistory = [];
                         localStorage.removeItem(chatHistoryKey);
-                        addMessageToChat('bot', "⚠️ 대화 기록을 불러오는 중 오류가 발생했습니다.");
                     }
                 } else {
                     chatHistory = [];
@@ -415,7 +384,6 @@
                 popup.classList.toggle('show');
                 if (popup.classList.contains('show')) {
                     loadChatHistory();
-                } else {
                 }
             });
 
@@ -441,26 +409,15 @@
                     .then(data => {
                         console.log("서버 응답 전체:", data);
 
-                        if (data && Array.isArray(data.response) && data.response.length > 0) {
+                        if (Array.isArray(data.response) && data.response.length > 0) {
                             const houseList = data.response;
                             houseList.forEach(item => {
                                 const houseData = item.hit ? item.hit : item;
-                                if (houseData && houseData._source) {
-                                    addMessageToChat('bot', houseData);
-                                } else {
-                                    console.warn("Unexpected item format in response array:", item);
-                                    const textContent = item.response || item.text || JSON.stringify(item);
-                                    if (textContent) {
-                                        addMessageToChat('bot', textContent);
-                                    }
-                                }
+                                addMessageToChat('bot', houseData);
                             });
-                        } else if (data && data.response) {
+                        } else if (data.response) {
                             addMessageToChat('bot', data.response);
-                        } else if (data && data.text) {
-                            addMessageToChat('bot', data.text);
                         } else {
-                            console.warn("Unexpected server response format or no results:", data);
                             addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다.");
                         }
                     })

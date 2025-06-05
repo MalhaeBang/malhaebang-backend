@@ -47,6 +47,16 @@ services:
     container_name: malhaebang-nlp
     ports:
       - "8000:8000"
+    environment:
+      - ES_HOST=elasticsearch
+      - ES_ID=elastic
+      - ES_PW=elasticteam3
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=malhaebang
+    volumes:
+      - ../MalhaeBangNlpServer/main:/app/main
     networks:
       - malhaebang-network
 
@@ -114,6 +124,43 @@ services:
       DATABASE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
+    networks:
+      - malhaebang-network
+
+
+  malhaebang-recommend-similar:
+    build:
+      context: ../MalhaeBangRecommendSimilarServer
+      dockerfile: Dockerfile
+    container_name: malhaebang-recommend-similar
+    ports:
+      - "5003:5000"
+    networks:
+      - malhaebang-network
+
+  malhaebang-news-crawler:
+    build:
+      context: ../MalhaeBangNewsCrawler
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: malhaebang-news-crawler
+    command: ["python", "main.py"]
+    volumes:
+      - ./news_data:/app/shared_data
+    networks:
+      - malhaebang-network
+
+  malhaebang-news-web:
+    build:
+      context: ../MalhaeBangNewsCrawler
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: malhaebang-news-web
+    command: ["python", "app.py"]
+    ports:
+      - "5004:5000"
+    volumes:
+      - ./news_data:/app/shared_data
     networks:
       - malhaebang-network
 

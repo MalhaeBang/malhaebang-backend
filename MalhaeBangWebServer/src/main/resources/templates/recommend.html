@@ -1,0 +1,23 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">매물 상세 정보</h2>
+    <button class="btn btn-outline-warning favorite-toggle" data-house-id="{{ house.houseId }}">
+        <i class="bi bi-star"></i>
+    </button>
+</div>
+
+<script>
+// 찜하기 버튼 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    const favoriteBtn = document.querySelector('.favorite-toggle');
+    if (favoriteBtn) {
+        favoriteBtn.addEventListener('click', function() {
+            const houseId = this.getAttribute('data-house-id');
+            // 부모 창에 메시지 전송
+            window.parent.postMessage({
+                type: 'toggleFavorite',
+                houseId: houseId
+            }, '*');
+        });
+    }
+});
+</script> 

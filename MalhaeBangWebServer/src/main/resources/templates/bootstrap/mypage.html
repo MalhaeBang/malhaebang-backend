@@ -548,40 +548,41 @@
 
                         <div th:each="liked : ${folder.likedItems}"
                              th:if="${liked.house != null}" class="favorite-item">
-                            <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <i class="bi bi-star-fill favorite-icon"></i>
-                                        <strong th:text="${liked.house.title}"></strong><br>
-                                    </div>
-                                    <div style="color: #1e40af; font-weight: bold;">
-                                        <span th:text="${liked.house.price}"></span>
-                                    </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <i class="bi bi-star-fill favorite-icon"></i>
+                                    <strong th:text="${liked.house.title}"></strong>
                                 </div>
+                                <div>
+                                    <button class="btn btn-outline-danger btn-unlike"
+                                            th:data-liked-id="${liked.likedId}">
+                                        <i class="bi bi-x-lg"></i> 찜 해제
+                                    </button>
+                                </div>
+                            </div>
 
-                                <!-- 주요 설명 -->
-                                <div class="favorite-description" style="margin-top: 5px;">
-                                    <span th:text="${liked.house.areaSize} + '㎡'"></span><br>
-                                    <span th:text="${liked.house.houseFeature}"></span>
-                                </div>
+                            <!-- 주요 설명 -->
+                            <div class="favorite-description" style="margin-top: 5px;">
+                                <span th:text="${liked.house.areaSize} + '㎡'"></span><br>
+                                <span th:text="${liked.house.houseFeature}"></span>
+                            </div>
 
-                                <div class="favorite-details">
-                                    📍 주소: <span th:text="${liked.house.address}"></span><br>
-                                    🧭 방향: <span th:text="${liked.house.direction}"></span><br>
-                                    🏢 층수: <span th:text="${liked.house.floor}"></span><br>
-                                    📦 거래 방식: <span th:text="${liked.house.depositType}"></span><br>
-                                    🅿️ 주차: <span th:text="${liked.house.parking}"></span><br>
-                                    💡 관리비: <span th:text="${liked.house.mfee} + '만원'"></span><br>
-                                    ⏰ 입주 가능일: <span th:text="${liked.house.aFrom}"></span><br>
-                                    🧑‍💼 중개사 정보: <span th:text="${liked.house.agentInfo}"></span><br>
-                                    📞 중개 수수료: <span th:text="${liked.house.agentComm}"></span><br>
-                                    🛏 방 개수: <span th:text="${liked.house.roomsCount}"></span><br>
-                                    🧰 옵션: <span th:text="${liked.house.options}"></span><br>
-                                    📅 등록일: <span th:text="${liked.house.postedAt}"></span><br>
-                                    🏙 지역: <span th:text="${liked.house.gu} + ' ' + ${liked.house.dong}"></span><br>
-                                    🏠 건물유형: <span th:text="${liked.house.buildingType}"></span><br>
-                                    🏗 준공일: <span th:text="${liked.house.builtDate}"></span><br>
-                                </div>
+                            <div class="favorite-details">
+                                📍 주소: <span th:text="${liked.house.address}"></span><br>
+                                🧭 방향: <span th:text="${liked.house.direction}"></span><br>
+                                🏢 층수: <span th:text="${liked.house.floor}"></span><br>
+                                📦 거래 방식: <span th:text="${liked.house.depositType}"></span><br>
+                                🅿️ 주차: <span th:text="${liked.house.parking}"></span><br>
+                                💡 관리비: <span th:text="${liked.house.mfee} + '만원'"></span><br>
+                                ⏰ 입주 가능일: <span th:text="${liked.house.aFrom}"></span><br>
+                                🧑‍💼 중개사 정보: <span th:text="${liked.house.agentInfo}"></span><br>
+                                📞 중개 수수료: <span th:text="${liked.house.agentComm}"></span><br>
+                                🛏 방 개수: <span th:text="${liked.house.roomsCount}"></span><br>
+                                🧰 옵션: <span th:text="${liked.house.options}"></span><br>
+                                📅 등록일: <span th:text="${liked.house.postedAt}"></span><br>
+                                🏙 지역: <span th:text="${liked.house.gu} + ' ' + ${liked.house.dong}"></span><br>
+                                🏠 건물유형: <span th:text="${liked.house.buildingType}"></span><br>
+                                🏗 준공일: <span th:text="${liked.house.builtDate}"></span><br>
                             </div>
                         </div>
                     </div>
@@ -630,10 +631,32 @@
         });
 
         // 상세 정보 토글
-        const items = document.querySelectorAll('.favorite-item');
-        items.forEach(item => {
-            item.addEventListener('click', () => {
+        document.querySelectorAll('.favorite-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                // 찜 해제 버튼 클릭 시에는 토글 동작하지 않게
+                if (e.target.closest('.btn-unlike')) return;
                 item.classList.toggle('expanded');
+            });
+        });
+
+        // 찜 해제 버튼
+        document.querySelectorAll('.btn-unlike').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation(); // 이벤트 버블링 차단
+                const likedId = this.getAttribute('data-liked-id');
+                if (!likedId) return;
+
+                if (!confirm('정말로 찜을 해제하시겠습니까?')) return;
+
+                fetch(`/api/like/${likedId}`, { method: 'DELETE' })
+                    .then(res => {
+                        if (!res.ok) throw new Error('찜 해제 실패');
+                        // 성공 시 UI에서 해당 아이템 제거
+                        this.closest('.favorite-item').remove();
+                    })
+                    .catch(err => {
+                        alert('찜 해제에 실패했습니다.');
+                    });
             });
         });
 

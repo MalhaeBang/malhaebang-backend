@@ -1,11 +1,28 @@
+# ▶ 환경 설정 파일 제외
+.env
+
+# ▶ Docker 관련 파일 제외
+Dockerfile
+.dockerignore
+
+# ▶ 파이썬 캐시 및 가상환경 제외
 __pycache__/
 *.py[cod]
-.env
-*.log
-
-# IDE
-.vscode/
-.idea/
-
-# Virtual Environment
 .venv/
+env/
+venv/
+
+# ▶ 모델 및 캐시 파일 제외
+.cache/
+.huggingface/
+*.pt
+*.bin
+*.ckpt
+*.pkl
+*.h5
+
+# ▶ 개발 도구 설정, 로그, 문서 제외
+.vscode/
+*.log
+*.ipynb
+*.pdf
