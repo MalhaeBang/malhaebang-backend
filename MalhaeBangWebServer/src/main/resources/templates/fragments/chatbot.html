@@ -1,0 +1,481 @@
+<div th:fragment="chatbot">
+    <button id="chatbotToggle" class="chatbot-toggle-btn" aria-label="chatbot">
+        <img src="/assets/img/malhaebang/logo_low.png" alt="챗봇 아이콘" class="chatbot-logo">
+    </button>
+    <div id="chatbotPopup" class="chatbot-popup">
+
+        <header class="chatbot-header">
+            <img src="/assets/img/malhaebang/logo3d.jpg" alt="로고" class="chatbot-logo" />
+            <div class="chatbot-header-text">
+                <h1>말해방</h1>
+                <p>AI가 바로 답변해 드려요</p>
+            </div>
+            <button id="chatbotClose" class="chatbot-close-btn">×</button>
+        </header>
+
+        <main class="chatbot-layout">
+            <div class="chatbot-main" id="chatWindow">
+                <div class="chat-message bot">👤 서울 용산구에 월세 150 이하인 집에서 살고 싶어</div>
+                <div class="chat-message bot">🤖 조건을 입력하시면 추천해드릴게요!</div>
+                <div class="chat-message user">노량진 전세 1억 이하, 주차 가능한 집 찾아줘.</div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" placeholder="조건을 자세하게 입력해주세요." />
+                <button>전송</button>
+            </div>
+        </main>
+
+        <div class="chat-tip">✅ Tip! 전입신고 + 확정일자를 꼭 받으세요!</div>
+    </div>
+
+    <style>
+        .chatbot-toggle-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            z-index: 9999;
+        }
+
+        .chatbot-logo {
+            width: 48px;
+            height: 48px;
+        }
+
+        .chatbot-popup {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 420px;
+            height: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 3px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 1100;
+            overflow: hidden;
+
+            /* 애니메이션 효과용 초기 상태 */
+            transform: scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .chatbot-popup.show {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .chatbot-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            background-color: #fff;
+        }
+
+        .chatbot-header-text h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .chatbot-header-text p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .chatbot-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 5px 16px !important;;
+            overflow: hidden;
+        }
+
+        .chatbot-main {
+            background-image: url('/assets/img/malhaebang/logo3d.jpg');
+            background-size: 300px auto;
+            background-repeat: no-repeat;
+            background-position: center center;
+            /*background-attachment: local;       */
+
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-message {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: keep-word;
+            white-space: pre-wrap;
+            max-width: 85%;
+            margin-bottom: 12px;
+
+        }
+
+        .chat-message.bot {
+            align-self: flex-start;
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            background-color: #111827;
+            color: #fff;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 12px 16px;
+            border-top: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            border-radius: 20px;
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 1px solid #aaa;
+        }
+
+        .chat-input-area button {
+            background-color: #111827;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .chat-tip {
+            font-size: 13px;
+            padding: 8px 16px;
+            background-color: white;
+            border-top: 1px solid #eee;
+            color: #222;
+            text-align: left;
+        }
+
+        .chatbot-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .chatbot-close-btn:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById('chatbotToggle');
+            const popup = document.getElementById('chatbotPopup');
+            const closeBtn = document.getElementById('chatbotClose');
+            const chatWindow = popup.querySelector("#chatWindow");
+            const inputField = popup.querySelector(".chat-input-area input");
+            const sendButton = popup.querySelector(".chat-input-area button");
+
+            const API_URL = "http://localhost:8000";
+            const chatHistoryKey = 'malhaebangChatHistory';
+
+            let chatHistory = [];
+
+            function createHouseCard(houseData) {
+                const card = document.createElement("div");
+                card.className = "chat-message bot house-card";
+
+                const safeGetString = (value) => {
+                    if (value === undefined || value === null) return '';
+                    if (typeof value === 'object') {
+                        try { return JSON.stringify(value); } catch (e) { return '[객체 변환 오류]'; }
+                    }
+                    return String(value);
+                };
+
+                const source = houseData._source || houseData;
+
+                const gu = safeGetString(source.gu);
+                const dong = safeGetString(source.dong);
+                const address = `${gu} ${dong}`.trim();
+
+                const depositType = safeGetString(source.deposit_type);
+                const deposit = (source.deposit !== undefined && source.deposit !== null) ? formatPrice(source.deposit) : '';
+                const monthlyRent = (source.monthly_rent !== undefined && source.monthly_rent !== null) ? formatPrice(source.monthly_rent) : '';
+                const priceInfo = `${depositType} ${deposit} / ${monthlyRent}`.trim();
+
+                const areaSize = safeGetString(source.area_size);
+                const floor = (source.floor !== undefined && source.floor !== null) ? safeGetString(source.floor) : '-';
+                const totalFloor = (source.total_floor !== undefined && source.total_floor !== null) ? safeGetString(source.total_floor) : '-';
+                const floorInfo = `${floor}/${totalFloor}층`;
+
+                const rooms = (source.rooms_count !== undefined && source.rooms_count !== null) ? safeGetString(source.rooms_count) : '-';
+                const bath = (source.bath_count !== undefined && source.bath_count !== null) ? safeGetString(source.bath_count) : '-';
+                const roomBathInfo = `방: ${rooms} / 욕실: ${bath}`;
+
+                const parking = source.parking;
+                const parkingInfo = (parking === 1) ? '가능' : ((parking === 0) ? '불가' : '');
+
+                const safetyGrade = safeGetString(source.safety_grade);
+                const options = source.options;
+                const matchedConditions = (Array.isArray(options) ? options.join(', ') : safeGetString(options)).replace('옵션 정보 없음', '');
+
+                const walkingInfo = '';
+
+                const houseFeature = safeGetString(source.house_feature);
+                const houseId = safeGetString(source.house_id);
+                const title = safeGetString(source.title);
+
+                let cardHtml = `
+                    <div class="title">${title || address || '매물 정보'}</div>
+                `;
+
+                if (priceInfo.trim()) { cardHtml += `<div class="info">💰 ${priceInfo}</div>`; }
+                if (areaSize) { cardHtml += `<div class="info">📐 ${areaSize}</div>`; }
+                if (floor !== '-' || totalFloor !== '-') { cardHtml += `<div class="info">🏙️ ${floorInfo}</div>`; }
+                if (rooms !== '-' || bath !== '-') { cardHtml += `<div class="info">🏎️ ${roomBathInfo}</div>`; }
+                if (parkingInfo) { cardHtml += `<div class="info">🅿️ 주차: ${parkingInfo}</div>`; }
+                if (safetyGrade) { cardHtml += `<div class="info">🔒 안전등급: ${safetyGrade}</div>`; }
+                if (matchedConditions) { cardHtml += `<div class="info">💡 일치 조건: ${matchedConditions}</div>`; }
+                if (walkingInfo) { cardHtml += `<div class="info">🚶‍♂️ ${walkingInfo}</div>`; }
+                if (address) { cardHtml += `<div class="location">📍 ${address}</div>`; }
+                if (houseFeature && houseFeature !== '-') { cardHtml += `<div class="info">✨ 특징: ${houseFeature}</div>`; }
+                if (houseId) { cardHtml += `<div class="info">🏷️ ID: ${houseId}</div>`; }
+
+                card.innerHTML = cardHtml;
+
+                card.addEventListener("click", () => {
+                    if (houseId) {
+                        window.location.href = `/map?houseId=${houseId}`;
+                    } else {
+                        console.warn("Cannot navigate to map: houseId is missing.", source);
+                    }
+                });
+
+                return card;
+            }
+
+            function addMessageToChat(type, content) {
+                const chatWindow = document.getElementById("chatWindow");
+
+                const initialStaticMessages = chatWindow.querySelectorAll('.tip-box, .chat-message.bot'); // 정적 요소 선택
+                const initialStaticCount = initialStaticMessages.length; // 정적 요소 개수
+
+                 // 기존 메시지 중 동적으로 추가된 메시지만 삭제
+                Array.from(chatWindow.children).forEach((child, index) => {
+                     // 팁 박스가 아니고, 초기 정적 메시지 인덱스 범위를 벗어나는 메시지만 삭제
+                    // findIndex를 사용하여 해당 자식이 initialStaticMessages에 포함되어 있는지 확인하는 것이 더 정확합니다.
+                    const isStatic = Array.from(initialStaticMessages).some(staticMsg => staticMsg === child);
+
+                    // 팁 박스나 정적 메시지가 아니면 삭제
+                    if (!child.classList.contains('tip-box') && !isStatic) {
+                         child.remove();
+                    }
+                });
+
+
+                let historyEntry = null; // historyEntry 초기화
+                 let messageElement = null; // 실제로 DOM에 추가될 메시지/카드 엘리먼트
+
+                if (type === 'bot' && content && content._source) { // 봇 메시지이고, content가 매물 데이터 객체인 경우
+                     // ... createHouseCard 호출 및 추가 ...
+                     const houseCard = createHouseCard(content);
+                     chatWindow.appendChild(houseCard);
+                     messageElement = houseCard; // 엘리먼트 저장
+                     historyEntry = { type: 'bot', houseData: content };
+                } else { // 사용자 메시지이거나, 봇 메시지이지만 일반 텍스트인 경우
+                     const textContent = content !== null && content !== undefined ? String(content) : ''; // content를 안전하게 문자열로 변환
+                      if (textContent.trim()) { // 빈 문자열이 아닌 경우에만 추가
+                        const messageDiv = document.createElement("div");
+                        messageDiv.className = `chat-message ${type}`;
+                        messageDiv.textContent = textContent;
+                        chatWindow.appendChild(messageDiv);
+                        messageElement = messageDiv; // 엘리먼트 저장
+                        historyEntry = { type: type, text: textContent };
+                     } else {
+                         console.warn("Attempted to add empty or invalid text message:", content);
+                         return; // 빈 메시지는 기록하지 않고 종료
+                     }
+                }
+
+
+                // 팁 박스는 기록에서 제외
+                // messageElement가 정의되었고 팁 박스가 아닌 경우에만 기록
+                if (messageElement && !messageElement.classList.contains('tip-box')) { // messageElement가 실제로 DOM에 추가되었고 팁 박스가 아닌 경우
+                     // historyEntry는 이미 위에서 유효한 경우에만 생성됨
+                     if (historyEntry) {
+                        chatHistory.push(historyEntry);
+                        saveChatHistory();
+                     }
+                }
+
+
+                chatWindow.scrollTop = chatWindow.scrollHeight; // 스크롤 최신 위치로
+            }
+
+            function saveChatHistory() {
+                try {
+                    localStorage.setItem(chatHistoryKey, JSON.stringify(chatHistory));
+                } catch (e) {
+                    console.error("Failed to save chat history:", e);
+                }
+            }
+
+            function loadChatHistory() {
+                const savedHistory = localStorage.getItem(chatHistoryKey);
+                if (savedHistory) {
+                    try {
+                        chatHistory = JSON.parse(savedHistory);
+                        let clearAfterElement = chatWindow.querySelector('.chat-message.bot:last-of-type');
+                        if (clearAfterElement) {
+                            let nextElement = clearAfterElement.nextElementSibling;
+                            while (nextElement) {
+                                const toRemove = nextElement;
+                                nextElement = toRemove.nextElementSibling;
+                                if (!toRemove.classList.contains('tip-box')) {
+                                    toRemove.remove();
+                                }
+                            }
+                        } else {
+                            chatWindow.querySelectorAll('.chat-message:not(.tip-box)').forEach(msg => msg.remove());
+                        }
+
+                        chatHistory.forEach(entry => {
+                            if (entry.houseData) {
+                                const houseCard = createHouseCard(entry.houseData);
+                                chatWindow.appendChild(houseCard);
+                            } else if (entry.text !== undefined && entry.text !== null) {
+                                const messageDiv = document.createElement("div");
+                                messageDiv.className = `chat-message ${entry.type}`;
+                                messageDiv.textContent = entry.text;
+                                chatWindow.appendChild(messageDiv);
+                            }
+                        });
+
+                        chatWindow.scrollTop = chatWindow.scrollHeight;
+                    } catch (e) {
+                        console.error("Error loading chat history from localStorage:", e);
+                        chatHistory = [];
+                        localStorage.removeItem(chatHistoryKey);
+                        addMessageToChat('bot', "⚠️ 대화 기록을 불러오는 중 오류가 발생했습니다.");
+                    }
+                } else {
+                    chatHistory = [];
+                }
+            }
+
+            function formatPrice(val) {
+                if (val === undefined || val === null) return '';
+                const num = parseInt(val, 10);
+                if (isNaN(num)) return '';
+
+                if (num >= 100000000) {
+                    const uk = Math.floor(num / 100000000);
+                    const man = Math.floor((num % 100000000) / 10000);
+                    return `${uk}억 ${man.toLocaleString()}만원`;
+                } else if (num >= 10000) {
+                    return `${Math.floor(num / 10000).toLocaleString()}만원`;
+                }
+                return `${num.toLocaleString()}원`;
+            }
+
+            toggleBtn.addEventListener('click', () => {
+                popup.classList.toggle('show');
+                if (popup.classList.contains('show')) {
+                    loadChatHistory();
+                } else {
+                }
+            });
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    popup.classList.remove('show');
+                });
+            }
+
+            sendButton.addEventListener("click", () => {
+                const query = inputField.value.trim();
+                if (!query) return;
+
+                addMessageToChat('user', query);
+                inputField.value = "";
+
+                fetch(`${API_URL}/query`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("서버 응답 전체:", data);
+
+                        if (data && Array.isArray(data.response) && data.response.length > 0) {
+                            const houseList = data.response;
+                            houseList.forEach(item => {
+                                const houseData = item.hit ? item.hit : item;
+                                if (houseData && houseData._source) {
+                                    addMessageToChat('bot', houseData);
+                                } else {
+                                    console.warn("Unexpected item format in response array:", item);
+                                    const textContent = item.response || item.text || JSON.stringify(item);
+                                    if (textContent) {
+                                        addMessageToChat('bot', textContent);
+                                    }
+                                }
+                            });
+                        } else if (data && data.response) {
+                            addMessageToChat('bot', data.response);
+                        } else if (data && data.text) {
+                            addMessageToChat('bot', data.text);
+                        } else {
+                            console.warn("Unexpected server response format or no results:", data);
+                            addMessageToChat('bot', "조건에 맞는 매물을 찾지 못했습니다.");
+                        }
+                    })
+                    .catch((err) => {
+                        console.error("Fetch error:", err);
+                        addMessageToChat('bot', "⚠️ 서버 연결 중 오류가 발생했습니다.");
+                    });
+            });
+
+            inputField.addEventListener("keydown", function (event) {
+                if (event.key === "Enter" && !event.isComposing) {
+                    event.preventDefault();
+                    sendButton.click();
+                }
+            });
+        });
+    </script>
+</div>

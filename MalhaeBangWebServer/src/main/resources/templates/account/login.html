@@ -9,16 +9,50 @@
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/img/malhaebang/logo_low.png" rel="icon">
+    <link href="assets/img/malhaebang/logo_low.png" rel="apple-touch-icon">
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #ffffff;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #ffffff 100%);
+            background-attachment: fixed;
             color: #000;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 배경 파티클 효과 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(108, 117, 125, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
         }
 
         main.main {
@@ -26,111 +60,227 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: 80px;
+            padding: 20px;
+            z-index: 2;
+            position: relative;
         }
 
         .login-container {
             width: 100%;
-            max-width: 400px;
-            padding: 40px;
-            background: #ffffff;
+            max-width: 420px;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideInUp 1s ease-out forwards;
         }
 
-        .login-container h2 {
+        @keyframes slideInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logo-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 47px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #495057 0%, #212529 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             text-align: center;
-            margin-bottom: 2px;
-            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtitle {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .form-group {
             margin-bottom: 30px;
+            position: relative;
         }
 
         .form-control {
-            background: none;
-            border: none;
-            border-bottom: 1px solid #ccc;
-            border-radius: 0;
-            padding: 12px 4px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(108, 117, 125, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
             font-size: 16px;
-            color: #000;
-            height: 40px;
+            color: #333;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
 
         .form-control:focus {
-            background: none;
-            border-bottom: 2px solid #000;
-            box-shadow: none;
+            background: rgba(255, 255, 255, 1);
+            border: 2px solid #495057;
+            box-shadow: 0 0 0 3px rgba(73, 80, 87, 0.1);
             outline: none;
+            transform: translateY(-2px);
         }
 
-        ::placeholder {
-            color: #aaa; /* 연한 회색 */
-            opacity: 1; /* 파이어폭스 호환 */
+        .form-control:focus + .form-label,
+        .form-control:not(:placeholder-shown) + .form-label {
+            transform: translateY(-35px) scale(0.8);
+            color: #495057;
+        }
+
+        .form-label {
+            position: absolute;
+            left: 20px;
+            top: 15px;
+            font-size: 16px;
+            color: #6c757d;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0 8px;
+            border-radius: 4px;
         }
 
         .btn-login {
             width: 100%;
-            background: #000;
+            background: linear-gradient(135deg, #343a40 0%, #212529 100%);
             color: #fff;
             font-weight: bold;
             font-size: 18px;
-            margin-top: 30px;
+            margin-top: 20px;
             border-radius: 12px;
-            height: 50px;
+            height: 55px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(52, 58, 64, 0.3);
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
         }
 
         .login-links {
-            margin-top: 20px;
+            margin-top: 25px;
             text-align: center;
             font-size: 14px;
-            color: #666;
+            color: #6c757d;
+            animation: fadeIn 2s ease-out;
         }
 
         .login-links a {
-            color: #666;
-            margin: 0 10px;
+            color: #495057;
+            margin: 0 8px;
             text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-         .logo-title {
-             font-family: 'Bebas Neue', sans-serif;
-             font-size: 48px;
-             font-weight: bold;
-             letter-spacing: 1px;
-             color: #000;
-             text-align: center;
-             margin-bottom: 2px;
-         }
+        .login-links a:hover {
+            color: #212529;
+            transform: scale(1.05);
+        }
 
-        .logo-subtitle {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 20px;
-            text-transform: uppercase; /* 대문자 변환 */
-            letter-spacing: 2px;
-            color: #666;
-            text-align: center;
+        .login-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #495057 0%, #212529 100%);
+            transition: width 0.3s ease;
+        }
+
+        .login-links a:hover::after {
+            width: 100%;
         }
 
         .social-login-buttons {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
             margin-top: 30px;
+            animation: slideInUp 1.5s ease-out;
         }
 
         .social-button {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px 16px;
-            background-color: #fff;
-            border: 1px solid #ddd;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(108, 117, 125, 0.2);
             border-radius: 12px;
             text-decoration: none;
-            color: #000;
-            font-weight: bold;
+            color: #333;
+            font-weight: 600;
             font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(73, 80, 87, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .social-button:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: #495057;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-button:hover::before {
+            left: 100%;
         }
 
         .social-button img {
@@ -138,16 +288,97 @@
             height: 24px;
             margin-right: 12px;
             border-radius: 4px;
+            transition: transform 0.3s ease;
         }
 
-        .social-button:hover {
-            background-color: #f7f7f7;
+        .social-button:hover img {
+            transform: scale(1.1);
         }
 
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .login-container {
+                margin: 20px;
+                padding: 30px 25px;
+            }
+
+            .logo-title {
+                font-size: 36px;
+            }
+
+            .logo-subtitle {
+                font-size: 16px;
+            }
+
+            .form-control, .btn-login, .social-button {
+                height: 50px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+            }
+
+            .logo-title {
+                font-size: 32px;
+            }
+
+            .social-login-buttons {
+                gap: 12px;
+            }
+        }
+
+        /* 로딩 스피너 */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff40;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 성공/에러 메시지 애니메이션 */
+        .alert-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .alert-message.show {
+            transform: translateX(0);
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f44336, #da190b);
+        }
     </style>
 </head>
 
 <body class="index-page">
+
+<!-- 배경 파티클 효과 -->
+<div class="particles" id="particles"></div>
 
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: header}"></div>
@@ -158,17 +389,22 @@
         <!-- 본문 -->
         <h2 class="logo-title">MalHaeBang</h2>
         <h3 class="logo-subtitle">말로 찾는 나만의 공간</h3>
-        <form method="post" action="/login/form">
+        <form method="post" action="/login/form" id="loginForm">
 
             <div class="form-group">
-                <input type="text" name="username" class="form-control" placeholder="ID" required>
+                <input type="text" name="username" class="form-control" placeholder=" " required>
+                <label class="form-label">아이디</label>
             </div>
 
             <div class="form-group">
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
+                <input type="password" name="password" class="form-control" placeholder=" " required>
+                <label class="form-label">비밀번호</label>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-login">Login</button>
+            <button type="submit" class="btn btn-primary btn-login">
+                <span class="btn-text">로그인</span>
+                <div class="loading-spinner"></div>
+            </button>
 
         </form>
 
@@ -191,26 +427,137 @@
                 <img src="assets/img/malhaebang/google_login.png" alt="구글 로그인">
                 <span>구글로 로그인</span>
             </a>
-
-
         </div>
 
     </div>
 </main>
 
-<!-- 푸터 -->
-<!--<footer th:replace="footer :: footer"></footer>-->
-
 <!-- Vendor JS -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/main.js"></script>
-<!-- login.html 내부 -->
+
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-    if (error === 'already_registered') {
-        alert('이미 가입된 계정입니다. 기존 로그인 방식을 이용해 주세요.');
+    // 파티클 생성
+    function createParticles() {
+        const particles = document.getElementById('particles');
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            const size = Math.random() * 5 + 1;
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            const duration = Math.random() * 3 + 3;
+            
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.animationDuration = duration + 's';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            
+            particles.appendChild(particle);
+        }
     }
+
+    // 알림 메시지 표시
+    function showAlert(message, type = 'error') {
+        const alert = document.createElement('div');
+        alert.className = `alert-message alert-${type}`;
+        alert.textContent = message;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => alert.classList.add('show'), 100);
+        
+        setTimeout(() => {
+            alert.classList.remove('show');
+            setTimeout(() => document.body.removeChild(alert), 300);
+        }, 3000);
+    }
+
+    // 폼 제출 처리
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const button = this.querySelector('.btn-login');
+        const buttonText = button.querySelector('.btn-text');
+        const spinner = button.querySelector('.loading-spinner');
+        
+        // 로딩 상태 표시
+        buttonText.textContent = '로그인 중...';
+        spinner.style.display = 'inline-block';
+        button.disabled = true;
+        
+        // 실제 제출은 계속 진행
+    });
+
+    // 입력 필드 애니메이션
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+
+    // 소셜 로그인 버튼 클릭 효과
+    document.querySelectorAll('.social-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('div');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(102, 126, 234, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            `;
+            
+            this.appendChild(ripple);
+            setTimeout(() => this.removeChild(ripple), 600);
+        });
+    });
+
+    // CSS 애니메이션 추가
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to { transform: scale(4); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 페이지 로드 시 초기화
+    window.addEventListener('load', function() {
+        createParticles();
+        
+        // URL 파라미터 체크
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        
+        if (error === 'already_registered') {
+            showAlert('이미 가입된 계정입니다. 기존 로그인 방식을 이용해 주세요.', 'error');
+        }
+    });
+
+    // 반응형 파티클 재조정
+    window.addEventListener('resize', function() {
+        const particles = document.getElementById('particles');
+        particles.innerHTML = '';
+        createParticles();
+    });
 </script>
+
 </body>
 </html>

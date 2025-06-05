@@ -203,7 +203,7 @@ def download_pdf():
     # --- PDF 요소 구성 ---
     elements = []
 
-    logo = Image("static/말해방.png", width=45, height=40)
+    logo = Image("static/logo_low.png", width=45, height=40)
     text = Paragraph("전세가격지수 예측 보고서", title_style)
     empty = Paragraph("", normal_style)
     data = [[empty, text, logo]]

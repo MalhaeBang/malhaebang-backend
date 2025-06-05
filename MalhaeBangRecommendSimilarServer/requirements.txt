@@ -1,0 +1,6 @@
+flask
+sqlalchemy
+pymysql
+pandas
+faiss-cpu==1.11.0
+python-dotenv

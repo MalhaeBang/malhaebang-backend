@@ -10,87 +10,108 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @Table(name = "house")
 public class House {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "house_id")
+    @Column(name = "house_id", nullable = false)
     private Integer houseId;
 
-    @Column(nullable = false)
+    @Column
     private String title;
 
-    @Column(nullable = false)
+    @Column
     private String price;
 
-    @Column(nullable = false)
+    @Column
     private String address;
 
-    @Column(nullable = false)
+    @Column
     private String floor;
 
-    @Column(name = "deposit_type", nullable = false)
+    @Column(name = "deposit_type")
     private String depositType;
 
     @Column(name = "management_fee")
-    private String mFee;
+    private Integer mfee;
 
-    @Column(name = "availabe_from", nullable = false)
+    @Column(name = "available_from")
     private String aFrom;
 
+    @Column(name = "house_num")
+    private Long houseNum;
 
     @Column(name = "agent_comm")
-    private String agentComm;
+    private Integer agentComm;
 
-    @Column(name = "agent_info", nullable = false)
+    @Column(name = "agent_info")
     private String agentInfo;
 
-    @Column(name = "rooms_count", nullable = false)
-    private String roomsCnt;
+    @Column(name = "rooms_count")
+    private Integer roomsCount;
 
     @Column(columnDefinition = "TEXT")
     private String options;
 
-    @Column(name = "posted_at", nullable = false)
+    @Column(name = "posted_at")
     private String postedAt;
 
-    @Column(nullable = false)
+    @Column
     private String gu;
 
-    @Column(nullable = false)
+    @Column
     private String dong;
-
-    @Column(name = "apt_name")
-    private String aptName;
 
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
-    @Column(name = "area_size", nullable = false)
-    private String area;
+    @Column(name = "area_size")
+    private String areaSize;
 
-    @Column(nullable = false)
+    @Column
     private String direction;
 
     @Column(name = "built_date")
     private String builtDate;
 
-    @Column(nullable = false)
-    private String parking;
+    @Column
+    private Integer parking;
 
-    @Column(name = "building_type", nullable = false)
+    @Column(name = "building_type")
     private String buildingType;
 
     @Column(name = "house_feature", columnDefinition = "TEXT")
-    private String feature;
+    private String houseFeature;
 
     @Column(name = "house_explanations", columnDefinition = "TEXT")
-    private String explanations;
+    private String houseExplanations;
 
+    @Column(name = "safety_grade")
+    private String safetyGrade;
 
-    @Column(name = "house_num", nullable = false)
-    private Long num;
+    @Column
+    private Integer deposit;
+
+    @Column(name = "monthly_rent")
+    private Integer monthlyRent;
+
+    @Column
+    private Integer space;
+
+    @Column(name = "bath_count")
+    private Integer bathCount;
+
+    @Column(name = "total_floor")
+    private Integer totalFloor;
+
+    @Column(columnDefinition = "TEXT")
+    private String gptDescription;
+
+    @Lob
+    @Column(name = "final_embedding", columnDefinition = "LONGTEXT")
+    private String finalEmbedding;
 
     @Setter
     private Double latitude;
@@ -98,11 +119,9 @@ public class House {
     @Setter
     private Double longitude;
 
-    @OneToOne(mappedBy = "house", fetch = FetchType.LAZY)
-    private SafetyScore safetyScore;
+    @Column
+    private String safetyScore;
 
     @OneToMany(mappedBy = "house")
     private List<HouseKeyword> houseKeywords;
-
-
 }

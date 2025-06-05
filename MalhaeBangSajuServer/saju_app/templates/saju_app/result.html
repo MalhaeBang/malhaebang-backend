@@ -1,0 +1,850 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>사주 결과</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-size: 16px;
+        }
+
+        /* 모바일 최적화 스타일 */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            /* 사주명식&오행분포 카드 모바일 레이아웃 */
+            .d-flex.gap-3 {
+                flex-direction: column;
+            }
+
+            .card {
+                width: 100% !important;
+                margin-bottom: 1rem;
+            }
+
+            /* 매물 카드 모바일 최적화 */
+            .house-card {
+                min-width: 280px !important;
+                margin-bottom: 1rem;
+            }
+
+            .house-card .card-img-top {
+                height: 180px !important;
+            }
+
+            /* 말풍선 모바일 최적화 */
+            .speech-bubble {
+                max-width: 120px;
+                font-size: 12px;
+                padding: 8px 12px;
+                margin-right: 60px;
+            }
+
+            .chat-cat {
+                width: 50px;
+                height: 50px;
+            }
+
+            /* 모달 모바일 최적화 */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            #modal-img {
+                max-height: 200px;
+            }
+
+            .nav-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* 태블릿 최적화 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                max-width: 95%;
+            }
+
+            .house-card {
+                min-width: 250px !important;
+            }
+        }
+
+        /* 기본 스타일 */
+        .house-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 10;
+        }
+
+        .house-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* 스크롤바 스타일링 */
+        .d-flex.overflow-auto {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+
+        .d-flex.overflow-auto::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .d-flex.overflow-auto::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .d-flex.overflow-auto::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        /* 다크 모드 지원 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+
+            .card {
+                background-color: #2a2a2a;
+                border-color: #3a3a3a;
+            }
+
+            .card-body {
+                color: #ffffff;
+            }
+
+            .list-group-item {
+                background-color: #2a2a2a;
+                color: #ffffff;
+                border-color: #3a3a3a;
+            }
+
+            .text-muted {
+                color: #a0a0a0 !important;
+            }
+
+            .speech-bubble {
+                background-color: #2a2a2a;
+                color: #ffffff;
+                border-color: #3a3a3a;
+            }
+
+            .speech-bubble::after {
+                border-color: transparent transparent transparent #2a2a2a;
+            }
+
+            .modal-content {
+                background-color: #2a2a2a;
+                color: #ffffff;
+            }
+
+            .modal-header {
+                border-bottom-color: #3a3a3a;
+            }
+
+            .modal-footer {
+                border-top-color: #3a3a3a;
+            }
+
+            .btn-close-white {
+                filter: invert(1) grayscale(100%) brightness(200%);
+            }
+        }
+
+        /* 툴팁 기본 스타일 조정 */
+        .card-title {
+            cursor: default;
+        }
+
+        .chat-cat {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            z-index: 1050;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .chat-cat:hover {
+            transform: scale(1.1);
+        }
+
+        .dog-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .dog-image:hover {
+            transform: scale(1.1);
+        }
+
+        /* 떨어지는 부적 애니메이션용 스타일 */
+        .talisman-fall {
+            position: fixed;
+            top: -100px;
+            width: 64px;
+            height: 64px;
+            pointer-events: none;
+            z-index: 1100;
+            user-select: none;
+            animation-name: fallRotate;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fallRotate {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 튕기는 애니메이션 (중앙에 나타남) */
+        .talisman-bounce {
+            position: fixed;
+            top: 40vh;
+            left: 50vw;
+            width: 100px;
+            height: 100px;
+            margin-left: -50px;
+            margin-top: -50px;
+            pointer-events: none;
+            user-select: none;
+            animation: bounceScale 1.5s ease forwards;
+            z-index: 1100;
+        }
+
+        @keyframes bounceScale {
+            0% {
+                transform: scale(0) translateY(0);
+                opacity: 0;
+            }
+
+            40% {
+                transform: scale(1.3) translateY(-30px);
+                opacity: 1;
+            }
+
+            60% {
+                transform: scale(0.8) translateY(10px);
+            }
+
+            80% {
+                transform: scale(1) translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* 좌우 흔들리며 천천히 내려오기 */
+        .talisman-sway {
+            position: fixed;
+            top: -100px;
+            width: 70px;
+            height: 70px;
+            pointer-events: none;
+            user-select: none;
+            animation: swayDown 4s linear forwards;
+            z-index: 1100;
+        }
+
+        @keyframes swayDown {
+            0% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            25% {
+                transform: translateX(20px) translateY(25vh) rotate(15deg);
+            }
+
+            50% {
+                transform: translateX(-20px) translateY(50vh) rotate(-15deg);
+            }
+
+            75% {
+                transform: translateX(15px) translateY(75vh) rotate(10deg);
+            }
+
+            100% {
+                transform: translateX(0) translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+        }
+
+        /* 반짝이기 효과 (중앙) */
+        .talisman-sparkle {
+            position: fixed;
+            top: 40vh;
+            left: 50vw;
+            width: 100px;
+            height: 100px;
+            margin-left: -50px;
+            margin-top: -50px;
+            pointer-events: none;
+            user-select: none;
+            animation: sparkleFade 2.5s ease forwards;
+            filter: drop-shadow(0 0 5px gold);
+            z-index: 1100;
+        }
+
+        @keyframes sparkleFade {
+            0% {
+                opacity: 0;
+                filter: drop-shadow(0 0 0 gold);
+                transform: scale(0.8);
+            }
+
+            30% {
+                opacity: 1;
+                filter: drop-shadow(0 0 10px gold);
+                transform: scale(1.1);
+            }
+
+            50% {
+                filter: drop-shadow(0 0 20px gold);
+                transform: scale(1.2);
+            }
+
+            70% {
+                filter: drop-shadow(0 0 10px gold);
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                filter: drop-shadow(0 0 0 gold);
+                transform: scale(0.8);
+            }
+        }
+
+        .chat-cat-wrapper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .speech-bubble {
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-right: 90px;
+            position: relative;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            max-width: 150px;
+        }
+
+        /* 말풍선 꼬리 */
+        .speech-bubble::after {
+            content: '';
+            position: relative;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 10px 0 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent transparent #fff;
+            border-right-color: #fff;
+            border-left-color: transparent;
+        }
+
+        /* 고양이 이미지 스타일 */
+        .chat-cat {
+            width: 80px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        #talismanImg {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #talismanImg.zoomed {
+            transform: scale(2);
+            transition: transform 0.3s ease;
+            cursor: zoom-out;
+            z-index: 1050;
+            position: relative;
+        }
+
+        /* 모달 내 좌우 버튼 스타일 */
+        .modal-content .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            line-height: 1;
+            padding: 0;
+            z-index: 1050;
+            border: none;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: white;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .modal-content .nav-btn:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content .nav-prev {
+            left: 10px;
+        }
+
+        .modal-content .nav-next {
+            right: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<!-- 본문 내용 -->
+<div id="main-content" class="container py-5">
+
+    <!-- 헤더: 제목 -->
+    <div class="text-center mb-4">
+        <h1 class="header-title animate__animated animate__fadeInDown text-dark">🔮 사주 분석 결과</h1>
+    </div>
+
+    {% if saju %}
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4 animate__animated animate__fadeInUp"
+         style="animation-delay: 0.15s; background: #f9fbff;">
+        <div class="card-body text-center px-4 py-3">
+            <h3 class="fw-bold mb-3 text-primary fs-5" style="letter-spacing: 0.5px;">
+                {{ character_message }}
+            </h3>
+        </div>
+    </div>
+
+    <!-- 사주명식&오행분포 가로 배치 -->
+    <div class="d-flex gap-3 mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.15s;">
+
+        <!-- 사주 명식 카드 -->
+        <div class="card flex-fill shadow" style="width: 45vw;">
+            <div class="card-body">
+                <h5 class="card-title">🧾 나의 사주 명식</h5>
+                <p class="text-muted">
+                    사주 명식은 태어난 연, 월, 일, 시에 따른 <strong>천간(天干)과 지지(地支)</strong>로 구성된 8글자 표예요.
+                    <span class="text-primary">운세와 성격</span>을 해석하는 핵심이에요.
+                </p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        📅 <strong data-bs-toggle="tooltip" title="태어난 해의 기운으로 부모, 조상과의 인연을 나타내요.">연주:</strong> {{ saju.year.0 }}{{ saju.year.1 }}
+                    </li>
+                    <li class="list-group-item">
+                        🌙 <strong data-bs-toggle="tooltip" title="태어난 달의 기운으로 사회적 환경, 직업 경향을 의미해요.">월주:</strong> {{ saju.month.0 }}{{ saju.month.1 }}
+                    </li>
+                    <li class="list-group-item">
+                        ☀️ <strong data-bs-toggle="tooltip" title="자신의 중심 기둥으로 자아, 성격, 기질을 나타내요.">일주:</strong> {{ saju.day.0 }}{{ saju.day.1 }}
+                    </li>
+                    <li class="list-group-item">
+                        🕰️ <strong data-bs-toggle="tooltip" title="태어난 시간의 기운으로 자식, 말년운 등을 의미해요.">시주:</strong> {{ saju.hour }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 오행 분포 카드 -->
+        <div class="card flex-fill shadow" style="width: 45vw;">
+            <div class="card-body">
+                <h5 class="card-title">🌟 오행 분포</h5>
+                <p class="text-muted">당신의 사주에 포함된 <strong>오행의 균형</strong>을 보여드려요.</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">🌳 목(木): <span class="badge bg-success">{{ elements.목 }}</span></li>
+                    <li class="list-group-item">🔥 화(火): <span class="badge bg-danger">{{ elements.화 }}</span></li>
+                    <li class="list-group-item">⛰️ 토(土): <span class="badge bg-warning text-dark">{{ elements.토 }}</span></li>
+                    <li class="list-group-item">⚙️ 금(金): <span class="badge bg-secondary">{{ elements.금 }}</span>
+                    </li>
+                    <li class="list-group-item">💧 수(水): <span class="badge bg-primary">{{ elements.수 }}</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+        <div class="card-body">
+            <h5 class="card-title">🏡 이런 집이 좋아요!</h5>
+            <p class="card-text fs-5">{{ recommendation }}</p>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-start gap-3 mt-5 mb-3">
+        <h3 class="mb-0">🏘️ 추천 매물 리스트</h3>
+
+        <!-- 고양이 이미지 -->
+        <img src="{% static 'images/cat.png' %}" alt="고양이"
+             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+    </div>
+
+    <!-- 매물 카드 -->
+    <div class="d-flex overflow-auto pb-2" style="gap: 1rem;">
+        {% if recommended_houses %}
+        {% for house in recommended_houses %}
+        <div class="card shadow-sm flex-shrink-0 house-card" style="min-width: 220px;"
+             data-bs-toggle="modal" data-bs-target="#houseDetailModal"
+             data-img="{{ house.get_img_list.0|default:'' }}"
+             data-title="{{ house.apt_name }}"
+             data-address="{{ house.address }}"
+             data-description="{{ house.house_explanations|default:house.house_feature }}"
+             data-price="{{ house.price|default:'' }}"
+             data-house_feature="{{ house.house_feature|default:'' }}">
+
+            {% if house.get_img_list %}
+            <img src="{{ house.get_img_list.0 }}" alt="대표 이미지" class="card-img-top" style="height: 140px; object-fit: cover;">
+            {% else %}
+            <p>이미지가 없습니다.</p>
+            {% endif %}
+
+            <div class="card-body">
+                <h5 class="card-title text-truncate" title="{{ house.apt_name }}">🏡 {{ house.apt_name }}</h5>
+                <p class="card-text text-muted small mb-1">📍 {{ house.address }}</p>
+                <p class="card-text small">
+                    {{ house.house_explanations|default:house.house_feature|truncatewords:12 }}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <div class="card p-4 text-center flex-shrink-0" style="min-width: 220px;">
+            <p class="mb-0 text-muted">🙁 현재 추천 가능한 매물이 없어요.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <div class="alert alert-warning text-center">
+        사주 정보를 입력해주세요.
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'index' %}" class="btn btn-outline-primary">🔁 다시 입력하기</a>
+    </div>
+</div>
+
+<!-- 상세 정보 모달 -->
+<div class="modal fade" id="houseDetailModal" tabindex="-1" aria-labelledby="houseDetailModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 bg-white">
+            <div class="modal-header bg-white border-bottom-0">
+                <h5 class="modal-title fw-bold text-dark" id="houseDetailModalLabel">🏠 매물 상세 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="닫기"></button>
+            </div>
+
+            <div class="modal-body p-0 bg-white">
+                <!-- 이미지 섹션 -->
+                <div class="position-relative">
+                    <img id="modal-img" src="" alt="" class="img-fluid w-100"
+                         style="max-height: 400px; object-fit: cover;" />
+                    
+                    <!-- 가격 배지 -->
+                    <div id="modal-price"
+                         class="position-absolute bottom-0 end-0 m-3 px-3 py-1 bg-dark bg-opacity-75 text-white rounded-pill fw-semibold"
+                         style="font-size: 1rem;">
+                    </div>
+                </div>
+
+                <!-- 텍스트 내용 -->
+                <div class="px-4 py-3 bg-white">
+                    <h4 id="modal-title" class="fw-bold mb-3 text-primary">🏠</h4>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                        <p id="modal-address" class="text-muted mb-0">📍</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="badge bg-secondary text-white mb-1">✨ 특징</span>
+                        <p id="modal-house_feature" class="mb-0 text-body small"></p>
+                    </div>
+
+                    <div>
+                        <span class="badge bg-secondary text-white mb-1">📝 상세 설명</span>
+                        <p id="modal-description" class="mb-0 text-body small"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="chat-cat-wrapper">
+    <!-- 말풍선 -->
+    <div class="speech-bubble">
+        오늘의 부적 👉
+    </div>
+
+    <!-- 고양이 이미지 -->
+    <img src="{% static 'images/cat.png' %}" alt="고양이챗봇" id="chatCat" class="chat-cat" title="오늘의 부적 보기 🐈🍀🐈‍⬛" />
+</div>
+
+<!-- 부적 결과 모달 -->
+<div class="modal fade" id="talismanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-body">
+                <p id="talismanMessage" class="fw-bold fs-5"></p>
+                <img id="talismanImage" src="" alt="부적" class="img-fluid mb-3" />
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // 1. 부트스트랩 툴팁 초기화
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            new bootstrap.Tooltip(el);
+        });
+
+        // 2. 추천 매물 카드 배열화
+        const houseCards = Array.from(document.querySelectorAll('.house-card'));
+
+        // 현재 보고 있는 매물 인덱스
+        let currentIndex = -1;
+
+        // 모달 엘리먼트와 내부 요소
+        const houseModal = document.getElementById('houseDetailModal');
+        const modalImg = document.getElementById('modal-img');
+        const modalTitle = document.getElementById('modal-title');
+        const modalAddress = document.getElementById('modal-address');
+        const modalDescription = document.getElementById('modal-description');
+        const modalPrice = document.getElementById('modal-price');
+        const modalHouseFeature = document.getElementById('modal-house_feature');
+
+        // 좌우 버튼 생성 및 모달에 추가
+        const modalContent = houseModal.querySelector('.modal-content');
+
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'btn btn-carousel position-absolute top-50 start-0 translate-middle-y';
+        btnPrev.type = 'button';
+        btnPrev.className = 'nav-btn nav-prev';
+        btnPrev.title = '이전 매물';
+        btnPrev.innerHTML = '❮'; // ←
+
+        const btnNext = document.createElement('button');
+        btnNext.className = 'btn btn-carousel position-absolute top-50 end-0 translate-middle-y';
+        btnNext.type = 'button';
+        btnNext.className = 'nav-btn nav-next';
+        btnNext.title = '다음 매물';
+        btnNext.innerHTML = '❯'; // →
+
+        modalContent.appendChild(btnPrev);
+        modalContent.appendChild(btnNext);
+
+        // 모달에 매물 데이터 세팅 함수
+        function setModalContent(index) {
+            if (index < 0) index = houseCards.length - 1;
+            if (index >= houseCards.length) index = 0;
+
+            currentIndex = index;
+            const card = houseCards[index];
+
+            modalImg.src = card.getAttribute('data-img') || '';
+            modalTitle.textContent = card.getAttribute('data-title') || '';
+            modalAddress.textContent = card.getAttribute('data-address') || '';
+            modalDescription.textContent = card.getAttribute('data-description') || '';
+            modalPrice.textContent = card.getAttribute('data-price') ? '💰 ' + card.getAttribute('data-price') : '';
+            modalHouseFeature.textContent = card.getAttribute('data-house_feature') || '';
+        }
+
+        // 모달이 열릴 때 선택된 매물로 세팅
+        houseModal.addEventListener('show.bs.modal', event => {
+            const triggeredCard = event.relatedTarget;
+            currentIndex = houseCards.indexOf(triggeredCard);
+            setModalContent(currentIndex);
+        });
+
+        // 이전/다음 버튼 클릭 이벤트
+        btnPrev.addEventListener('click', () => {
+            setModalContent(currentIndex - 1);
+        });
+        btnNext.addEventListener('click', () => {
+            setModalContent(currentIndex + 1);
+        });
+
+        // 3. 부적 이미지와 메시지 배열
+        const talismans = [
+            { image: "{% static 'images/talismans/001.png' %}", message: "💰 돈이 들어오는 부적입니다!" },
+            { image: "{% static 'images/talismans/002.png' %}", message: "🍀 행운 가득 부적입니다!" },
+            { image: "{% static 'images/talismans/003.png' %}", message: "🌈 좋은 일이 생기는 부적입니다!" },
+            { image: "{% static 'images/talismans/004.png' %}", message: "💪 힘이 생기는 부적입니다!" },
+            { image: "{% static 'images/talismans/005.png' %}", message: "🌟 소원이 이루어지는 부적입니다!" }
+        ];
+
+
+        // 4. 떨어지는 부적 함수
+        function createFallingTalisman(imgSrc) {
+            const talisman = document.createElement('img');
+            talisman.src = imgSrc;
+            talisman.className = 'talisman-fall';
+            talisman.style.left = Math.random() * (window.innerWidth - 64) + 'px';
+            talisman.style.animationDuration = (3000 + Math.random() * 2000) + 'ms';
+            document.body.appendChild(talisman);
+
+            talisman.addEventListener('animationend', () => talisman.remove());
+        }
+
+        function createBounceTalisman(imgSrc) {
+            const talisman = document.createElement('img');
+            talisman.src = imgSrc;
+            talisman.className = 'talisman-bounce';
+
+            const x = Math.random() * (window.innerWidth - 100); // -100은 이미지 너비 고려
+            const y = (20 + Math.random() * 60) * window.innerHeight / 100; // 20~80vh 비율
+
+            talisman.style.left = x + 'px';
+            talisman.style.top = y + 'px';
+
+            document.body.appendChild(talisman);
+            talisman.addEventListener('animationend', () => talisman.remove());
+        }
+
+        function createSwayTalisman(imgSrc) {
+            const talisman = document.createElement('img');
+            talisman.src = imgSrc;
+            talisman.className = 'talisman-sway';
+            talisman.style.left = Math.random() * (window.innerWidth - 70) + 'px';
+            document.body.appendChild(talisman);
+            talisman.addEventListener('animationend', () => talisman.remove());
+        }
+
+        function createSparkleTalisman(imgSrc) {
+            const talisman = document.createElement('img');
+            talisman.src = imgSrc;
+            talisman.className = 'talisman-sparkle';
+
+            // 랜덤 위치 지정 (화면 안에서)
+            talisman.style.position = 'fixed';
+            talisman.style.left = `${Math.random() * 100}vw`;
+            talisman.style.top = `${Math.random() * 100}vh`;
+
+            document.body.appendChild(talisman);
+            talisman.addEventListener('animationend', () => talisman.remove());
+        }
+
+        // 여러 번, 여러 위치에서 반짝이기
+        function createMultipleSparkles(imgSrc, count = 7, interval = 200) {
+            let created = 0;
+            const timer = setInterval(() => {
+                createSparkleTalisman(imgSrc);
+                created++;
+                if (created >= count) clearInterval(timer);
+            }, interval);
+        }
+
+
+        // 5. 고양이 클릭 시 부적 모달 띄우기
+        const chatCat = document.getElementById('chatCat');
+        const talismanImg = document.getElementById('talismanImage');
+        const talismanMessage = document.getElementById('talismanMessage');
+        const talismanModal = new bootstrap.Modal(document.getElementById('talismanModal'));
+
+        chatCat.addEventListener('click', () => {
+            const selected = talismans[Math.floor(Math.random() * talismans.length)];
+
+            const effects = [
+                () => { // 떨어지는 부적 여러 개
+                    for (let i = 0; i < 7; i++) {
+                        setTimeout(() => createFallingTalisman(selected.image), i * 300);
+                    }
+                },
+                () => { // 튕기는 애니메이션
+                    for(let i = 0; i < 7; i++) {
+                        setTimeout(() => createBounceTalisman(selected.image), i * 400);
+                    }
+
+                },
+                () => { // 좌우 흔들리며 내려오는 부적 여러 개
+                    for (let i = 0; i < 7; i++) {
+                        setTimeout(() => createSwayTalisman(selected.image), i * 400);
+                    }
+                },
+                () => { // 반짝이기 효과
+                    createMultipleSparkles(selected.image, 7, 150);
+                }
+            ];
+
+            // 랜덤 효과 실행
+            const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+            randomEffect();
+
+            // 모달 띄우기 (부적 이미지/메시지 세팅)
+            setTimeout(() => {
+                talismanMessage.textContent = selected.message;
+                talismanImg.src = selected.image;
+                talismanModal.show();
+            }, 2500);
+        });
+    });
+
+</script>
+
+
+</body>
+
+</html>

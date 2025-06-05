@@ -2,7 +2,6 @@ package org.example.malhaebangwebserver.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.malhaebangwebserver.security.CustomOAuth2UserService;
-import org.example.malhaebangwebserver.security.CustomUserDetailsService;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
@@ -26,6 +24,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/signup", "/findid", "/findpassword").permitAll()
                         .requestMatchers(HttpMethod.POST, "/signup", "/findid", "/findpassword").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/check-user-login-type", "/send-temp-password", "/verify-email", "/check-verification-status").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/verify-email/*").permitAll()
                         .requestMatchers("/login", "/assets/**").permitAll()
                         .anyRequest().authenticated()
                 )

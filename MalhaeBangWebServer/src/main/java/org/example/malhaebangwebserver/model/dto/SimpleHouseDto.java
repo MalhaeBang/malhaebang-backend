@@ -1,6 +1,5 @@
 package org.example.malhaebangwebserver.model.dto;
 
-
 import lombok.*;
 
 @Getter
@@ -8,39 +7,42 @@ import lombok.*;
 @NoArgsConstructor
 public class SimpleHouseDto {
     private Integer houseId;
-    private Double latitude;
-    private Double longitude;
     private String title;
     private String price;
     private String address;
     private String floor;
     private String depositType;
-    private String mFee;
+    private Integer mFee;
     private String aFrom;
-    private String agentComm;
+    private Integer agentComm;
     private String agentInfo;
-    private String roomsCnt;
+    private Integer roomsCnt;
     private String options;
     private String postedAt;
     private String gu;
     private String dong;
     private String imgUrl;
-    private String area;
+    private String areaSize;
     private String direction;
     private String builtDate;
-    private String parking;
+    private Integer parking;
     private String buildingType;
-    private String feature;
-    private String explanations;
+    private String houseFeature;
+    private String houseExplanations;
     private Long num;
     private Boolean isLiked;
+    private Double latitude;
+    private Double longitude;
+    private String gptDescription;
+    private String finalEmbedding;
+    private String safetyGrade;
 
 
     public SimpleHouseDto(Integer houseId, Double latitude, Double longitude, String title, String price, String address, String floor,
-                          String depositType, String mFee, String aFrom, String agentComm, String agentInfo,
-                          String roomsCnt, String options, String postedAt, String gu, String dong,
-                          String imgUrl, String area, String direction, String builtDate,
-                          String parking, String buildingType, String feature, String explanations, Long num) {
+                          String depositType, Integer mFee, String aFrom, Integer agentComm, String agentInfo,
+                          Integer roomsCnt, String options, String postedAt, String gu, String dong,
+                          String imgUrl, String areaSize, String direction, String builtDate,
+                          Integer parking, String buildingType, String houseFeature, String houseExplanations, Long num, String safetyGrade) {
         this.houseId = houseId;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -59,14 +61,14 @@ public class SimpleHouseDto {
         this.gu = gu;
         this.dong = dong;
         this.imgUrl = imgUrl;
-        this.area = area;
+        this.areaSize = areaSize;
         this.direction = direction;
         this.builtDate = builtDate;
         this.parking = parking;
         this.buildingType = buildingType;
-        this.feature = feature;
-        this.explanations = explanations;
+        this.houseFeature = houseFeature;
+        this.houseExplanations = houseExplanations;
         this.num = num;
-
+        this.safetyGrade = safetyGrade;
     }
 }
