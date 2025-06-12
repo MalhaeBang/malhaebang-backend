@@ -1,0 +1,31 @@
+{{- if .Values.similar.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-similar
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: similar
+spec:
+  replicas: {{ .Values.similar.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: similar
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: similar
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-similar
+          image: "{{ .Values.similar.image.repository }}:{{ .Values.similar.image.tag }}"
+          imagePullPolicy: {{ .Values.similar.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.similar.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.similar.resources | nindent 12 }}
+{{- end }} 

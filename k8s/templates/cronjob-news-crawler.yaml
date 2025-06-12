@@ -1,0 +1,35 @@
+{{- if .Values.newsCrawler.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-news-crawler
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: news-crawler
+spec:
+  schedule: {{ .Values.newsCrawler.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "malhaebang.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: news-crawler
+        spec:
+          containers:
+          - name: news-crawler
+            image: "{{ .Values.newsCrawler.image.repository }}:{{ .Values.newsCrawler.image.tag }}"
+            imagePullPolicy: {{ .Values.newsCrawler.image.pullPolicy }}
+            command:
+              {{- toYaml .Values.newsCrawler.command | nindent 14 }}
+            volumeMounts:
+              - name: news-data
+                mountPath: /app/shared_data
+            resources:
+              {{- toYaml .Values.newsCrawler.resources | nindent 14 }}
+          volumes:
+            - name: news-data
+              persistentVolumeClaim:
+                claimName: {{ include "malhaebang.fullname" . }}-news-data
+          restartPolicy: OnFailure
+{{- end }} 

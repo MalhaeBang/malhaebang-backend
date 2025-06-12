@@ -1,0 +1,46 @@
+{{- if .Values.elasticsearch.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-elasticsearch
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: elasticsearch
+spec:
+  replicas: {{ .Values.elasticsearch.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: elasticsearch
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: "{{ .Values.elasticsearch.image.repository }}:{{ .Values.elasticsearch.image.tag }}"
+          imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.elasticsearch.service.port }}
+              protocol: TCP
+            - name: transport
+              containerPort: 9300
+              protocol: TCP
+          env:
+            {{- range $key, $value := .Values.elasticsearch.environment }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.elasticsearch.resources | nindent 12 }}
+          volumeMounts:
+            - name: nlp-data
+              mountPath: /usr/share/elasticsearch/data
+      volumes:
+        - name: nlp-data
+          persistentVolumeClaim:
+            claimName: {{ include "malhaebang.fullname" . }}-nlp-data-pvc
+{{- end }} 

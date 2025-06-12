@@ -1,0 +1,9 @@
+# Kubernetes configuration files
+values.yaml
+*.backup*
+*.env
+*secret*.yaml
+*secrets*.yaml
+*cookies*.txt
+*.txt
+*.log 

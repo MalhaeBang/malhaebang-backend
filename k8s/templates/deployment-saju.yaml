@@ -1,0 +1,47 @@
+{{- if .Values.saju.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-saju
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: saju
+spec:
+  replicas: {{ .Values.saju.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: saju
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: saju
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-saju
+          image: "{{ .Values.saju.image.repository }}:{{ .Values.saju.image.tag }}"
+          imagePullPolicy: {{ .Values.saju.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.saju.service.port }}
+              protocol: TCP
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: {{ .Values.saju.environment.DJANGO_SETTINGS_MODULE }}
+            - name: DATABASE_NAME
+              value: {{ .Values.saju.environment.DATABASE_NAME }}
+            - name: DATABASE_USER
+              value: {{ .Values.saju.environment.DATABASE_USER }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "malhaebang.fullname" . }}
+                  key: MYSQL_PASSWORD
+            - name: DATABASE_HOST
+              value: {{ .Values.saju.environment.DATABASE_HOST }}
+            - name: DATABASE_PORT
+              value: {{ .Values.saju.environment.DATABASE_PORT | quote }}
+          resources:
+            {{- toYaml .Values.saju.resources | nindent 12 }}
+{{- end }} 

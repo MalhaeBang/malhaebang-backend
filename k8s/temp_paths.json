@@ -1,0 +1,134 @@
+[
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-nlp",
+        "port": {
+          "number": 8000
+        }
+      }
+    },
+    "path": "/nlp",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-nlp",
+        "port": {
+          "number": 8000
+        }
+      }
+    },
+    "path": "/api/chatbot",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-saju",
+        "port": {
+          "number": 8000
+        }
+      }
+    },
+    "path": "/api/saju",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-pricepredict",
+        "port": {
+          "number": 5000
+        }
+      }
+    },
+    "path": "/api/pricepredict",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-similar",
+        "port": {
+          "number": 5000
+        }
+      }
+    },
+    "path": "/api/similar",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-web",
+        "port": {
+          "number": 80
+        }
+      }
+    },
+    "path": "/recommend",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-web",
+        "port": {
+          "number": 80
+        }
+      }
+    },
+    "path": "/pricepredict",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-web",
+        "port": {
+          "number": 80
+        }
+      }
+    },
+    "path": "/chatbot",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-web",
+        "port": {
+          "number": 80
+        }
+      }
+    },
+    "path": "/saju",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-news-web",
+        "port": {
+          "number": 5000
+        }
+      }
+    },
+    "path": "/news",
+    "pathType": "Prefix"
+  },
+  {
+    "backend": {
+      "service": {
+        "name": "malhaebang-web",
+        "port": {
+          "number": 80
+        }
+      }
+    },
+    "path": "/",
+    "pathType": "Prefix"
+  }
+]

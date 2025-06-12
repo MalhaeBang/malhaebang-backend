@@ -1,0 +1,31 @@
+{{- if .Values.recommend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-recommend
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recommend
+spec:
+  replicas: {{ .Values.recommend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: recommend
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: recommend
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-recommend
+          image: "{{ .Values.recommend.image.repository }}:{{ .Values.recommend.image.tag }}"
+          imagePullPolicy: {{ .Values.recommend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.recommend.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.recommend.resources | nindent 12 }}
+{{- end }} 

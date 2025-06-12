@@ -1,0 +1,68 @@
+{{- if .Values.logging.kibana.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-kibana
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kibana
+spec:
+  replicas: {{ .Values.logging.kibana.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: kibana
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.labels" . | nindent 8 }}
+        app.kubernetes.io/component: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: "{{ .Values.logging.kibana.image.repository }}:{{ .Values.logging.kibana.image.tag }}"
+        imagePullPolicy: {{ .Values.logging.kibana.image.pullPolicy }}
+        ports:
+        - containerPort: 5601
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://{{ include "malhaebang.fullname" . }}-elasticsearch:9200"
+        - name: SERVER_NAME
+          value: "kibana"
+        - name: SERVER_BASEPATH
+          value: "/kibana"
+        - name: SERVER_REWRITEBASEPATH
+          value: "true"
+        resources:
+          {{- toYaml .Values.logging.kibana.resources | nindent 10 }}
+        readinessProbe:
+          httpGet:
+            path: /kibana/api/status
+            port: 5601
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /kibana/api/status
+            port: 5601
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-kibana
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kibana
+spec:
+  type: {{ .Values.logging.kibana.service.type }}
+  ports:
+  - port: {{ .Values.logging.kibana.service.port }}
+    targetPort: 5601
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "malhaebang.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: kibana
+{{- end }} 

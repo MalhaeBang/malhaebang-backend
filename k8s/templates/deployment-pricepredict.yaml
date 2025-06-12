@@ -1,0 +1,31 @@
+{{- if .Values.pricepredict.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-pricepredict
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pricepredict
+spec:
+  replicas: {{ .Values.pricepredict.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: pricepredict
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: pricepredict
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-pricepredict
+          image: "{{ .Values.pricepredict.image.repository }}:{{ .Values.pricepredict.image.tag }}"
+          imagePullPolicy: {{ .Values.pricepredict.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.pricepredict.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.pricepredict.resources | nindent 12 }}
+{{- end }} 

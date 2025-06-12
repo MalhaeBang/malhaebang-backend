@@ -1,0 +1,40 @@
+{{- if .Values.newsWeb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-news-web
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: news-web
+spec:
+  replicas: {{ .Values.newsWeb.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: news-web
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: news-web
+    spec:
+      containers:
+        - name: news-web
+          image: "{{ .Values.newsWeb.image.repository }}:{{ .Values.newsWeb.image.tag }}"
+          imagePullPolicy: {{ .Values.newsWeb.image.pullPolicy }}
+          command:
+            {{- toYaml .Values.newsWeb.command | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.newsWeb.service.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: news-data
+              mountPath: /app/shared_data
+          resources:
+            {{- toYaml .Values.newsWeb.resources | nindent 12 }}
+      volumes:
+        - name: news-data
+          persistentVolumeClaim:
+            claimName: {{ include "malhaebang.fullname" . }}-news-data
+{{- end }} 

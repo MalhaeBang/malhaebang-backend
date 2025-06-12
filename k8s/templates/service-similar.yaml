@@ -1,0 +1,19 @@
+{{- if .Values.similar.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-similar
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: similar
+spec:
+  type: {{ .Values.similar.service.type }}
+  ports:
+    - port: {{ .Values.similar.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "malhaebang.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: similar
+{{- end }} 

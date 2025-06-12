@@ -1,0 +1,51 @@
+{{- if .Values.recommendsimilar.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-recommendsimilar
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recommendsimilar
+spec:
+  replicas: {{ .Values.recommendsimilar.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: recommendsimilar
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: recommendsimilar
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-recommendsimilar
+          image: "{{ .Values.recommendsimilar.image.repository }}:{{ .Values.recommendsimilar.image.tag }}"
+          imagePullPolicy: {{ .Values.recommendsimilar.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.recommendsimilar.service.port }}
+              protocol: TCP
+          env:
+            - name: DATABASE_HOST
+              value: {{ .Values.recommendsimilar.environment.DATABASE_HOST | quote }}
+            - name: DATABASE_USER
+              value: {{ .Values.recommendsimilar.environment.DATABASE_USER | quote }}
+            - name: DATABASE_PASSWORD
+              value: {{ .Values.recommendsimilar.environment.DATABASE_PASSWORD | quote }}
+            - name: DATABASE_NAME
+              value: {{ .Values.recommendsimilar.environment.DATABASE_NAME | quote }}
+            - name: DATABASE_PORT
+              value: {{ .Values.recommendsimilar.environment.DATABASE_PORT | quote }}
+            - name: DEFAULT_IMAGE_URL
+              value: {{ .Values.recommendsimilar.environment.DEFAULT_IMAGE_URL | quote }}
+          volumeMounts:
+            - name: cache-storage
+              mountPath: /app/cache
+          resources:
+            {{- toYaml .Values.recommendsimilar.resources | nindent 12 }}
+      volumes:
+        - name: cache-storage
+          persistentVolumeClaim:
+            claimName: {{ include "malhaebang.fullname" . }}-recommendsimilar-cache-pvc
+{{- end }} 
