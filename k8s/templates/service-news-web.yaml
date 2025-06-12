@@ -1,0 +1,19 @@
+{{- if .Values.newsWeb.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-news-web
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: news-web
+spec:
+  type: {{ .Values.newsWeb.service.type }}
+  ports:
+    - port: {{ .Values.newsWeb.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "malhaebang.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: news-web
+{{- end }} 

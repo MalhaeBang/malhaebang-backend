@@ -1,0 +1,43 @@
+{{- if .Values.web.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-web
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "malhaebang.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      labels:
+        {{- include "malhaebang.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: web
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-web
+          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
+          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.web.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: MYSQL_HOST
+              value: {{ .Values.web.environment.MYSQL_HOST }}
+            - name: MYSQL_USER
+              value: {{ .Values.web.environment.MYSQL_USER }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.web.environment.MYSQL_DATABASE }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "malhaebang.fullname" . }}
+                  key: MYSQL_PASSWORD
+          resources:
+            {{- toYaml .Values.web.resources | nindent 12 }}
+{{- end }} 

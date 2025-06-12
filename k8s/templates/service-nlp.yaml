@@ -1,0 +1,19 @@
+{{- if .Values.nlp.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "malhaebang.fullname" . }}-nlp
+  labels:
+    {{- include "malhaebang.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nlp
+spec:
+  type: {{ .Values.nlp.service.type }}
+  ports:
+    - port: {{ .Values.nlp.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "malhaebang.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: nlp
+{{- end }} 
